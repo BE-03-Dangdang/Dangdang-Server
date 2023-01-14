@@ -30,6 +30,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    //valid
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // coolsms
+    implementation 'net.nurigo:sdk:4.2.7'
+
     // lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

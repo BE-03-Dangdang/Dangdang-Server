@@ -3,10 +3,8 @@ package com.dangdang.server.domain.post.domain.entity;
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.Category;
-import com.dangdang.server.domain.post.dto.request.PostFindAllRequest;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,7 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import jdk.jfr.Unsigned;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 

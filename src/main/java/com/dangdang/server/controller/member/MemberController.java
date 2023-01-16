@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.member.controller;
+package com.dangdang.server.controller.member;
 
 import com.dangdang.server.domain.member.dto.request.MemberCertifiyRequestDto;
 import com.dangdang.server.domain.member.dto.request.MemberSendRequestDto;

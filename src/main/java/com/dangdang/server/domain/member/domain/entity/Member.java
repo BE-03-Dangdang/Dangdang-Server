@@ -1,6 +1,7 @@
 package com.dangdang.server.domain.member.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
+import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,13 +21,23 @@ public class Member extends BaseEntity {
   @Column(nullable = false, length = 30)
   private String nickname;
 
-  @Column(nullable = false, length = 30)
+  @Column(nullable = false, unique = true, length = 30)
   private String phoneNumber;
 
-  @Column
+  @Column(unique = true)
   @Lob
   private String profileImgUrl;
 
   protected Member() {
+  }
+
+  public Member(String nickname, String phoneNumber, String profileImgUrl) {
+    this.nickname = nickname;
+    this.phoneNumber = phoneNumber;
+    this.profileImgUrl = profileImgUrl;
+  }
+
+  public static MemberSignUpResponse from(Member member) {
+    return new MemberSignUpResponse(member.getPhoneNumber());
   }
 }

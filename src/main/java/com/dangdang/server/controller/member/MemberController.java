@@ -1,9 +1,11 @@
 package com.dangdang.server.controller.member;
 
+import com.dangdang.server.domain.member.application.MemberService;
+import com.dangdang.server.domain.member.application.SmsMessageService;
 import com.dangdang.server.domain.member.dto.request.MemberCertifiyRequestDto;
 import com.dangdang.server.domain.member.dto.request.MemberSendRequestDto;
-import com.dangdang.server.domain.member.service.MemberCertifiedService;
-import com.dangdang.server.domain.member.service.SmsMessageService;
+import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
+import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Null;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
   private final SmsMessageService smsMessageService;
-  private final MemberCertifiedService memberCertifiedService;
+  private final MemberService memberService;
 
-  public MemberController(SmsMessageService smsMessageService,
-      MemberCertifiedService memberCertifiedService) {
+  public MemberController(SmsMessageService smsMessageService, MemberService memberService) {
     this.smsMessageService = smsMessageService;
-    this.memberCertifiedService = memberCertifiedService;
+    this.memberService = memberService;
   }
 
   @PostMapping("/send")
@@ -36,9 +37,16 @@ public class MemberController {
   @PostMapping("/certify")
   public ResponseEntity<Null> certify(
       @RequestBody @Valid MemberCertifiyRequestDto memberCertifiyRequestDto) {
-    memberCertifiedService.certify(memberCertifiyRequestDto.getToNumber(),
+    memberService.certify(memberCertifiyRequestDto.getToNumber(),
         memberCertifiyRequestDto.getRandomNumber());
 
     return ResponseEntity.ok(null);
+  }
+
+  @PostMapping("/signup")
+  public ResponseEntity<MemberSignUpResponse> signup(
+      @RequestBody MemberSignUpRequest memberSignUpRequest) {
+    MemberSignUpResponse memberSignUpResponse = memberService.signup(memberSignUpRequest);
+    return ResponseEntity.ok(memberSignUpResponse);
   }
 }

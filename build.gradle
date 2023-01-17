@@ -30,6 +30,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 

@@ -38,5 +38,9 @@ public class MemberTown extends BaseEntity {
   protected MemberTown() {
   }
 
-
+  public MemberTown(Member member, Town town, RangeType rangeType) {
+    this.member = member;
+    this.town = town;
+    this.rangeType = rangeType;
+  }
 }

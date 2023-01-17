@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.member.service;
+package com.dangdang.server.domain.member.application;
 
 import com.dangdang.server.global.utill.RedisUtil;
 import java.util.Random;
@@ -14,16 +14,13 @@ import org.springframework.stereotype.Service;
 public class SmsMessageService {
 
   private String fromNumber;
-  private final RedisUtil redisUtil;
   private final DefaultMessageService defaultMessageService;
   private Random random = new Random();
 
   public SmsMessageService(@Value("${secret.coolsms.apikey}") String apiKey,
       @Value("${secret.coolsms.apiSecret}") String apiSecret,
-      @Value("${secret.coolsms.fromNumber}") String fromNumber,
-      RedisUtil redisUtil) {
+      @Value("${secret.coolsms.fromNumber}") String fromNumber) {
     this.fromNumber = fromNumber;
-    this.redisUtil = redisUtil;
     this.defaultMessageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret,
         "https://api.coolsms.co.kr");
   }
@@ -32,8 +29,8 @@ public class SmsMessageService {
     //redis에 넣어야함
     String code = generateAuthNo2();
 
-    redisUtil.deleteData(toNumber);
-    redisUtil.setDataExpire(toNumber, code, 60 * 5L);
+    RedisUtil.deleteData(toNumber);
+    RedisUtil.setDataExpire(toNumber, code, 60 * 5L);
 
     String text =
         "[Web 발신]\n" + "[당근마켓] 인증번호 [" + code + "] *타인에게 절대 알리지 마세요. (계정 도용 위험)";

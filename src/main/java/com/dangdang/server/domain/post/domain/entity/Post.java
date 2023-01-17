@@ -69,4 +69,20 @@ public class Post extends BaseEntity {
 
   protected Post() {
   }
+
+  public Post(String title, String content, Category category, Integer price,
+      String desiredPlaceName, BigDecimal desiredPlaceLongitude, BigDecimal desiredPlaceLatitude,
+      Integer view, Boolean sharing, Member member, Town town) {
+    this.title = title;
+    this.content = content;
+    this.category = category;
+    this.price = price;
+    this.desiredPlaceName = desiredPlaceName;
+    this.desiredPlaceLongitude = desiredPlaceLongitude;
+    this.desiredPlaceLatitude = desiredPlaceLatitude;
+    this.view = view;
+    this.sharing = sharing;
+    this.member = member;
+    this.town = town;
+  }
 }

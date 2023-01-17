@@ -29,4 +29,10 @@ public class Member extends BaseEntity {
 
   protected Member() {
   }
+
+  public Member(String nickname, String phoneNumber, String profileImgUrl) {
+    this.nickname = nickname;
+    this.phoneNumber = phoneNumber;
+    this.profileImgUrl = profileImgUrl;
+  }
 }

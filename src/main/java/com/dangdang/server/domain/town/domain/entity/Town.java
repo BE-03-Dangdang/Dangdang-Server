@@ -30,4 +30,9 @@ public class Town extends BaseEntity {
   protected Town() {
   }
 
+  public Town(String name, BigDecimal longitude, BigDecimal latitude) {
+    this.name = name;
+    this.longitude = longitude;
+    this.latitude = latitude;
+  }
 }

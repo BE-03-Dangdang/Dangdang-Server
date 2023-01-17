@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import lombok.Cleanup;
 import lombok.Getter;
 
 @Entity
@@ -14,7 +14,7 @@ import lombok.Getter;
 public class Town extends BaseEntity {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "town_id")
   private Long id;
 

@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.Getter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -27,7 +28,8 @@ public class BankAccount extends BaseEntity {
   private String bank;
 
   @Column(columnDefinition = "INT UNSIGNED")
-  private Integer balance;
+  @ColumnDefault("0")
+  private Integer balance = 0;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "pay_member_id")

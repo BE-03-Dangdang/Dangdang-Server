@@ -4,7 +4,6 @@ import com.dangdang.server.global.security.JwtAuthenticationFilter;
 import com.dangdang.server.global.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,16 +19,16 @@ public class SecurityConfig {
 
   private final JwtTokenProvider jwtTokenProvider;
 
-
   public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
     this.jwtTokenProvider = jwtTokenProvider;
   }
 
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer(){
-    return (web) -> web.ignoring()
-        .antMatchers("/favicon.ico")
-        .antMatchers("/resources/**");
+    return web -> web.ignoring()
+        .antMatchers("/docs/**")
+        .antMatchers("/index3.html")
+        .antMatchers("/index2.html");
   }
 
   @Bean
@@ -41,10 +40,10 @@ public class SecurityConfig {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeRequests()
-        .antMatchers(HttpMethod.POST, "/api/v1/member/signup").permitAll()
         .anyRequest().authenticated()
         .and()
-        .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+            UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
@@ -54,5 +53,4 @@ public class SecurityConfig {
       AuthenticationConfiguration authenticationConfiguration) throws Exception {
     return authenticationConfiguration.getAuthenticationManager();
   }
-
 }

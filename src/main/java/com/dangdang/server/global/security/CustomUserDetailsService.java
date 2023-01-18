@@ -18,8 +18,8 @@ public class CustomUserDetailsService implements UserDetailsService {
   }
 
   @Override
-  public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
-    return memberRepository.findByPhoneNumber(phoneNumber).orElseThrow(() -> new BusinessException(
+  public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
+    return memberRepository.findById(Long.parseLong(memberId)).orElseThrow(() -> new BusinessException(
         ExceptionCode.MEMBER_NOT_FOUND));
   }
 }

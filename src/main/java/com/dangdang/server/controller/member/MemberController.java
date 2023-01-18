@@ -1,13 +1,9 @@
 package com.dangdang.server.controller.member;
 
 import com.dangdang.server.domain.member.application.MemberService;
-import com.dangdang.server.domain.member.application.SmsMessageService;
-import com.dangdang.server.domain.member.dto.request.MemberCertifiyRequestDto;
-import com.dangdang.server.domain.member.dto.request.MemberLoginRequest;
-import com.dangdang.server.domain.member.dto.request.MemberSendRequestDto;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
-import com.dangdang.server.domain.member.dto.response.MemberLoginResponse;
-import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
+import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
+import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Null;
 import org.springframework.http.ResponseEntity;
@@ -17,44 +13,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/member")
+@RequestMapping("/member")
 public class MemberController {
 
-  private final SmsMessageService smsMessageService;
   private final MemberService memberService;
 
-  public MemberController(SmsMessageService smsMessageService, MemberService memberService) {
-    this.smsMessageService = smsMessageService;
+  public MemberController(MemberService memberService) {
     this.memberService = memberService;
   }
 
-  @PostMapping("/send")
-  public ResponseEntity<Null> send(
-      @RequestBody @Valid MemberSendRequestDto memberSendRequestDto) {
-    smsMessageService.sendMessage(memberSendRequestDto.getToNumber());
-
-    return ResponseEntity.ok(null);
-  }
-
-  @PostMapping("/certify")
-  public ResponseEntity<Null> certify(
-      @RequestBody @Valid MemberCertifiyRequestDto memberCertifiyRequestDto) {
-    memberService.certify(memberCertifiyRequestDto.getToNumber(),
-        memberCertifiyRequestDto.getRandomNumber());
-
-    return ResponseEntity.ok(null);
-  }
-
   @PostMapping("/signup")
-  public ResponseEntity<MemberSignUpResponse> signup(
-      @RequestBody MemberSignUpRequest memberSignUpRequest) {
-    MemberSignUpResponse memberSignUpResponse = memberService.signup(memberSignUpRequest);
-    return ResponseEntity.ok(memberSignUpResponse);
+  public ResponseEntity<MemberCertifyResponse> signUp(@RequestBody MemberSignUpRequest memberSignupRequest) {
+    MemberCertifyResponse memberCertifyResponse = memberService.signup(memberSignupRequest);
+    return ResponseEntity.ok(memberCertifyResponse);
   }
 
-//  @PostMapping("/login")
-//  public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest memberLoginRequest) {
-//    MemberLoginResponse memberLoginResponse = memberService.login(memberLoginRequest);
-//    return ResponseEntity.ok(memberLoginResponse);
-//  }
+  @PostMapping("/signupCertify")
+  public ResponseEntity<MemberCertifyResponse> signupCertify(
+      @RequestBody @Valid PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
+    MemberCertifyResponse memberCertifyResponse = memberService.signupCertify(phoneNumberCertifyRequest);
+
+    return ResponseEntity.ok(memberCertifyResponse);
+  }
+
+  @PostMapping("/loginCertify")
+  public ResponseEntity<Null> loginCertify(
+      @RequestBody @Valid PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
+    memberService.loginCertify(phoneNumberCertifyRequest);
+
+    return ResponseEntity.ok(null);
+  }
 }

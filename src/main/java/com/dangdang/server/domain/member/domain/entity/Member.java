@@ -3,6 +3,7 @@ package com.dangdang.server.domain.member.domain.entity;
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
 import java.util.Collection;
+import java.util.Collections;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -35,10 +36,22 @@ public class Member extends BaseEntity implements UserDetails {
   protected Member() {
   }
 
+  public Member(Long id, String nickname, String phoneNumber, String profileImgUrl) {
+    this.id = id;
+    this.nickname = nickname;
+    this.phoneNumber = phoneNumber;
+    this.profileImgUrl = profileImgUrl;
+  }
+
   public Member(String nickname, String phoneNumber, String profileImgUrl) {
     this.nickname = nickname;
     this.phoneNumber = phoneNumber;
     this.profileImgUrl = profileImgUrl;
+  }
+
+  public Member(String nickname, String phoneNumber) {
+    this.nickname = nickname;
+    this.phoneNumber = phoneNumber;
   }
 
   public static MemberSignUpResponse from(Member member) {
@@ -47,7 +60,7 @@ public class Member extends BaseEntity implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override
@@ -57,7 +70,7 @@ public class Member extends BaseEntity implements UserDetails {
 
   @Override
   public String getUsername() {
-    return this.phoneNumber;
+    return String.valueOf(this.id);
   }
 
   @Override

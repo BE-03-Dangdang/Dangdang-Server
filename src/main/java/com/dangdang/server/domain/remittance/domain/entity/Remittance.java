@@ -13,7 +13,7 @@ import lombok.Getter;
 public class Remittance extends BaseEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "remittance_id")
   private Long id;
 

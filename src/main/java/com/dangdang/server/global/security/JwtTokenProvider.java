@@ -5,27 +5,19 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.io.IOException;
 import java.util.Base64;
 import java.util.Date;
-import javax.annotation.PostConstruct;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 public class JwtTokenProvider  {
 
   private String secretKey;
-
-  private final long ACCESS_TOKEN_EXPIRED_TIME = 1000 * 60 * 30L;
 
   private final CustomUserDetailsService customUserDetailsService;
 
@@ -36,31 +28,32 @@ public class JwtTokenProvider  {
   }
 
 
-  public String createAccessToken(String phoneNumber) {
+  public String createAccessToken(long memberId) {
     Claims claims = Jwts.claims().setSubject("Dangdang");
-    claims.put("phoneNumber", phoneNumber);
+    claims.put("memberId", memberId);
 
     Date date = new Date();
 
+    long expiredTime = 1000 * 60 * 30L;
     return Jwts.builder()
         .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
         .setClaims(claims)
         .setIssuedAt(date)
         .setIssuer("Dangdang-server")
-        .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_EXPIRED_TIME))
+        .setExpiration(new Date(date.getTime() + expiredTime))
         .signWith(SignatureAlgorithm.HS256, secretKey)
         .compact();
   }
 
   //토큰에서 인증정보를 조회하는 메서드
   public Authentication getAuthentication(String token) {
-    UserDetails userDetails = customUserDetailsService.loadUserByUsername(getPhoneNumber(token));
+    UserDetails userDetails = customUserDetailsService.loadUserByUsername(getMemberId(token));
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 
-  public String getPhoneNumber(String token) {
+  public String getMemberId(String token) {
     return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody()
-        .get("phoneNumber").toString();
+        .get("memberId").toString();
   }
 
   public String resolveAccessToken(HttpServletRequest request) {

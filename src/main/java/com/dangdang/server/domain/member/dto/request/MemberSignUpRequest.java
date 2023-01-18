@@ -15,9 +15,17 @@ public class MemberSignUpRequest {
 
   }
 
+  public MemberSignUpRequest(String townName, String nickname, String phoneNumber,
+      String profileImgUrl) {
+    this.townName = townName;
+    this.nickname = nickname;
+    this.phoneNumber = phoneNumber;
+    this.profileImgUrl = profileImgUrl;
+  }
+
   public static Member toMember(MemberSignUpRequest memberSignUpDto) {
-    return new Member(memberSignUpDto.nickname,
-        memberSignUpDto.phoneNumber,
-        memberSignUpDto.profileImgUrl);
+    return new Member(memberSignUpDto.getNickname(),
+        memberSignUpDto.getPhoneNumber(),
+        memberSignUpDto.getProfileImgUrl());
   }
 }

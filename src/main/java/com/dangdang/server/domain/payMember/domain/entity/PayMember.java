@@ -31,7 +31,7 @@ public class PayMember extends BaseEntity {
 
   @Column(columnDefinition = "INT UNSIGNED")
   @ColumnDefault("5")
-  private Integer fee_count = 5;
+  private Integer feeCount = 5;
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id")
@@ -40,4 +40,8 @@ public class PayMember extends BaseEntity {
   protected PayMember() {
   }
 
+  public PayMember(String password, Member member) {
+    this.password = password;
+    this.member = member;
+  }
 }

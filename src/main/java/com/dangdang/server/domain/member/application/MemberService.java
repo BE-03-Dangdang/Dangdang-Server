@@ -4,7 +4,9 @@ import static com.dangdang.server.domain.member.dto.request.MemberSignUpRequest.
 
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
+import com.dangdang.server.domain.member.dto.request.MemberLoginRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
+import com.dangdang.server.domain.member.dto.response.MemberLoginResponse;
 import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTownRepository;
@@ -62,4 +64,8 @@ public class MemberService {
     RedisUtil.deleteData(toNumber);
     RedisUtil.setDataExpire(toNumber, "true", 3600L);
   }
+
+//  public MemberLoginResponse login(MemberLoginRequest memberLoginRequest) {
+//    certify(memberLoginRequest.getPhoneNumber(), );
+//  }
 }

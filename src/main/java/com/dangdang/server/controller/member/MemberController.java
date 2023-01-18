@@ -3,8 +3,10 @@ package com.dangdang.server.controller.member;
 import com.dangdang.server.domain.member.application.MemberService;
 import com.dangdang.server.domain.member.application.SmsMessageService;
 import com.dangdang.server.domain.member.dto.request.MemberCertifiyRequestDto;
+import com.dangdang.server.domain.member.dto.request.MemberLoginRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSendRequestDto;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
+import com.dangdang.server.domain.member.dto.response.MemberLoginResponse;
 import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Null;
@@ -49,4 +51,10 @@ public class MemberController {
     MemberSignUpResponse memberSignUpResponse = memberService.signup(memberSignUpRequest);
     return ResponseEntity.ok(memberSignUpResponse);
   }
+
+//  @PostMapping("/login")
+//  public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest memberLoginRequest) {
+//    MemberLoginResponse memberLoginResponse = memberService.login(memberLoginRequest);
+//    return ResponseEntity.ok(memberLoginResponse);
+//  }
 }

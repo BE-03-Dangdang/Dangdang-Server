@@ -1,6 +1,7 @@
 package com.dangdang.server.domain.bankAccount.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
+import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.payMember.domain.entity.PayMember;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,4 +40,19 @@ public class BankAccount extends BaseEntity {
   protected BankAccount() {
   }
 
+  public BankAccount(String accountNumber, String bank, Integer balance, PayMember payMember) {
+    this.accountNumber = accountNumber;
+    this.bank = bank;
+    this.balance = balance;
+    this.payMember = payMember;
+  }
+
+  public BankAccount(String accountNumber, String bank, Integer balance, PayMember payMember,
+      StatusType statusType) {
+    this.accountNumber = accountNumber;
+    this.bank = bank;
+    this.balance = balance;
+    this.payMember = payMember;
+    this.status = statusType;
+  }
 }

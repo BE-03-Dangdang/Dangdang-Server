@@ -30,4 +30,11 @@ public class ConnectionAccount extends BaseEntity {
   @JoinColumn(name = "bank_account_id")
   private BankAccount bankAccount;
 
+  protected ConnectionAccount() {
+  }
+
+  public ConnectionAccount(PayMember payMember, BankAccount bankAccount) {
+    this.payMember = payMember;
+    this.bankAccount = bankAccount;
+  }
 }

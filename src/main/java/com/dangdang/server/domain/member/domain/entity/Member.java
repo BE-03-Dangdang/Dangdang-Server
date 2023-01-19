@@ -34,5 +34,10 @@ public class Member extends BaseEntity {
   public Member(String nickname, String phoneNumber) {
     this.nickname = nickname;
     this.phoneNumber = phoneNumber;
+
+  public Member(String nickname, String phoneNumber, String profileImgUrl) {
+    this.nickname = nickname;
+    this.phoneNumber = phoneNumber;
+    this.profileImgUrl = profileImgUrl;
   }
 }

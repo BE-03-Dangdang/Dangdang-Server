@@ -37,8 +37,9 @@ public class Post extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Category category;
 
-  @Column(columnDefinition = "INT UNSIGNED")
-  private Integer price;
+  @Column(columnDefinition = "INT UNSIGNED", nullable = false)
+  @ColumnDefault("0")
+  private Integer price = 0;
 
   @Column(length = 100)
   private String desiredPlaceName;
@@ -51,7 +52,7 @@ public class Post extends BaseEntity {
 
   @Column(nullable = false)
   @ColumnDefault("0")
-  private Integer view;
+  private Integer view = 0;
 
   @Column(nullable = false)
   @ColumnDefault("false")
@@ -63,9 +64,25 @@ public class Post extends BaseEntity {
   private Member member;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "town_id")
+  @JoinColumn(name = "town_id", nullable = false)
   private Town town;
 
   protected Post() {
+  }
+
+  public Post(String title, String content, Category category, Integer price,
+      String desiredPlaceName, BigDecimal desiredPlaceLongitude, BigDecimal desiredPlaceLatitude,
+      Integer view, Boolean sharing, Member member, Town town) {
+    this.title = title;
+    this.content = content;
+    this.category = category;
+    this.price = price;
+    this.desiredPlaceName = desiredPlaceName;
+    this.desiredPlaceLongitude = desiredPlaceLongitude;
+    this.desiredPlaceLatitude = desiredPlaceLatitude;
+    this.view = view;
+    this.sharing = sharing;
+    this.member = member;
+    this.town = town;
   }
 }

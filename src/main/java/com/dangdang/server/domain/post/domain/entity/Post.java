@@ -37,9 +37,8 @@ public class Post extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Category category;
 
-  @Column(columnDefinition = "INT UNSIGNED", nullable = false)
-  @ColumnDefault("0")
-  private Integer price = 0;
+  @Column(columnDefinition = "INT UNSIGNED")
+  private Integer price;
 
   @Column(length = 100)
   private String desiredPlaceName;

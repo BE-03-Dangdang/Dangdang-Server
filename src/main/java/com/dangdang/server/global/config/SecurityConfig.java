@@ -33,8 +33,8 @@ public class SecurityConfig {
   @Bean
   protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
     http
-        .httpBasic().disable()
         .csrf().disable()
+        .httpBasic().disable()
         .formLogin().disable()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
@@ -54,4 +54,5 @@ public class SecurityConfig {
       AuthenticationConfiguration authenticationConfiguration) throws Exception {
     return authenticationConfiguration.getAuthenticationManager();
   }
+
 }

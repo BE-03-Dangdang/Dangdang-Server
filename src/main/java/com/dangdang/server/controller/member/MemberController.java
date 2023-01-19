@@ -5,7 +5,6 @@ import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import javax.validation.Valid;
-import javax.validation.constraints.Null;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +21,7 @@ public class MemberController {
     this.memberService = memberService;
   }
 
+  // 완료 버튼 후 회원가입할  모든 정보 보냄
   @PostMapping("/signup")
   public ResponseEntity<MemberCertifyResponse> signUp(@RequestBody MemberSignUpRequest memberSignupRequest) {
     MemberCertifyResponse memberCertifyResponse = memberService.signup(memberSignupRequest);
@@ -37,10 +37,11 @@ public class MemberController {
   }
 
   @PostMapping("/loginCertify")
-  public ResponseEntity<Null> loginCertify(
+  public ResponseEntity<MemberCertifyResponse> loginCertify(
       @RequestBody @Valid PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
-    memberService.loginCertify(phoneNumberCertifyRequest);
+    MemberCertifyResponse memberCertifyResponse = memberService.loginCertify(
+        phoneNumberCertifyRequest);
 
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok(memberCertifyResponse);
   }
 }

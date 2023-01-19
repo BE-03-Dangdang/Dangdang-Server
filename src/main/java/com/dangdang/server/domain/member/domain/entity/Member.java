@@ -23,11 +23,11 @@ public class Member extends BaseEntity implements UserDetails {
   @Column(name = "member_id")
   private Long id;
 
-  @Column(nullable = false, length = 30)
-  private String nickname;
-
   @Column(nullable = false, unique = true, length = 30)
   private String phoneNumber;
+
+  @Column(nullable = false, length = 30)
+  private String nickname;
 
   @Column(unique = true)
   @Lob
@@ -36,22 +36,23 @@ public class Member extends BaseEntity implements UserDetails {
   protected Member() {
   }
 
-  public Member(Long id, String nickname, String phoneNumber, String profileImgUrl) {
+  public Member(Long id, String phoneNumber, String profileImgUrl, String nickname) {
     this.id = id;
-    this.nickname = nickname;
     this.phoneNumber = phoneNumber;
     this.profileImgUrl = profileImgUrl;
+    this.nickname = nickname;
   }
 
-  public Member(String nickname, String phoneNumber, String profileImgUrl) {
-    this.nickname = nickname;
+  public Member(String phoneNumber, String profileImgUrl, String nickname) {
+
     this.phoneNumber = phoneNumber;
     this.profileImgUrl = profileImgUrl;
+    this.nickname = nickname;
   }
 
-  public Member(String nickname, String phoneNumber) {
-    this.nickname = nickname;
+  public Member(String phoneNumber, String nickname) {
     this.phoneNumber = phoneNumber;
+    this.nickname = nickname;
   }
 
   public static MemberSignUpResponse from(Member member) {

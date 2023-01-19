@@ -4,6 +4,7 @@ import com.dangdang.server.global.security.JwtAuthenticationFilter;
 import com.dangdang.server.global.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,9 +27,7 @@ public class SecurityConfig {
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer(){
     return web -> web.ignoring()
-        .antMatchers("/docs/**")
-        .antMatchers("/index3.html")
-        .antMatchers("/index2.html");
+        .antMatchers("/docs/**");
   }
 
   @Bean
@@ -40,6 +39,8 @@ public class SecurityConfig {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeRequests()
+        .antMatchers(HttpMethod.POST, "/smsMessage/**").permitAll()
+        .antMatchers(HttpMethod.POST, "/member/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),

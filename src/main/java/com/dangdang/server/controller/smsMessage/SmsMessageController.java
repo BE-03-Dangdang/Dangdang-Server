@@ -2,7 +2,7 @@ package com.dangdang.server.controller.smsMessage;
 
 import com.dangdang.server.domain.member.application.SmsMessageService;
 import com.dangdang.server.domain.member.dto.request.SmsRequest;
-import net.nurigo.sdk.message.response.SingleMessageSentResponse;
+import com.dangdang.server.domain.member.dto.response.TestSendMessageResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,8 +20,9 @@ public class SmsMessageController {
   }
 
   @PostMapping()
-  public ResponseEntity<SingleMessageSentResponse> sendSms(@RequestBody SmsRequest smsRequest) {
-    SingleMessageSentResponse singleMessageSentResponse = smsMessageService.sendMessage(smsRequest);
-    return ResponseEntity.ok(singleMessageSentResponse);
+  public ResponseEntity<TestSendMessageResponse> sendMessage(@RequestBody SmsRequest smsRequest) {
+    String authCode = smsMessageService.sendMessage(smsRequest);
+    TestSendMessageResponse testSendMessageResponse = new TestSendMessageResponse(authCode);
+    return ResponseEntity.ok(testSendMessageResponse);
   }
 }

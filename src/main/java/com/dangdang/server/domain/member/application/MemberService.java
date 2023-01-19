@@ -101,6 +101,8 @@ public class MemberService {
             new BusinessException(ExceptionCode.CERTIFIED_FAIL)
         );
 
+    redisSmsRepository.deleteById(phoneNumberCertifyRequest.getPhoneNumber());
+
     String authCode = redisSms.getAuthCode();
 
     if (!authCode.equals(phoneNumberCertifyRequest.getAuthCode())) {

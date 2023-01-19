@@ -12,9 +12,6 @@ public class PostSliceResponse {
   private String townName;
   private LocalDateTime createdAt;
 
-  private PostSliceResponse() {
-  }
-
   private PostSliceResponse(Long id, String title, String townName, LocalDateTime createdAt) {
     this.id = id;
     this.title = title;

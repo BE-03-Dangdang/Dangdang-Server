@@ -4,6 +4,7 @@ import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.domain.entity.Post;
+import com.dangdang.server.domain.postImage.dto.PostImageRequest;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.math.BigDecimal;
@@ -48,10 +49,13 @@ public class PostSaveRequest {
   @Size(max = 10)
   private String townName;
 
+  @Size(max = 10)
+  private PostImageRequest postImageRequest;
+
   @JsonCreator
   public PostSaveRequest(String title, String content, Category category, Integer price,
       String desiredPlaceName, BigDecimal desiredPlaceLongitude, BigDecimal desiredPlaceLatitude,
-      Boolean sharing, String townName) {
+      Boolean sharing, String townName, PostImageRequest postImageRequest) {
     this.title = title;
     this.content = content;
     this.category = category;
@@ -62,6 +66,7 @@ public class PostSaveRequest {
     this.view = 0;
     this.sharing = sharing;
     this.townName = townName;
+    this.postImageRequest = postImageRequest;
   }
 
   public static Post toPost(PostSaveRequest postSaveRequest, Member loginMember, Town town) {

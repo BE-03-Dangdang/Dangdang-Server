@@ -32,4 +32,8 @@ public class PostImage extends BaseEntity {
   protected PostImage() {
   }
 
+  public PostImage(Post post, String url) {
+    this.post = post;
+    this.url = url;
+  }
 }

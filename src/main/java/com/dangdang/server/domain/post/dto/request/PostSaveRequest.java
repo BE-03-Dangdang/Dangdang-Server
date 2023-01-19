@@ -7,20 +7,45 @@ import com.dangdang.server.domain.post.domain.entity.Post;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.math.BigDecimal;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
 public class PostSaveRequest {
 
+  @NotNull
+  @Max(value = 255)
   private String title;
+
+  @NotNull
+  @Max(value = 1000)
   private String content;
+
+  @NotNull
   private Category category;
+
+  @Min(value = 0)
   private Integer price;
+
+  @Size(max = 100)
   private String desiredPlaceName;
+
   private BigDecimal desiredPlaceLongitude;
+
   private BigDecimal desiredPlaceLatitude;
+
+  @Null
   private Integer view;
+
+  @NotNull
   private Boolean sharing;
+
+  @NotNull
+  @Size(max = 10)
   private String townName;
 
   @JsonCreator

@@ -1,6 +1,7 @@
 package com.dangdang.server.domain.post.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
+import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.town.domain.entity.Town;
@@ -71,7 +72,7 @@ public class Post extends BaseEntity {
 
   public Post(String title, String content, Category category, Integer price,
       String desiredPlaceName, BigDecimal desiredPlaceLongitude, BigDecimal desiredPlaceLatitude,
-      Integer view, Boolean sharing, Member member, Town town) {
+      Integer view, Boolean sharing, Member member, Town town, StatusType statusType) {
     this.title = title;
     this.content = content;
     this.category = category;
@@ -83,5 +84,10 @@ public class Post extends BaseEntity {
     this.sharing = sharing;
     this.member = member;
     this.town = town;
+    super.status = statusType;
+  }
+
+  public String getTownName() {
+    return town.getName();
   }
 }

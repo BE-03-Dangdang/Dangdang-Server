@@ -4,6 +4,7 @@ import com.dangdang.server.domain.common.BaseEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import lombok.Getter;
 public class Member extends BaseEntity {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "member_id")
   private Long id;
 
@@ -29,6 +30,10 @@ public class Member extends BaseEntity {
 
   protected Member() {
   }
+
+  public Member(String nickname, String phoneNumber) {
+    this.nickname = nickname;
+    this.phoneNumber = phoneNumber;
 
   public Member(String nickname, String phoneNumber, String profileImgUrl) {
     this.nickname = nickname;

@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -17,7 +18,7 @@ import org.hibernate.annotations.ColumnDefault;
 public class PayMember extends BaseEntity {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "pay_user_id")
   private Long id;
 
@@ -30,7 +31,7 @@ public class PayMember extends BaseEntity {
 
   @Column(columnDefinition = "INT UNSIGNED")
   @ColumnDefault("5")
-  private Integer fee_count = 5;
+  private Integer feeCount = 5;
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id")
@@ -39,4 +40,8 @@ public class PayMember extends BaseEntity {
   protected PayMember() {
   }
 
+  public PayMember(String password, Member member) {
+    this.password = password;
+    this.member = member;
+  }
 }

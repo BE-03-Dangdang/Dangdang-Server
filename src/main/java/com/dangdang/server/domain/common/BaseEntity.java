@@ -17,6 +17,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
+  @Column
+  @Enumerated(EnumType.STRING)
+  @ColumnDefault("'ACTIVE'")
+  protected StatusType status = StatusType.ACTIVE;
+
   @CreatedDate
   @Column(updatable = false)
   private LocalDateTime createdAt;
@@ -24,9 +29,4 @@ public abstract class BaseEntity {
   @LastModifiedDate
   @Column
   private LocalDateTime updatedAt;
-
-  @Column
-  @Enumerated(EnumType.STRING)
-  @ColumnDefault("'ACTIVE'")
-  private StatusType status = StatusType.ACTIVE;
 }

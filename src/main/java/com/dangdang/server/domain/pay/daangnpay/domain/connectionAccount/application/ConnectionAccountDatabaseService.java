@@ -1,19 +1,19 @@
-package com.dangdang.server.domain.pay.connectionAccount.application;
+package com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application;
 
 import static com.dangdang.server.global.exception.ExceptionCode.BANK_ACCOUNT_INACTIVE;
 import static com.dangdang.server.global.exception.ExceptionCode.BANK_ACCOUNT_NOT_FOUND;
 import static com.dangdang.server.global.exception.ExceptionCode.PAY_MEMBER_NOT_FOUND;
 
-import com.dangdang.server.domain.pay.bankAccount.domain.BankAccountRepository;
-import com.dangdang.server.domain.pay.bankAccount.domain.entity.BankAccount;
-import com.dangdang.server.domain.pay.bankAccount.exception.InactiveBankAccountException;
 import com.dangdang.server.domain.common.StatusType;
-import com.dangdang.server.domain.pay.connectionAccount.domain.ConnectionAccountRepository;
-import com.dangdang.server.domain.pay.connectionAccount.domain.entity.ConnectionAccount;
-import com.dangdang.server.domain.pay.connectionAccount.dto.AddConnectionAccountRequest;
-import com.dangdang.server.domain.pay.connectionAccount.exception.EmptyResultException;
-import com.dangdang.server.domain.pay.payMember.domain.entity.PayMember;
-import com.dangdang.server.domain.pay.payMember.domain.entity.PayMemberRepository;
+import com.dangdang.server.domain.pay.banks.bankAccount.domain.BankAccountRepository;
+import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccount;
+import com.dangdang.server.domain.pay.banks.bankAccount.exception.InactiveBankAccountException;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.ConnectionAccountRepository;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +38,6 @@ public class ConnectionAccountDatabaseService {
   @Transactional
   public ConnectionAccount addConnectionAccount(Long memberId,
       AddConnectionAccountRequest addConnectionAccountRequest) {
-    PayMember payMember = payMemberRepository.findByMemberId(memberId)
-        .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
-
     BankAccount bankAccount = bankAccountRepository.findById(
             addConnectionAccountRequest.getBankAccountId())
         .orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
@@ -48,6 +45,9 @@ public class ConnectionAccountDatabaseService {
     if (bankAccount.getStatus() == StatusType.INACTIVE) {
       throw new InactiveBankAccountException(BANK_ACCOUNT_INACTIVE);
     }
+    
+    PayMember payMember = payMemberRepository.findByMemberId(memberId)
+        .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
 
     ConnectionAccount connectionAccount = AddConnectionAccountRequest.toConnectionAccount(payMember,
         bankAccount);

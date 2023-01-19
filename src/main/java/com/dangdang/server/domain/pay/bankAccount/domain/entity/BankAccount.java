@@ -1,8 +1,8 @@
-package com.dangdang.server.domain.bankAccount.domain.entity;
+package com.dangdang.server.domain.pay.bankAccount.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
-import com.dangdang.server.domain.payMember.domain.entity.PayMember;
+import com.dangdang.server.domain.pay.payMember.domain.entity.PayMember;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

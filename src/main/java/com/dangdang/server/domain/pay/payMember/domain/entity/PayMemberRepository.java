@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.payMember.domain.entity;
+package com.dangdang.server.domain.pay.payMember.domain.entity;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PayMemberRepository extends JpaRepository<PayMember, Long> {
 
-  Optional<PayMember> findByMember_Id(@Param(value = "memberId") Long memberId);
+  Optional<PayMember> findByMemberId(@Param(value = "memberId") Long memberId);
 }

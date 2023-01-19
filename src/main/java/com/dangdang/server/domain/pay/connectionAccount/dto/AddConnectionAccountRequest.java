@@ -1,8 +1,8 @@
-package com.dangdang.server.domain.connectionAccount.dto;
+package com.dangdang.server.domain.pay.connectionAccount.dto;
 
-import com.dangdang.server.domain.bankAccount.domain.entity.BankAccount;
-import com.dangdang.server.domain.connectionAccount.domain.entity.ConnectionAccount;
-import com.dangdang.server.domain.payMember.domain.entity.PayMember;
+import com.dangdang.server.domain.pay.bankAccount.domain.entity.BankAccount;
+import com.dangdang.server.domain.pay.connectionAccount.domain.entity.ConnectionAccount;
+import com.dangdang.server.domain.pay.payMember.domain.entity.PayMember;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 

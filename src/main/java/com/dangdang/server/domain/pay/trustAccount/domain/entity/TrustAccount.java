@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.trustAccount.domain.entity;
+package com.dangdang.server.domain.pay.trustAccount.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import javax.persistence.Column;

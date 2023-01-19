@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.connectionAccount.exception;
+package com.dangdang.server.domain.pay.connectionAccount.exception;
 
 import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;

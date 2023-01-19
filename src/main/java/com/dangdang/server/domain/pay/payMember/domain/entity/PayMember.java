@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.payMember.domain.entity;
+package com.dangdang.server.domain.pay.payMember.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.member.domain.entity.Member;

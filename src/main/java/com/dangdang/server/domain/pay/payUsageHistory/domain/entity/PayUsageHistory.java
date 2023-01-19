@@ -1,8 +1,8 @@
-package com.dangdang.server.domain.connectionAccount.domain.entity;
+package com.dangdang.server.domain.pay.payUsageHistory.domain.entity;
 
-import com.dangdang.server.domain.bankAccount.domain.entity.BankAccount;
+import com.dangdang.server.domain.pay.bankAccount.domain.entity.BankAccount;
 import com.dangdang.server.domain.common.BaseEntity;
-import com.dangdang.server.domain.payMember.domain.entity.PayMember;
+import com.dangdang.server.domain.pay.payMember.domain.entity.PayMember;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,15 +12,23 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.Getter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
-public class ConnectionAccount extends BaseEntity {
+public class PayUsageHistory extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "connection_account_id")
+  @Column(name = "pay_usage_history_id")
   private Long id;
+
+  @Column(length = 255)
+  private String title;
+
+  @Column(columnDefinition = "INT UNSIGNED")
+  @ColumnDefault("0")
+  private Integer amount = 0;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "pay_member_id")
@@ -30,11 +38,6 @@ public class ConnectionAccount extends BaseEntity {
   @JoinColumn(name = "bank_account_id")
   private BankAccount bankAccount;
 
-  protected ConnectionAccount() {
-  }
-
-  public ConnectionAccount(PayMember payMember, BankAccount bankAccount) {
-    this.payMember = payMember;
-    this.bankAccount = bankAccount;
+  protected PayUsageHistory() {
   }
 }

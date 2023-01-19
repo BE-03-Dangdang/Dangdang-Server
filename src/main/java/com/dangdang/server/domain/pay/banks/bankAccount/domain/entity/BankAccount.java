@@ -1,8 +1,8 @@
-package com.dangdang.server.domain.pay.bankAccount.domain.entity;
+package com.dangdang.server.domain.pay.banks.bankAccount.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
-import com.dangdang.server.domain.pay.payMember.domain.entity.PayMember;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -54,5 +54,13 @@ public class BankAccount extends BaseEntity {
     this.balance = balance;
     this.payMember = payMember;
     this.status = statusType;
+  }
+
+  public void withdraw(Integer amount) {
+    balance -= amount;
+  }
+
+  public void deposit(Integer amount) {
+    balance += amount;
   }
 }

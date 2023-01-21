@@ -3,6 +3,7 @@ package com.dangdang.server.domain.member.application;
 import static com.dangdang.server.domain.member.dto.request.MemberSignUpRequest.*;
 import static com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest.*;
 
+import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
@@ -13,7 +14,7 @@ import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
-import com.dangdang.server.domain.memberTown.domain.entity.MemberTownRepository;
+import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.memberTown.domain.entity.RangeType;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import com.dangdang.server.domain.town.domain.entity.TownRepository;
@@ -89,7 +90,7 @@ public class MemberService {
     Town town = townRepository.findByName(memberSignupRequest.getTownName())
         .orElseThrow(() -> new BusinessException(ExceptionCode.TOWN_NOT_FOUND));
 
-    MemberTown memberTown = new MemberTown(member, town, RangeType.LEVEL1);
+    MemberTown memberTown = new MemberTown(member, town);
     memberTownRepository.save(memberTown);
 
     return getMemberCertifyResponse(member.getId());

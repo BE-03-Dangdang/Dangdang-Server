@@ -1,6 +1,7 @@
 package com.dangdang.server.domain.memberTown.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
+import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import javax.persistence.Column;
@@ -13,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import lombok.Getter;
 
 @Entity
@@ -25,7 +27,7 @@ public class MemberTown extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
+  @JoinColumn(name = "member_id", nullable = false)
   private Member member;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -39,9 +41,30 @@ public class MemberTown extends BaseEntity {
   protected MemberTown() {
   }
 
-  public MemberTown(Member member, Town town, RangeType rangeType) {
+  public MemberTown(Member member, Town town) {
+    this.member = member;
+    this.town = town;
+    this.rangeType = RangeType.LEVEL2;
+    this.status = StatusType.ACTIVE;
+  }
+
+  public MemberTown(Long id, Member member, Town town, RangeType rangeType) {
+    this.id = id;
     this.member = member;
     this.town = town;
     this.rangeType = rangeType;
   }
+
+  public MemberTown(StatusType statusType) {
+    this.status = statusType;
+  }
+
+  public void isOwner(Long memberId) {
+    this.member.isId(memberId);
+  }
+
+  public void update(MemberTown updateMemberTown) {
+    this.status = updateMemberTown.getStatus();
+  }
+
 }

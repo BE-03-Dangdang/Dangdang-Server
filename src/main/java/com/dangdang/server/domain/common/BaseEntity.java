@@ -28,5 +28,5 @@ public abstract class BaseEntity {
   @Column
   @Enumerated(EnumType.STRING)
   @ColumnDefault("'ACTIVE'")
-  private StatusType status = StatusType.ACTIVE;
+  protected StatusType status = StatusType.ACTIVE;
 }

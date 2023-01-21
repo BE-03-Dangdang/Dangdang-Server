@@ -2,14 +2,21 @@ package com.dangdang.server.domain.member.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
+import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
+import com.dangdang.server.global.exception.BusinessException;
+import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,6 +41,7 @@ public class Member extends BaseEntity implements UserDetails {
   private String profileImgUrl;
 
   protected Member() {
+
   }
 
   public Member(Long id, String phoneNumber, String profileImgUrl, String nickname) {
@@ -92,5 +100,11 @@ public class Member extends BaseEntity implements UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
+  }
+
+  public void isId(Long memberId) {
+    if (!Objects.equals(this.id, memberId)) {
+      throw new BusinessException(ExceptionCode.NOT_PERMISSION);
+    }
   }
 }

@@ -51,8 +51,18 @@ public class SmsMessageService {
     return authCode;
   }
 
-  private String generateAuthCode() {
+  public String generateAuthCode() {
     random.setSeed(System.currentTimeMillis());
-    return String.valueOf(random.nextInt(1000000) % 1000000);
+    StringBuilder sb = new StringBuilder();
+    int sixth_digit = random.nextInt(10);
+    int fifth_digit = random.nextInt(10);
+    int fourth_digit = random.nextInt(10);
+    int third_digit = random.nextInt(10);
+    int second_digit = random.nextInt(10);
+    int first_digit = random.nextInt(10);
+    sb.append(sixth_digit).append(fifth_digit).append(fourth_digit).append(third_digit)
+        .append(second_digit).append(first_digit);
+    return sb.toString();
   }
+
 }

@@ -21,6 +21,7 @@ import com.dangdang.server.domain.town.domain.entity.TownRepository;
 import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import com.dangdang.server.global.security.JwtTokenProvider;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,12 +52,11 @@ public class MemberService {
     phoneNumberCertify(phoneNumberCertifyRequest);
 
     // 시작하기 -> User DB에 있는 경우 -> token 발급
-    if (memberRepository.findByPhoneNumber(phoneNumberCertifyRequest.getPhoneNumber())
-        .isPresent()) {
-      Member member = memberRepository.findByPhoneNumber(
-              phoneNumberCertifyRequest.getPhoneNumber())
-          .orElseThrow(() -> new BusinessException(ExceptionCode.MEMBER_NOT_FOUND));
-      return getMemberCertifyResponse(member.getId());
+    Optional<Member> member = memberRepository.findByPhoneNumber(
+        phoneNumberCertifyRequest.getPhoneNumber());
+
+    if (member.isPresent()) {
+      return getMemberCertifyResponse(member.get().getId());
     }
 
     RedisAuthCode redisAuthCode = toRedisAuthCode(
@@ -101,8 +101,6 @@ public class MemberService {
         .orElseThrow(() ->
             new BusinessException(ExceptionCode.CERTIFIED_FAIL)
         );
-
-    redisSmsRepository.deleteById(phoneNumberCertifyRequest.getPhoneNumber());
 
     String authCode = redisSms.getAuthCode();
 

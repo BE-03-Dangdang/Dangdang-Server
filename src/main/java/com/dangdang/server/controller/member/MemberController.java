@@ -28,7 +28,7 @@ public class MemberController {
     return ResponseEntity.ok(memberCertifyResponse);
   }
 
-  @PostMapping("/signupCertify")
+  @PostMapping("/signup-certify")
   public ResponseEntity<MemberCertifyResponse> signupCertify(
       @RequestBody @Valid PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
     MemberCertifyResponse memberCertifyResponse = memberService.signupCertify(phoneNumberCertifyRequest);
@@ -36,7 +36,7 @@ public class MemberController {
     return ResponseEntity.ok(memberCertifyResponse);
   }
 
-  @PostMapping("/loginCertify")
+  @PostMapping("/login-certify")
   public ResponseEntity<MemberCertifyResponse> loginCertify(
       @RequestBody @Valid PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
     MemberCertifyResponse memberCertifyResponse = memberService.loginCertify(

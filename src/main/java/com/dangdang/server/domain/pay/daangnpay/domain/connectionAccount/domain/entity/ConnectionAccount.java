@@ -1,6 +1,7 @@
 package com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
+import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,7 +35,9 @@ public class ConnectionAccount extends BaseEntity {
   protected ConnectionAccount() {
   }
 
-  public ConnectionAccount(PayMember payMember) {
+  public ConnectionAccount(BankAccount bankAccount, PayMember payMember) {
+    this.bank = bankAccount.getBankName();
+    this.bankAccountNumber = bankAccount.getAccountNumber();
     this.payMember = payMember;
   }
 }

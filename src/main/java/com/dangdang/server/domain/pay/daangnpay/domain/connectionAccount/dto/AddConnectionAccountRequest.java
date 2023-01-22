@@ -1,16 +1,7 @@
 package com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.Getter;
+import javax.validation.constraints.NotNull;
 
-@Getter
-public class AddConnectionAccountRequest {
-
-  private Long bankAccountId;
-
-  @JsonCreator
-  public AddConnectionAccountRequest(Long bankAccountId) {
-    this.bankAccountId = bankAccountId;
-  }
+public record AddConnectionAccountRequest(@NotNull Long bankAccountId) {
 
 }

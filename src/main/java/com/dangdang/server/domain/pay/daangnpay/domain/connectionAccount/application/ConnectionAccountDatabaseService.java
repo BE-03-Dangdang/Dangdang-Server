@@ -39,7 +39,7 @@ public class ConnectionAccountDatabaseService {
   public ConnectionAccount addConnectionAccount(Long memberId,
       AddConnectionAccountRequest addConnectionAccountRequest) {
     BankAccount bankAccount = bankAccountRepository.findById(
-            addConnectionAccountRequest.getBankAccountId())
+            addConnectionAccountRequest.bankAccountId())
         .orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
 
     if (bankAccount.getStatus() == StatusType.INACTIVE) {
@@ -49,7 +49,7 @@ public class ConnectionAccountDatabaseService {
     PayMember payMember = payMemberRepository.findByMemberId(memberId)
         .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
 
-    ConnectionAccount connectionAccount = new ConnectionAccount(payMember);
+    ConnectionAccount connectionAccount = new ConnectionAccount(bankAccount, payMember);
     return connectionAccountRepository.save(connectionAccount);
   }
 }

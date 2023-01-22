@@ -51,7 +51,7 @@ public class BankAccountService {
     return BankOpenBankingApiResponse.from(bankAccount);
   }
 
-  @Transactional(propagation = Propagation.MANDATORY)
+  @Transactional
   public BankOpenBankingApiResponse deposit(OpenBankingDepositRequest openBankingDepositRequest) {
     Long toBankAccountId = openBankingDepositRequest.toBankAccountId();
 

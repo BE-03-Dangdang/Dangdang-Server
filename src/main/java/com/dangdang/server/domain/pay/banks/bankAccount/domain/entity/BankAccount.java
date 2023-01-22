@@ -27,7 +27,7 @@ public class BankAccount extends BaseEntity {
   private String accountNumber;
 
   @Column(length = 20)
-  private String bank;
+  private String bankName;
 
   @Column(columnDefinition = "INT UNSIGNED")
   @ColumnDefault("0")
@@ -40,17 +40,17 @@ public class BankAccount extends BaseEntity {
   protected BankAccount() {
   }
 
-  public BankAccount(String accountNumber, String bank, Integer balance, PayMember payMember) {
+  public BankAccount(String accountNumber, String bankName, Integer balance, PayMember payMember) {
     this.accountNumber = accountNumber;
-    this.bank = bank;
+    this.bankName = bankName;
     this.balance = balance;
     this.payMember = payMember;
   }
 
-  public BankAccount(String accountNumber, String bank, Integer balance, PayMember payMember,
+  public BankAccount(String accountNumber, String bankName, Integer balance, PayMember payMember,
       StatusType statusType) {
     this.accountNumber = accountNumber;
-    this.bank = bank;
+    this.bankName = bankName;
     this.balance = balance;
     this.payMember = payMember;
     this.status = statusType;

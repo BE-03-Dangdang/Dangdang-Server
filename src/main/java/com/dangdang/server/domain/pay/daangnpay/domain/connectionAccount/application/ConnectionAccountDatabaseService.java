@@ -45,12 +45,11 @@ public class ConnectionAccountDatabaseService {
     if (bankAccount.getStatus() == StatusType.INACTIVE) {
       throw new InactiveBankAccountException(BANK_ACCOUNT_INACTIVE);
     }
-    
+
     PayMember payMember = payMemberRepository.findByMemberId(memberId)
         .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
 
-    ConnectionAccount connectionAccount = AddConnectionAccountRequest.toConnectionAccount(payMember,
-        bankAccount);
+    ConnectionAccount connectionAccount = new ConnectionAccount(payMember);
     return connectionAccountRepository.save(connectionAccount);
   }
 }

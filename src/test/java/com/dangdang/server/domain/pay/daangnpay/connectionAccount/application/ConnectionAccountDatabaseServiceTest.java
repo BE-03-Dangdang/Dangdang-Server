@@ -69,7 +69,7 @@ class ConnectionAccountDatabaseServiceTest {
   class addConnectionAccount {
 
     @Test
-    @DisplayName("성공한다면 bankAccountId와 payMemberId가 저장된다.")
+    @DisplayName("성공한다면 bankAccount 정보와 payMemberId가 저장된다.")
     void successAdd() {
       for (BankAccount bankAccount : bankAccounts) {
         AddConnectionAccountRequest addConnectionAccountRequest = new AddConnectionAccountRequest(
@@ -78,7 +78,9 @@ class ConnectionAccountDatabaseServiceTest {
         ConnectionAccount connectionAccount = connectionAccountDataBaseService.addConnectionAccount(
             payMember.getId(), addConnectionAccountRequest);
 
-        assertThat(connectionAccount.getBankAccount().getId()).isEqualTo(bankAccount.getId());
+        assertThat(connectionAccount.getBankAccountNumber()).isEqualTo(
+            bankAccount.getAccountNumber());
+        assertThat(connectionAccount.getBank()).isEqualTo(bankAccount.getBankName());
         assertThat(connectionAccount.getPayMember().getId()).isEqualTo(payMember.getId());
       }
     }

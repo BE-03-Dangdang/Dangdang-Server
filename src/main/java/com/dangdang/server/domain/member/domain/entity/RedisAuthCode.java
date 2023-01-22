@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.index.Indexed;
 @RedisHash(value = "redisAuthCode")
 public class RedisAuthCode {
 
+  public static final Long AUTH_CODE_TTL= 600L;
   @Id
   private String id;
   @Indexed
@@ -23,6 +24,6 @@ public class RedisAuthCode {
     this.id = phoneNumber;
     this.phoneNumber = phoneNumber;
     this.authCheck = authCheck;
-    this.expiration = 600L;
+    this.expiration = AUTH_CODE_TTL;
   }
 }

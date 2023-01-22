@@ -30,7 +30,7 @@ public class PayMemberController {
   /**
    * 당근머니 충전 API
    */
-  @PatchMapping("/money/{id}")
+  @PatchMapping("/money")
   public ResponseEntity<PayResponse> charge(Authentication authentication,
       @RequestBody @Valid PayRequest payRequest, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {

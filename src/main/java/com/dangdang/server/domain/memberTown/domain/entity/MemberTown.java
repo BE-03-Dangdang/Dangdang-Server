@@ -1,5 +1,7 @@
 package com.dangdang.server.domain.memberTown.domain.entity;
 
+import static com.dangdang.server.domain.memberTown.domain.entity.TownAuthStatus.TOWN_UNCERTIFIED;
+
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.entity.Member;
@@ -49,6 +51,7 @@ public class MemberTown extends BaseEntity {
     this.town = town;
     this.rangeType = RangeType.LEVEL2;
     this.status = StatusType.ACTIVE;
+    this.townAuthStatus = TOWN_UNCERTIFIED;
   }
 
   public MemberTown(Long id, Member member, Town town, RangeType rangeType,

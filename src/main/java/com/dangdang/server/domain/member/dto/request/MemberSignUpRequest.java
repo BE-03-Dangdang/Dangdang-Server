@@ -6,17 +6,25 @@ import lombok.Getter;
 @Getter
 public class MemberSignUpRequest {
 
-  private final String townName;
-  private final String phoneNumber;
-  private final String profileImgUrl;
-  private final String nickname;
+  private String townName;
+  private String phoneNumber;
+  private String profileImgUrl;
+  private String nickname;
 
+  private MemberSignUpRequest() {
+  }
 
   public MemberSignUpRequest(String townName, String phoneNumber, String profileImgUrl,
       String nickname) {
     this.townName = townName;
     this.phoneNumber = phoneNumber;
     this.profileImgUrl = profileImgUrl;
+    this.nickname = nickname;
+  }
+
+  public MemberSignUpRequest(String townName, String phoneNumber, String nickname) {
+    this.townName = townName;
+    this.phoneNumber = phoneNumber;
     this.nickname = nickname;
   }
 

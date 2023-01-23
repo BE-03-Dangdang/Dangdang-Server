@@ -41,7 +41,8 @@ class PostRepositoryTest {
 
       Post post = new Post("제목" + i, "내용" + i, Category.디지털기기, 20000,
           null, null, null, 0, false,
-          member, town, StatusType.SELLING);
+          member, town, "image_url", StatusType.SELLING);
+      // "image_url"은 기존 테스트 코드의 동작을 보장하기 위한 임의의 image link String 값입니다.
       // when
       postRepository.save(post);
     }

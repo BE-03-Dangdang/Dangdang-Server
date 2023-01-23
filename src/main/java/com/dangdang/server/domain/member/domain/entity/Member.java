@@ -4,6 +4,7 @@ import com.dangdang.server.domain.common.BaseEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import lombok.Getter;
@@ -13,14 +14,14 @@ import lombok.Getter;
 public class Member extends BaseEntity {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "member_id")
   private Long id;
 
   @Column(nullable = false, length = 30)
   private String nickname;
 
-  @Column(nullable = false, length = 30, unique = true)
+  @Column(nullable = false, unique = true, length = 30)
   private String phoneNumber;
 
   @Column
@@ -28,6 +29,11 @@ public class Member extends BaseEntity {
   private String profileImgUrl;
 
   protected Member() {
+  }
+
+  public Member(String nickname, String phoneNumber) {
+    this.nickname = nickname;
+    this.phoneNumber = phoneNumber;
   }
 
   public Member(String nickname, String phoneNumber, String profileImgUrl) {

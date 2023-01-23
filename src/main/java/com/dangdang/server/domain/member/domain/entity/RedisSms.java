@@ -15,15 +15,12 @@ public class RedisSms {
   @Id
   private String id;
   @Indexed
-  private String phoneNumber;
-  @Indexed
   private String authCode;
   @TimeToLive
   private Long expiration;
 
-  public RedisSms(String phoneNumber, String authCode) {
+  public RedisSms(String phoneNumber, String authCode ) {
     this.id = phoneNumber;
-    this.phoneNumber = phoneNumber;
     this.authCode = authCode;
     this.expiration = SMS_TTL;
   }

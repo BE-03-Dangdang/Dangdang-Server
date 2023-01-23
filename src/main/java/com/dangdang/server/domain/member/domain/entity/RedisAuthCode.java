@@ -14,15 +14,12 @@ public class RedisAuthCode {
   @Id
   private String id;
   @Indexed
-  private String phoneNumber;
-  @Indexed
   private Boolean authCheck;
   @TimeToLive
   private Long expiration;
 
   public RedisAuthCode(String phoneNumber, Boolean authCheck) {
     this.id = phoneNumber;
-    this.phoneNumber = phoneNumber;
     this.authCheck = authCheck;
     this.expiration = AUTH_CODE_TTL;
   }

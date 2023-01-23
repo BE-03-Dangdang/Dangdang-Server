@@ -16,7 +16,7 @@ public class MemberSignUpRequest {
   @Pattern(regexp = "[\\d]{11}", message = "핸드폰 번호 또는 인증코드가 잘못되었습니다.")
   private String phoneNumber;
   private String profileImgUrl;
-  @Length(max = 12, min = 2)
+  @Length(max=12, min=2)
   @Pattern(regexp = "[가-힣|a-z|A-Z|0-9]+")
   private String nickname;
 

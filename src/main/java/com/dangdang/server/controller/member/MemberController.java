@@ -23,7 +23,7 @@ public class MemberController {
 
   // 완료 버튼 후 회원가입할  모든 정보 보냄
   @PostMapping("/signup")
-  public ResponseEntity<MemberCertifyResponse> signUp(@RequestBody MemberSignUpRequest memberSignupRequest) {
+  public ResponseEntity<MemberCertifyResponse> signUp(@RequestBody @Valid MemberSignUpRequest memberSignupRequest) {
     MemberCertifyResponse memberCertifyResponse = memberService.signup(memberSignupRequest);
     return ResponseEntity.ok(memberCertifyResponse);
   }

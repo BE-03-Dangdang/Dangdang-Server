@@ -54,12 +54,12 @@ class MemberRestDocsTest {
   void signupCertifyTest() throws Exception {
     //given
     //인증 문자 발송
-    String phoneNuber = "01012345678";
-    SmsRequest smsRequest = new SmsRequest(phoneNuber);
+    String phoneNumber = "01012345678";
+    SmsRequest smsRequest = new SmsRequest(phoneNumber);
     String authCode = smsMessageService.sendMessage(smsRequest);
 
     //인증 요청
-    PhoneNumberCertifyRequest phoneNumberCertifyRequest = new PhoneNumberCertifyRequest(phoneNuber,
+    PhoneNumberCertifyRequest phoneNumberCertifyRequest = new PhoneNumberCertifyRequest(phoneNumber,
         authCode);
 
     String json = objectMapper.writeValueAsString(phoneNumberCertifyRequest);

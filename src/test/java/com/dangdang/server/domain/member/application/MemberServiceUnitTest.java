@@ -18,7 +18,6 @@ import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import com.dangdang.server.domain.member.exception.MemberCertifiedFailException;
 import com.dangdang.server.domain.member.exception.MemberNotFoundException;
-import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import com.dangdang.server.domain.town.domain.entity.TownRepository;
 import com.dangdang.server.global.security.JwtTokenProvider;
@@ -34,7 +33,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("유저가 도메인이 실행한다. ")
-class MemberServiceTest {
+class MemberServiceUnitTest {
 
   @InjectMocks
   private MemberService memberService;

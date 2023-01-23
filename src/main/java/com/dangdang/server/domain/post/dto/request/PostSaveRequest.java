@@ -1,11 +1,14 @@
 package com.dangdang.server.domain.post.dto.request;
 
+import static com.dangdang.server.global.util.S3ConstantMessage.*;
+
 import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.domain.entity.Post;
 import com.dangdang.server.domain.postImage.dto.PostImageRequest;
 import com.dangdang.server.domain.town.domain.entity.Town;
+import com.dangdang.server.global.util.S3ConstantMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.math.BigDecimal;
 import javax.validation.constraints.Max;
@@ -73,6 +76,8 @@ public class PostSaveRequest {
     return new Post(postSaveRequest.title, postSaveRequest.content, postSaveRequest.category,
         postSaveRequest.price, postSaveRequest.desiredPlaceName,
         postSaveRequest.getDesiredPlaceLongitude(), postSaveRequest.desiredPlaceLatitude,
-        postSaveRequest.view, postSaveRequest.sharing, loginMember, town, StatusType.SELLING);
+        postSaveRequest.view, postSaveRequest.sharing, loginMember, town,
+        postSaveRequest.postImageRequest.getUrl().size() == 0 ? DEFAULT_IMAGE_LINK
+            : postSaveRequest.postImageRequest.getUrl().get(0), StatusType.SELLING);
   }
 }

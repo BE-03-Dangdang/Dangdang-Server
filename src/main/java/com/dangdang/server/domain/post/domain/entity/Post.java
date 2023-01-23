@@ -4,8 +4,10 @@ import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.Category;
+import com.dangdang.server.domain.postImage.domain.entity.PostImage;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,7 +17,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -67,12 +72,15 @@ public class Post extends BaseEntity {
   @JoinColumn(name = "town_id", nullable = false)
   private Town town;
 
+  @Lob
+  private String imageUrl;
+
   protected Post() {
   }
 
   public Post(String title, String content, Category category, Integer price,
       String desiredPlaceName, BigDecimal desiredPlaceLongitude, BigDecimal desiredPlaceLatitude,
-      Integer view, Boolean sharing, Member member, Town town, StatusType statusType) {
+      Integer view, Boolean sharing, Member member, Town town, String imageUrl, StatusType statusType) {
     this.title = title;
     this.content = content;
     this.category = category;
@@ -84,6 +92,7 @@ public class Post extends BaseEntity {
     this.sharing = sharing;
     this.member = member;
     this.town = town;
+    this.imageUrl = imageUrl;
     super.status = statusType;
   }
 

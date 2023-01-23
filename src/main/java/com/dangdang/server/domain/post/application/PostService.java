@@ -47,16 +47,13 @@ public class PostService {
      */
     long townIdSelectedByUser = 1L;
     int level = 1;
-    List<Long> adjacency = townRepository.findAdjacencyTownId(
-        townIdSelectedByUser, level);
-    Slice<Post> posts = postRepository.findPostsByTownIdFetchJoinSortByCreatedAt(
-        adjacency,
+    List<Long> adjacency = townRepository.findAdjacencyTownId(townIdSelectedByUser, level);
+    Slice<Post> posts = postRepository.findPostsByTownIdFetchJoinSortByCreatedAt(adjacency,
         PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize(),
             Sort.by("createdAt")));
     return PostsSliceResponse.of(
-        posts.getContent().stream().map(PostSliceResponse::from).collect(
-            Collectors.toList()), posts.hasNext()
-    );
+        posts.getContent().stream().map(post -> PostSliceResponse.from(post))
+            .collect(Collectors.toList()), posts.hasNext());
   }
 
   @Transactional
@@ -66,7 +63,6 @@ public class PostService {
     Post post = PostSaveRequest.toPost(postSaveRequest, loginMember, foundTown);
     Post savedPost = postRepository.save(post);
     postImageService.savePostImage(savedPost, postSaveRequest.getPostImageRequest());
-
     return PostResponse.from(savedPost);
   }
 

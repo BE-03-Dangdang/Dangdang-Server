@@ -13,13 +13,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.dangdang.server.domain.member.application.SmsMessageService;
 import com.dangdang.server.domain.member.domain.MemberRepository;
+import com.dangdang.server.domain.member.domain.RedisAuthCodeRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
+import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
+import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.request.SmsRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
 @SpringBootTest
+@Transactional
 class MemberRestDocsTest {
 
   @Autowired
@@ -41,6 +46,8 @@ class MemberRestDocsTest {
   SmsMessageService smsMessageService;
   @Autowired
   MemberRepository memberRepository;
+  @Autowired
+  RedisAuthCodeRepository redisAuthCodeRepository;
 
   @Test
   @DisplayName("회원 가입 시 핸드폰 번호와 인증 번호로 요청함, 회원 가입이 되어 있지 않다면 Http 200 상태코드가 응답됨")
@@ -129,6 +136,53 @@ class MemberRestDocsTest {
                 )
             )
         );
+  }
 
+  @Test
+  @DisplayName("/api/v1/signup -> 닉네임과 프로필 이미지 핸드폰 번호 지역 이름으로 요청, 성공 시 http 200 status code와 accessToken으로 응답")
+  void signUpTest() throws Exception {
+    //회원 가입된 정보 생성
+    long id = 1L;
+    String phoneNuber = "01012345678";
+
+    //휴대폰 인증 완료 등록
+    redisAuthCodeRepository.save(new RedisAuthCode(phoneNuber, true));
+
+    //requestDto 생성
+    String townName = "역삼동";
+    String nickname = "cloudwi";
+
+    MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest(townName, phoneNuber,
+        nickname);
+
+    String json = objectMapper.writeValueAsString(memberSignUpRequest);
+
+    mockMvc.perform(
+            post("/members/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .content(json)
+        )
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "MemberController/signup",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("townName").type(JsonFieldType.STRING).description("첫 등록 지역 이름"),
+                    fieldWithPath("phoneNumber").type(JsonFieldType.STRING)
+                        .description("인증 코드를 받은 번호"),
+                    fieldWithPath("profileImgUrl").type(JsonFieldType.NULL)
+                        .description("프로필 이미지는 Optional"),
+                    fieldWithPath("nickname").type(JsonFieldType.STRING).description("인증 코드")
+                ),
+                responseFields(
+                    fieldWithPath("accessToken").type(JsonFieldType.STRING)
+                        .description("accessToken"),
+                    fieldWithPath("isCertified").type(JsonFieldType.BOOLEAN).description("인증 여부")
+                )
+            )
+        );
   }
 }

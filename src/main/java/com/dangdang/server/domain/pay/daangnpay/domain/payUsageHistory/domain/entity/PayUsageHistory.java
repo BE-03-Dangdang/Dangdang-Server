@@ -1,9 +1,12 @@
 package com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayType;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -35,6 +38,10 @@ public class PayUsageHistory extends BaseEntity {
   @Column(columnDefinition = "INT UNSIGNED")
   @ColumnDefault("0")
   private Integer fee = 0;
+
+  @Enumerated(EnumType.STRING)
+  @Column(length = 20, nullable = false)
+  private PayType payType;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "pay_member_id")

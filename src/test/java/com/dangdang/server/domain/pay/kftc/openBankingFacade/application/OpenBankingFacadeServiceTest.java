@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.dangdang.server.domain.common.StatusType;
+import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
-import com.dangdang.server.domain.member.domain.entity.MemberRepository;
 import com.dangdang.server.domain.pay.banks.bankAccount.application.BankAccountService;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.BankAccountRepository;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccount;

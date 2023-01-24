@@ -19,8 +19,8 @@ import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import com.dangdang.server.domain.member.exception.MemberCertifiedFailException;
 import com.dangdang.server.domain.member.exception.MemberNotFoundException;
 import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
+import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
-import com.dangdang.server.domain.town.domain.entity.TownRepository;
 import com.dangdang.server.global.security.JwtTokenProvider;
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -217,7 +217,7 @@ class MemberServiceUnitTest {
             phoneNumber, null);
 
         when(redisAuthCodeRepository.findById(any())).thenReturn(
-            Optional.of(new RedisAuthCode(phoneNumber, true)));
+            Optional.of(new RedisAuthCode(phoneNumber)));
         when(townRepository.findByName(any())).thenReturn(
             Optional.of(new Town("강남동", BigDecimal.valueOf(11L), BigDecimal.valueOf(11L))));
         when(memberRepository.save(any())).thenReturn(new Member(1L, "cloudwi", "01012345678"));
@@ -261,7 +261,7 @@ class MemberServiceUnitTest {
             phoneNumber, null);
 
         when(redisAuthCodeRepository.findById(any())).thenReturn(
-            Optional.of(new RedisAuthCode(phoneNumber, true)));
+            Optional.of(new RedisAuthCode(phoneNumber)));
         when(townRepository.findByName(any())).thenReturn(
             Optional.empty());
         //when

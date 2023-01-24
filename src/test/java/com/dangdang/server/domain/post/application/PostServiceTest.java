@@ -58,7 +58,7 @@ class PostServiceTest {
     Town town = new Town("서현동", null, null);
     townRepository.save(town);
 
-    PostImageRequest postImageRequest = new PostImageRequest(List.of("url1", "url2"));
+    PostImageRequest postImageRequest = new PostImageRequest(List.of("http://s3.amazonaws.com/test1.png", "http://s3.amazonaws.com/test2.png"));
 
     PostSaveRequest postSaveRequest = new PostSaveRequest("title1", "content1", Category.디지털기기,
         1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "서현동",
@@ -89,7 +89,7 @@ class PostServiceTest {
     Town town = new Town("서현동", null, null);
     townRepository.save(town);
 
-    PostImageRequest postImageRequest = new PostImageRequest(Arrays.asList("url1", "url2"));
+    PostImageRequest postImageRequest = new PostImageRequest(Arrays.asList("http://s3.amazonaws.com/test1.png", "http://s3.amazonaws.com/test2.png"));
 
     PostSaveRequest postSaveRequest = new PostSaveRequest("title1", "content1", Category.디지털기기,
         1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "서현동",

@@ -36,8 +36,8 @@ public class TrustAccountService {
 
   @Transactional
   public void withdraw(OpenBankingDepositRequest openBankingDepositRequest) {
-    Long fromTurstAccountId = openBankingDepositRequest.fromTurstAccountId();
-    TrustAccount trustAccount = trustAccountRepository.findById(fromTurstAccountId)
+    Long fromTrustAccountId = openBankingDepositRequest.fromTurstAccountId();
+    TrustAccount trustAccount = trustAccountRepository.findById(fromTrustAccountId)
         .orElseThrow(() -> new EmptyResultException(TRUST_ACCOUNT_NOT_FOUND));
 
     checkTrustAccountStatus(trustAccount);

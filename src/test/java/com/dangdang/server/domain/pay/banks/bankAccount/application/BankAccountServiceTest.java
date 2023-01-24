@@ -32,7 +32,7 @@ class BankAccountServiceTest {
   BankAccountRepository bankAccountRepository;
   @Spy
   @InjectMocks
-  BankAccountService bankAccountService = new BankAccountService(bankAccountRepository);
+  BankAccountService bankAccountService;
 
   @Nested
   @DisplayName("은행 계좌에 출금 요청이 들어왔을 때")
@@ -155,7 +155,7 @@ class BankAccountServiceTest {
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
             new PayMember("password", new Member("닉네임", "핸드폰")), StatusType.INACTIVE);
-        
+
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
         assertThrows(InactiveBankAccountException.class,

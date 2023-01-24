@@ -24,7 +24,8 @@ public enum ExceptionCode {
   INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST.value(), "계좌의 잔액이 부족합니다."),
   BANK_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "금융기관을 찾지 못했습니다."),
   MEMBER_UNMATCH_AUTHOR(HttpStatus.FORBIDDEN.value(), "글 작성자가 아닙니다."),
-  POST_STATUS_IS_NULL(HttpStatus.BAD_REQUEST.value(), "글 상태값은 비어있을 수 없습니다.");
+  POST_STATUS_IS_NULL(HttpStatus.BAD_REQUEST.value(), "글 상태값은 비어있을 수 없습니다."),
+  SLICE_PARAMETER_UNDER_ZERO(HttpStatus.BAD_REQUEST.value(), "글 페이지, 사이즈는 음수일 수 없습니다.");
   int status;
   String message;
 

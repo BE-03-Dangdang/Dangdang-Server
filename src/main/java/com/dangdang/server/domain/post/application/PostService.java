@@ -89,6 +89,7 @@ public class PostService {
     }
 
     post.changeStatus(postUpdateStatusRequest.status());
-    return PostResponse.from(post);
+    List<String> imageUrls = postImageService.findPostImagesByPostId(postId);
+    return PostDetailResponse.from(post, imageUrls);
   }
 }

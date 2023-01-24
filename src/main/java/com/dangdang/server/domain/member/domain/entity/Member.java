@@ -44,10 +44,9 @@ public class Member extends BaseEntity implements UserDetails {
 
   }
 
-  public Member(Long id, String phoneNumber, String profileImgUrl, String nickname) {
+  public Member(Long id, String phoneNumber, String nickname) {
     this.id = id;
     this.phoneNumber = phoneNumber;
-    this.profileImgUrl = profileImgUrl;
     this.nickname = nickname;
   }
 

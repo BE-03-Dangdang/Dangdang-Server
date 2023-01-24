@@ -2,9 +2,12 @@ package com.dangdang.server.domain.member.application;
 
 import static com.dangdang.server.domain.member.dto.request.SmsRequest.toRedisSms;
 
+import com.dangdang.server.domain.member.domain.RedisSendSmsRepository;
 import com.dangdang.server.domain.member.domain.RedisSmsRepository;
 import com.dangdang.server.domain.member.domain.entity.RedisSms;
 import com.dangdang.server.domain.member.dto.request.SmsRequest;
+import com.dangdang.server.domain.member.exception.SmsFrequencyOverException;
+import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.Random;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.service.DefaultMessageService;
@@ -20,12 +23,15 @@ public class SmsMessageService {
   private String fromNumber;
   private final DefaultMessageService defaultMessageService;
   private Random random = new Random();
+  private final RedisSendSmsRepository redisSendSmsRepository;
 
   public SmsMessageService(RedisSmsRepository redisSmsRepository, @Value("${secret.coolsms.apikey}") String apiKey,
       @Value("${secret.coolsms.apiSecret}") String apiSecret,
-      @Value("${secret.coolsms.fromNumber}") String fromNumber) {
+      @Value("${secret.coolsms.fromNumber}") String fromNumber,
+      RedisSendSmsRepository redisSendSmsRepository) {
     this.redisSmsRepository = redisSmsRepository;
     this.fromNumber = fromNumber;
+    this.redisSendSmsRepository = redisSendSmsRepository;
     this.defaultMessageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret,
         "https://api.coolsms.co.kr");
   }
@@ -33,6 +39,10 @@ public class SmsMessageService {
   @Transactional
   public String sendMessage(SmsRequest smsRequest) {
     String authCode = generateAuthCode();
+
+    redisSendSmsRepository.findById(smsRequest.getToPhoneNumber()).ifPresent(redisSendSms -> {
+      throw new SmsFrequencyOverException(ExceptionCode.NOT_PERMISSION);
+    });
 
     RedisSms redisSms = toRedisSms(smsRequest, authCode);
     redisSmsRepository.save(redisSms);
@@ -51,8 +61,18 @@ public class SmsMessageService {
     return authCode;
   }
 
-  private String generateAuthCode() {
+  public String generateAuthCode() {
     random.setSeed(System.currentTimeMillis());
-    return String.valueOf(random.nextInt(1000000) % 1000000);
+    StringBuilder sb = new StringBuilder();
+    int sixth_digit = random.nextInt(10);
+    int fifth_digit = random.nextInt(10);
+    int fourth_digit = random.nextInt(10);
+    int third_digit = random.nextInt(10);
+    int second_digit = random.nextInt(10);
+    int first_digit = random.nextInt(10);
+    sb.append(sixth_digit).append(fifth_digit).append(fourth_digit).append(third_digit)
+        .append(second_digit).append(first_digit);
+    return sb.toString();
   }
+
 }

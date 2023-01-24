@@ -1,5 +1,6 @@
 package com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application;
 
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayType;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.PayUsageHistoryRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.entity.PayUsageHistory;
@@ -22,14 +23,15 @@ public class PayUsageHistoryService {
    * 이용내역 추가
    */
   @Transactional
-  public void addUsageHistory(OpenBankingResponse openBankingResponse, int money,
+  public void addUsageHistory(PayType payType, OpenBankingResponse openBankingResponse, int money,
       PayMember payMember) {
     String bankName = openBankingResponse.bankName();
     String accountNumber = openBankingResponse.accountNumber();
 
-    String usageHistoryTitle = bankName + accountNumber;
+    String usageHistoryTitle = bankName + " " + accountNumber;
 
-    PayUsageHistory payUsageHistory = new PayUsageHistory(usageHistoryTitle, money, payMember);
+    PayUsageHistory payUsageHistory = new PayUsageHistory(usageHistoryTitle, money, payMember,
+        payType);
     payUsageHistoryRepository.save(payUsageHistory);
   }
 

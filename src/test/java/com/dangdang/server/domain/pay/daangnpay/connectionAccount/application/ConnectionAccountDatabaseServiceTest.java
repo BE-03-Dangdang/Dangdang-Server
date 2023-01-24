@@ -77,7 +77,7 @@ class ConnectionAccountDatabaseServiceTest {
             bankAccount.getId());
 
         ConnectionAccount connectionAccount = connectionAccountDataBaseService.addConnectionAccount(
-            payMember.getId(), addConnectionAccountRequest);
+            member.getId(), addConnectionAccountRequest);
 
         assertThat(connectionAccount.getBankAccountNumber()).isEqualTo(
             bankAccount.getAccountNumber());
@@ -95,10 +95,10 @@ class ConnectionAccountDatabaseServiceTest {
 
       AddConnectionAccountRequest addConnectionAccountRequest = new AddConnectionAccountRequest(
           bankAccount.getId());
-      Long payMemberId = payMember.getId();
+      Long memberId = member.getId();
 
       assertThrows(InactiveBankAccountException.class,
-          () -> connectionAccountDataBaseService.addConnectionAccount(payMemberId,
+          () -> connectionAccountDataBaseService.addConnectionAccount(memberId,
               addConnectionAccountRequest));
     }
   }

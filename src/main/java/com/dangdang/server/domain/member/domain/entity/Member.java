@@ -36,7 +36,7 @@ public class Member extends BaseEntity implements UserDetails {
   @Column(nullable = false, length = 30)
   private String nickname;
 
-  @Column(unique = true)
+  @Column
   @Lob
   private String profileImgUrl;
 

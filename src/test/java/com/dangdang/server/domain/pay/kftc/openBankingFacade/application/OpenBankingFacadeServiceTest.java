@@ -19,7 +19,6 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMembe
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.InsufficientBankAccountException;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -33,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @SpringBootTest
 @Transactional
 @DisplayName("오픈뱅킹 API 통합테스트")
@@ -245,7 +243,6 @@ class OpenBankingFacadeServiceTest {
         @Test
         @DisplayName("계좌 잔액에 변화가 없어야 한다.")
         void notChangeBalance() {
-          log.info("계좌 잔액 25000원 : {}", bankAccount.getBalance());
           assertThat(bankAccount.getBalance()).isEqualTo(beforeBankBalance);
           assertThat(trustAccountInactive.getBalance()).isEqualTo(beforeTrustBalance);
         }

@@ -9,9 +9,6 @@ public class PostsSliceResponse {
   private List<PostSliceResponse> postSliceResponses;
   private boolean hasNext;
 
-  private PostsSliceResponse() {
-  }
-
   private PostsSliceResponse(List<PostSliceResponse> postSliceResponses, boolean hasNext) {
     this.postSliceResponses = postSliceResponses;
     this.hasNext = hasNext;

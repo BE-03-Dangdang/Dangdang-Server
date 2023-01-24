@@ -10,4 +10,9 @@ public class PostSliceRequest {
 
   private PostSliceRequest() {
   }
+
+  public PostSliceRequest(int page, int size) {
+    this.page = page;
+    this.size = size;
+  }
 }

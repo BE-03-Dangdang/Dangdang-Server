@@ -24,14 +24,14 @@ public class TrustAccount extends BaseEntity {
   @Column(name = "trust_account_id")
   private Long id;
 
-  @Column(length = 100)
+  @Column(length = 100, nullable = false)
   private String accountNumber;
 
-  @Column(columnDefinition = "INT UNSIGNED")
+  @Column(columnDefinition = "INT UNSIGNED", nullable = false)
   @ColumnDefault("0")
   private Integer balance;
 
-  @Column(length = 100)
+  @Column(length = 100, nullable = false)
   private String customer;
 
   protected TrustAccount() {

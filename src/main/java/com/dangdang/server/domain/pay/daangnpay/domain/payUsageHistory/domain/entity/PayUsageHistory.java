@@ -25,17 +25,17 @@ public class PayUsageHistory extends BaseEntity {
   @Column(name = "pay_usage_history_id")
   private Long id;
 
-  @Column(length = 255)
+  @Column(length = 255, nullable = false)
   private String title;
 
-  @Column(columnDefinition = "INT UNSIGNED")
+  @Column(columnDefinition = "INT UNSIGNED", nullable = false)
   @ColumnDefault("0")
   private Integer amount = 0;
 
-  @Column(columnDefinition = "INT UNSIGNED")
+  @Column(columnDefinition = "INT UNSIGNED", nullable = false)
   private Integer balanceMoney;
 
-  @Column(columnDefinition = "INT UNSIGNED")
+  @Column(columnDefinition = "INT UNSIGNED", nullable = false)
   @ColumnDefault("0")
   private Integer fee = 0;
 

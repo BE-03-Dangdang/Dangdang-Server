@@ -28,13 +28,13 @@ public class BankAccount extends BaseEntity {
   @Column(name = "bank_account_id")
   private Long id;
 
-  @Column(length = 100)
+  @Column(length = 100, nullable = false)
   private String accountNumber;
 
-  @Column(length = 20)
+  @Column(length = 20, nullable = false)
   private String bankName;
 
-  @Column(columnDefinition = "INT UNSIGNED")
+  @Column(columnDefinition = "INT UNSIGNED", nullable = false)
   @ColumnDefault("0")
   private Integer balance = 0;
 

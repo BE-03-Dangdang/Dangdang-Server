@@ -56,9 +56,7 @@ public class TrustAccount extends BaseEntity {
   }
 
   public void withdraw(OpenBankingDepositRequest openBankingDepositRequest) {
-    int result = balance - openBankingDepositRequest.amount();
-
-    if (result < 0) {
+    if (balance < openBankingDepositRequest.amount()) {
       throw new InsufficientTrustAccountException(INSUFFICIENT_BALANCE);
     }
 

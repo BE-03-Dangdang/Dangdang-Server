@@ -3,7 +3,6 @@ package com.dangdang.server.domain.pay.banks.bankAccount.application;
 import static com.dangdang.server.global.exception.ExceptionCode.BANK_ACCOUNT_AUTHENTICATION_FAIL;
 import static com.dangdang.server.global.exception.ExceptionCode.BANK_ACCOUNT_INACTIVE;
 import static com.dangdang.server.global.exception.ExceptionCode.BANK_ACCOUNT_NOT_FOUND;
-import static com.dangdang.server.global.exception.ExceptionCode.INSUFFICIENT_BALANCE;
 
 import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.BankAccountRepository;
@@ -12,7 +11,6 @@ import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiRe
 import com.dangdang.server.domain.pay.banks.bankAccount.exception.BankAccountAuthenticationException;
 import com.dangdang.server.domain.pay.banks.bankAccount.exception.InactiveBankAccountException;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
-import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.InsufficientBankAccountException;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import org.springframework.stereotype.Service;
@@ -43,21 +41,21 @@ public class BankAccountService {
     BankAccount bankAccount = findById(fromBankAccountId);
     checkBankAccountStatus(bankAccount);
     checkPayMemberId(bankAccount, payMemberId);
-    checkBalance(bankAccount, openBankingWithdrawRequest);
 
-    int amount = openBankingWithdrawRequest.amount();
-    bankAccount.withdraw(amount);
+    bankAccount.withdraw(openBankingWithdrawRequest);
 
     return BankOpenBankingApiResponse.from(bankAccount);
   }
 
-  @Transactional
+  @Transactional(propagation = Propagation.MANDATORY)
   public BankOpenBankingApiResponse deposit(OpenBankingDepositRequest openBankingDepositRequest) {
     Long toBankAccountId = openBankingDepositRequest.toBankAccountId();
+    Long payMemberId = openBankingDepositRequest.payMemberId();
 
     BankAccount bankAccount = findById(toBankAccountId);
     checkBankAccountStatus(bankAccount);
-    bankAccount.deposit(openBankingDepositRequest.amount());
+    checkPayMemberId(bankAccount, payMemberId);
+    bankAccount.deposit(openBankingDepositRequest);
 
     return BankOpenBankingApiResponse.from(bankAccount);
   }
@@ -76,13 +74,6 @@ public class BankAccountService {
     Long payMemberIdFromAccount = getPayMemberIdFromAccount(bankAccount);
     if (!payMemberIdFromAccount.equals(payMemberId)) {
       throw new BankAccountAuthenticationException(BANK_ACCOUNT_AUTHENTICATION_FAIL);
-    }
-  }
-
-  private void checkBalance(BankAccount bankAccount,
-      OpenBankingWithdrawRequest openBankingWithdrawRequest) {
-    if (bankAccount.getBalance() < openBankingWithdrawRequest.amount()) {
-      throw new InsufficientBankAccountException(INSUFFICIENT_BALANCE);
     }
   }
 }

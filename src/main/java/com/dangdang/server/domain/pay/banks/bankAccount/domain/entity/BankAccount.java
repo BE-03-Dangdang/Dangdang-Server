@@ -1,8 +1,13 @@
 package com.dangdang.server.domain.pay.banks.bankAccount.domain.entity;
 
+import static com.dangdang.server.global.exception.ExceptionCode.INSUFFICIENT_BALANCE;
+
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.InsufficientBankAccountException;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -56,11 +61,15 @@ public class BankAccount extends BaseEntity {
     this.status = statusType;
   }
 
-  public void withdraw(Integer amount) {
-    balance -= amount;
+  public void withdraw(OpenBankingWithdrawRequest openBankingWithdrawRequest) {
+    Integer requestAmount = openBankingWithdrawRequest.amount();
+    if (balance < requestAmount) {
+      throw new InsufficientBankAccountException(INSUFFICIENT_BALANCE);
+    }
+    balance -= requestAmount;
   }
 
-  public void deposit(Integer amount) {
-    balance += amount;
+  public void deposit(OpenBankingDepositRequest openBankingDepositRequest) {
+    balance += openBankingDepositRequest.amount();
   }
 }

@@ -40,6 +40,9 @@ public class ConnectionAccountDatabaseService {
   @Transactional
   public ConnectionAccount addConnectionAccount(Long memberId,
       AddConnectionAccountRequest addConnectionAccountRequest) {
+    PayMember payMember = payMemberRepository.findByMemberId(memberId)
+        .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
+
     BankAccount bankAccount = bankAccountRepository.findById(
             addConnectionAccountRequest.bankAccountId())
         .orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
@@ -47,9 +50,6 @@ public class ConnectionAccountDatabaseService {
     if (bankAccount.getStatus() == StatusType.INACTIVE) {
       throw new InactiveBankAccountException(BANK_ACCOUNT_INACTIVE);
     }
-
-    PayMember payMember = payMemberRepository.findByMemberId(memberId)
-        .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
 
     ConnectionAccount connectionAccount = new ConnectionAccount(bankAccount, payMember);
     return connectionAccountRepository.save(connectionAccount);

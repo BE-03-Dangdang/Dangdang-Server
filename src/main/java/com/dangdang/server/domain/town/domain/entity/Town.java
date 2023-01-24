@@ -18,7 +18,7 @@ public class Town extends BaseEntity {
   @Column(name = "town_id")
   private Long id;
 
-  @Column(length = 30)
+  @Column(length = 30, unique = true)
   private String name;
 
   @Column(precision = 18, scale = 10)

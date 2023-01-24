@@ -1,7 +1,10 @@
 package com.dangdang.server.domain.pay.banks.trustAccount.domain.entity;
 
+import static com.dangdang.server.global.exception.ExceptionCode.INSUFFICIENT_BALANCE;
+
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
+import com.dangdang.server.domain.pay.banks.trustAccount.exception.InsufficientTrustAccountException;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import javax.persistence.Column;
@@ -18,7 +21,7 @@ public class TrustAccount extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "bank_account_id")
+  @Column(name = "trust_account_id")
   private Long id;
 
   @Column(length = 100)
@@ -53,6 +56,12 @@ public class TrustAccount extends BaseEntity {
   }
 
   public void withdraw(OpenBankingDepositRequest openBankingDepositRequest) {
+    int result = balance - openBankingDepositRequest.amount();
+
+    if (result < 0) {
+      throw new InsufficientTrustAccountException(INSUFFICIENT_BALANCE);
+    }
+
     balance -= openBankingDepositRequest.amount();
   }
 }

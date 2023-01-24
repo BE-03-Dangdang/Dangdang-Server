@@ -1,19 +1,20 @@
-package com.dangdang.server.domain.connectionAccount.application;
+package com.dangdang.server.domain.pay.daangnpay.connectionAccount.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.dangdang.server.domain.bankAccount.domain.BankAccountRepository;
-import com.dangdang.server.domain.bankAccount.domain.entity.BankAccount;
-import com.dangdang.server.domain.bankAccount.exception.InactiveBankAccountException;
 import com.dangdang.server.domain.common.StatusType;
-import com.dangdang.server.domain.connectionAccount.domain.ConnectionAccountRepository;
-import com.dangdang.server.domain.connectionAccount.domain.entity.ConnectionAccount;
-import com.dangdang.server.domain.connectionAccount.dto.AddConnectionAccountRequest;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.member.domain.entity.MemberRepository;
-import com.dangdang.server.domain.payMember.domain.entity.PayMember;
-import com.dangdang.server.domain.payMember.domain.entity.PayMemberRepository;
+import com.dangdang.server.domain.pay.banks.bankAccount.domain.BankAccountRepository;
+import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccount;
+import com.dangdang.server.domain.pay.banks.bankAccount.exception.InactiveBankAccountException;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application.ConnectionAccountDatabaseService;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.ConnectionAccountRepository;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,7 +69,7 @@ class ConnectionAccountDatabaseServiceTest {
   class addConnectionAccount {
 
     @Test
-    @DisplayName("성공한다면 bankAccountId와 payMemberId가 저장된다.")
+    @DisplayName("성공한다면 bankAccount 정보와 payMemberId가 저장된다.")
     void successAdd() {
       for (BankAccount bankAccount : bankAccounts) {
         AddConnectionAccountRequest addConnectionAccountRequest = new AddConnectionAccountRequest(
@@ -77,7 +78,9 @@ class ConnectionAccountDatabaseServiceTest {
         ConnectionAccount connectionAccount = connectionAccountDataBaseService.addConnectionAccount(
             payMember.getId(), addConnectionAccountRequest);
 
-        assertThat(connectionAccount.getBankAccount().getId()).isEqualTo(bankAccount.getId());
+        assertThat(connectionAccount.getBankAccountNumber()).isEqualTo(
+            bankAccount.getAccountNumber());
+        assertThat(connectionAccount.getBank()).isEqualTo(bankAccount.getBankName());
         assertThat(connectionAccount.getPayMember().getId()).isEqualTo(payMember.getId());
       }
     }

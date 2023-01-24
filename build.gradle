@@ -60,6 +60,9 @@ dependencies {
 
     // security
     implementation 'org.springframework.security:spring-security-core'
+
+    // validation
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 }
 
 bootJar {

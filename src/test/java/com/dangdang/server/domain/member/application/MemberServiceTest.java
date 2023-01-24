@@ -2,7 +2,7 @@ package com.dangdang.server.domain.member.application;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,8 +17,8 @@ import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
+import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
-import com.dangdang.server.domain.town.domain.entity.TownRepository;
 import com.dangdang.server.global.security.JwtTokenProvider;
 import java.math.BigDecimal;
 import java.util.Optional;

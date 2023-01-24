@@ -1,23 +1,21 @@
 package com.dangdang.server.domain.member.application;
 
-import static com.dangdang.server.domain.member.dto.request.MemberSignUpRequest.*;
-import static com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest.*;
+import static com.dangdang.server.domain.member.dto.request.MemberSignUpRequest.toMember;
+import static com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest.toRedisAuthCode;
 
-import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.MemberRepository;
+import com.dangdang.server.domain.member.domain.RedisAuthCodeRepository;
+import com.dangdang.server.domain.member.domain.RedisSmsRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
-import com.dangdang.server.domain.member.domain.RedisAuthCodeRepository;
 import com.dangdang.server.domain.member.domain.entity.RedisSms;
-import com.dangdang.server.domain.member.domain.RedisSmsRepository;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
-import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
-import com.dangdang.server.domain.memberTown.domain.entity.RangeType;
+import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
+import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
-import com.dangdang.server.domain.town.domain.entity.TownRepository;
 import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import com.dangdang.server.global.security.JwtTokenProvider;

@@ -60,27 +60,28 @@ public class PostService {
   }
 
   @Transactional
-  public PostResponse savePost(PostSaveRequest postSaveRequest, Member loginMember) {
+  public PostDetailResponse savePost(PostSaveRequest postSaveRequest, Member loginMember) {
     Town foundTown = townRepository.findByName(postSaveRequest.getTownName())
         .orElseThrow(() -> new TownNotFoundException(TOWN_NOT_FOUND));
     Post post = PostSaveRequest.toPost(postSaveRequest, loginMember, foundTown);
     Post savedPost = postRepository.save(post);
-    postImageService.savePostImage(savedPost, postSaveRequest.getPostImageRequest());
-    return PostResponse.from(savedPost);
+    List<String> imageUrls = postImageService.savePostImage(savedPost,
+        postSaveRequest.getPostImageRequest());
+
+    return PostDetailResponse.from(savedPost, imageUrls);
   }
 
   public PostDetailResponse findPostDetailById(Long postId) {
     Post foundPost = postRepository.findPostDetailById(postId)
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 
-    List<String> postImageUrls = postImageService.findPostImagesByPostId(postId);
+    List<String> imageUrls = postImageService.findPostImagesByPostId(postId);
 
-    return PostDetailResponse.from(foundPost, postImageUrls);
+    return PostDetailResponse.from(foundPost, imageUrls);
   }
 
   @Transactional
-  public PostResponse updatePostStatus(Long postId, PostUpdateStatusRequest postUpdateStatusRequest, Long authorId) {
-    // TODO : 작성자인지 아닌지 확인하는 로직 -> 아니라면 Exception
+  public PostDetailResponse updatePostStatus(Long postId, PostUpdateStatusRequest postUpdateStatusRequest, Long authorId) {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 

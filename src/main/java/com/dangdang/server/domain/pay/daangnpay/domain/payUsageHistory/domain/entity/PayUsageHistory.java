@@ -50,9 +50,10 @@ public class PayUsageHistory extends BaseEntity {
   protected PayUsageHistory() {
   }
 
-  public PayUsageHistory(String title, Integer balanceMoney, PayMember payMember) {
+  public PayUsageHistory(String title, Integer balanceMoney, PayMember payMember, PayType payType) {
     this.title = title;
     this.balanceMoney = balanceMoney;
     this.payMember = payMember;
+    this.payType = payType;
   }
 }

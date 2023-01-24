@@ -1,7 +1,7 @@
 package com.dangdang.server.domain.pay.daangnpay.payMember.domain.entity;
 
+import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
-import com.dangdang.server.domain.member.domain.entity.MemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import org.assertj.core.api.Assertions;

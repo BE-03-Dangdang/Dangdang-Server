@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/members")
 public class MemberController {
 
   private final MemberService memberService;
@@ -23,12 +23,12 @@ public class MemberController {
 
   // 완료 버튼 후 회원가입할  모든 정보 보냄
   @PostMapping("/signup")
-  public ResponseEntity<MemberCertifyResponse> signUp(@RequestBody MemberSignUpRequest memberSignupRequest) {
+  public ResponseEntity<MemberCertifyResponse> signUp(@RequestBody @Valid MemberSignUpRequest memberSignupRequest) {
     MemberCertifyResponse memberCertifyResponse = memberService.signup(memberSignupRequest);
     return ResponseEntity.ok(memberCertifyResponse);
   }
 
-  @PostMapping("/signupCertify")
+  @PostMapping("/signup-certify")
   public ResponseEntity<MemberCertifyResponse> signupCertify(
       @RequestBody @Valid PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
     MemberCertifyResponse memberCertifyResponse = memberService.signupCertify(phoneNumberCertifyRequest);
@@ -36,7 +36,7 @@ public class MemberController {
     return ResponseEntity.ok(memberCertifyResponse);
   }
 
-  @PostMapping("/loginCertify")
+  @PostMapping("/login-certify")
   public ResponseEntity<MemberCertifyResponse> loginCertify(
       @RequestBody @Valid PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
     MemberCertifyResponse memberCertifyResponse = memberService.loginCertify(

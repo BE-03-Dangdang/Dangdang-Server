@@ -1,7 +1,7 @@
 package com.dangdang.server.domain.town.domain;
 
 import com.dangdang.server.domain.town.domain.entity.Town;
-import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TownRepository extends JpaRepository<Town, Long> {

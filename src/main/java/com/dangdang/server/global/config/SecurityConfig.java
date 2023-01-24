@@ -40,7 +40,8 @@ public class SecurityConfig {
         .and()
         .authorizeRequests()
         .antMatchers(HttpMethod.POST, "/smsMessage/**").permitAll()
-        .antMatchers(HttpMethod.POST, "/member/**").permitAll()
+        .antMatchers(HttpMethod.POST, "/members/**").permitAll()
+        .antMatchers(HttpMethod.GET, "/mongo/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),

@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PayUsageHistoryService {
 
-  private static final int USAGE_HISTORY_ACCOUNT_LENGTH = 4;
+//  private static final int USAGE_HISTORY_ACCOUNT_LENGTH = 4;
 
   private final PayUsageHistoryRepository payUsageHistoryRepository;
 

@@ -1,4 +1,4 @@
-package com.dangdang.server.controller;
+package com.dangdang.server.controller.pay;
 
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application.ConnectionAccountDatabaseService;

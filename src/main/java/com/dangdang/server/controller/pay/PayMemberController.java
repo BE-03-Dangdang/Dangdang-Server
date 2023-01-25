@@ -12,7 +12,6 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.MinAm
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +49,7 @@ public class PayMemberController {
    */
   @PatchMapping("/money/withdraw")
   public ResponseEntity<PayResponse> withdraw(Authentication authentication,
-      @RequestBody @Valid PayRequest payRequest, BindingResult bindingResult) {
+      @RequestBody @Valid PayRequest payRequest) {
     if (!PayType.WITHDRAW.checkMinAmount(payRequest.amount())) {
       throw new MinAmountException(WITHDRAW_LESS_THAN_MIN_AMOUNT);
     }

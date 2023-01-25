@@ -30,6 +30,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
@@ -44,6 +47,7 @@ dependencies {
 
     // coolsms
     implementation 'net.nurigo:sdk:4.2.7'
+
 
     // lombok
     compileOnly 'org.projectlombok:lombok'

@@ -1,8 +1,11 @@
 package com.dangdang.server.domain.town.domain;
 
 import com.dangdang.server.domain.town.domain.entity.Town;
+
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TownRepository extends JpaRepository<Town, Long> {
 
@@ -14,4 +17,5 @@ public interface TownRepository extends JpaRepository<Town, Long> {
 //  public List<Long> findAdjacencyTownIdByRangeTypeAndTownId(long townId, int range);
   
     Optional<Town> findByName(String townName);
+
 }

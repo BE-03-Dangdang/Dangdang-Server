@@ -1,5 +1,6 @@
 package com.dangdang.server.domain.post.domain;
 
+import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.entity.Post;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -37,9 +39,10 @@ class PostRepositoryTest {
       Town town = new Town("테스트 동" + i, null, null);
       townRepository.save(town);
 
-      Post post = new Post("제목" + i, "내용" + i, Category.가전제품, 20000,
+      Post post = new Post("제목" + i, "내용" + i, Category.디지털기기, 20000,
           null, null, null, 0, false,
-          member, town);
+          member, town, "image_url", StatusType.SELLING);
+      // "image_url"은 기존 테스트 코드의 동작을 보장하기 위한 임의의 image link String 값입니다.
       // when
       postRepository.save(post);
     }
@@ -47,6 +50,7 @@ class PostRepositoryTest {
   }
 
   @Test
+  @DisplayName("게시글을 페이징 처리 할 수 있다.")
   public void getAllPosts() throws Exception {
     //given
     List<Post> posts = postRepository.findAll();

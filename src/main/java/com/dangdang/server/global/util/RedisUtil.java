@@ -1,4 +1,4 @@
-package com.dangdang.server.global.utill;
+package com.dangdang.server.global.util;
 
 import java.time.Duration;
 import org.springframework.data.redis.core.StringRedisTemplate;

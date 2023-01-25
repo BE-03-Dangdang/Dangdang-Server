@@ -10,6 +10,8 @@ import com.dangdang.server.domain.memberTown.dto.request.MemberTownRangeRequest;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRequest;
 import com.dangdang.server.domain.memberTown.dto.response.MemberTownRangeResponse;
 import com.dangdang.server.domain.memberTown.dto.response.MemberTownResponse;
+import com.dangdang.server.domain.memberTown.exception.MemberTownNotFoundException;
+import com.dangdang.server.domain.memberTown.exception.NotAppropriateCountException;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import com.dangdang.server.domain.town.domain.entity.TownRepository;
 import com.dangdang.server.global.exception.BusinessException;
@@ -40,7 +42,7 @@ public class MemberTownService {
     // 반드시 memberTown 개수가 1인 경우에만 추가 가능
     List<MemberTown> memberTownList = memberTownRepository.findByMemberId(member.getId());
     if (memberTownList.size() != 1) {
-      throw new BusinessException(ExceptionCode.NOT_APPROPRIATE_COUNT);
+      throw new NotAppropriateCountException(ExceptionCode.NOT_APPROPRIATE_COUNT);
     }
 
     Town foundTown = getTownByTownName(memberTownRequest.townName());
@@ -62,12 +64,14 @@ public class MemberTownService {
     // MemberTown 이 2개 있어야만 삭제가 가능하다
     List<MemberTown> memberTownList = memberTownRepository.findByMemberId(member.getId());
     if (memberTownList.size() != 2) {
-      throw new BusinessException(ExceptionCode.NOT_APPROPRIATE_COUNT);
+      throw new NotAppropriateCountException(ExceptionCode.NOT_APPROPRIATE_COUNT);
     }
 
     MemberTown memberTown1 = memberTownList.get(0);
     MemberTown memberTown2 = memberTownList.get(1);
 
+    System.out.println(memberTown1.getTown().getName());
+    System.out.println(memberTown2.getTown().getName());
     // Inactive 지운 경우 -> Active 만 남게 된다 (삭제)
     // Active 지운 경우 -> Inactive 가 Active 로 변경됨  (삭제 + 변경)
     if (memberTown1.getTown().getName().equals(memberTownRequest.townName())) {
@@ -75,11 +79,13 @@ public class MemberTownService {
         memberTown2.updateMemberTownStatus(StatusType.ACTIVE);
       }
       memberTownRepository.delete(memberTown1);
-    } else {
+    } else if (memberTown2.getTown().getName().equals(memberTownRequest.townName())) {
       if (memberTown2.getStatus() == StatusType.ACTIVE) {
-        memberTown2.updateMemberTownStatus(StatusType.ACTIVE);
+        memberTown1.updateMemberTownStatus(StatusType.ACTIVE);
       }
       memberTownRepository.delete(memberTown2);
+    } else {
+      throw new MemberTownNotFoundException(ExceptionCode.MEMBER_TOWN_NOT_FOUND);
     }
 
     return new MemberTownResponse(memberTownRequest.townName());
@@ -92,7 +98,7 @@ public class MemberTownService {
     // 이 메서드는 front 코드에서 모두 2개의 값이 있을 때 활성화 되야 함
     List<MemberTown> memberTownList = memberTownRepository.findByMemberId(member.getId());
     if (memberTownList.size() != 2) {
-      throw new BusinessException(ExceptionCode.NOT_APPROPRIATE_COUNT);
+      throw new NotAppropriateCountException(ExceptionCode.NOT_APPROPRIATE_COUNT);
     }
     for (MemberTown memberTown : memberTownList) {
       // 요구되는 이름인 경우 -> active
@@ -112,7 +118,7 @@ public class MemberTownService {
 
     MemberTown foundMemberTown = memberTownRepository
         .findByMemberIdAndTownId(foundMember.getId(), foundTown.getId())
-        .orElseThrow(() -> new BusinessException(ExceptionCode.MEMBER_TOWN_NOT_FOUND));
+        .orElseThrow(() -> new MemberTownNotFoundException(ExceptionCode.MEMBER_TOWN_NOT_FOUND));
 
     RangeType updatedRangeType = RangeType.getRangeType(memberTownRangeRequest.level());
     foundMemberTown.updateMemberTownRange(updatedRangeType);

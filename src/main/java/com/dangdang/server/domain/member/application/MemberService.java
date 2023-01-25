@@ -59,11 +59,10 @@ public class MemberService {
       return getMemberCertifyResponse(member.get().getId());
     }
 
-    RedisAuthCode redisAuthCode = toRedisAuthCode(
-        phoneNumberCertifyRequest);
+    RedisAuthCode redisAuthCode = toRedisAuthCode(phoneNumberCertifyRequest);
     redisAuthCodeRepository.save(redisAuthCode);
 
-    return new MemberCertifyResponse(null,true);
+    return MemberCertifyResponse.from(null,true);
   }
 
   @Transactional
@@ -102,17 +101,13 @@ public class MemberService {
             new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL)
         );
 
-    String authCode = redisSms.getAuthCode();
-
-    if (!authCode.equals(phoneNumberCertifyRequest.getAuthCode())) {
-      throw new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL);
-    }
+    redisSms.isAuthCode(phoneNumberCertifyRequest.getAuthCode());
 
     redisSmsRepository.deleteById(phoneNumberCertifyRequest.getPhoneNumber());
   }
 
   private MemberCertifyResponse getMemberCertifyResponse(Long memberId) {
     String accessToken = jwtTokenProvider.createAccessToken(memberId);
-    return new MemberCertifyResponse(accessToken, true);
+    return MemberCertifyResponse.from(accessToken, true);
   }
 }

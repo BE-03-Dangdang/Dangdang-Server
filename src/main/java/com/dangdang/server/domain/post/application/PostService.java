@@ -10,7 +10,6 @@ import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
 import com.dangdang.server.domain.post.dto.response.PostResponse;
-import com.dangdang.server.domain.post.dto.response.PostSliceResponse;
 import com.dangdang.server.domain.post.dto.response.PostsSliceResponse;
 import com.dangdang.server.domain.post.exception.PostNotFoundException;
 import com.dangdang.server.domain.postImage.application.PostImageService;
@@ -18,10 +17,6 @@ import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import com.dangdang.server.domain.town.exception.TownNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,10 +53,11 @@ public class PostService {
 //             Collectors.toList()), posts.hasNext()
 //     );
     return null;
+  }
 
   @Transactional
   public PostResponse savePost(PostSaveRequest postSaveRequest, Member loginMember) {
-    Town foundTown = townRepository.findTownByName(postSaveRequest.getTownName())
+    Town foundTown = townRepository.findByName(postSaveRequest.getTownName())
         .orElseThrow(() -> new TownNotFoundException(TOWN_NOT_FOUND));
     Post post = PostSaveRequest.toPost(postSaveRequest, loginMember, foundTown);
     Post savedPost = postRepository.save(post);

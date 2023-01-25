@@ -4,6 +4,7 @@ import static com.dangdang.server.domain.member.dto.request.SmsRequest.toRedisSm
 
 import com.dangdang.server.domain.member.domain.RedisSendSmsRepository;
 import com.dangdang.server.domain.member.domain.RedisSmsRepository;
+import com.dangdang.server.domain.member.domain.entity.RedisSendSms;
 import com.dangdang.server.domain.member.domain.entity.RedisSms;
 import com.dangdang.server.domain.member.dto.request.SmsRequest;
 import com.dangdang.server.domain.member.exception.SmsFrequencyOverException;
@@ -37,6 +38,8 @@ public class SmsMessageService {
   }
 
   @Transactional
+//  public SingleMessageSendingRequest(SmsRequest smsRequest) {
+  // 실제 서비스에서는 삭제해야함
   public String sendMessage(SmsRequest smsRequest) {
     String authCode = generateAuthCode();
 
@@ -44,10 +47,13 @@ public class SmsMessageService {
       throw new SmsFrequencyOverException(ExceptionCode.NOT_PERMISSION);
     });
 
+    RedisSendSms redisSendSms = new RedisSendSms(smsRequest.getToPhoneNumber());
+    redisSendSmsRepository.save(redisSendSms);
+
     RedisSms redisSms = toRedisSms(smsRequest, authCode);
     redisSmsRepository.save(redisSms);
-/*
 
+/*
     String text =
         "[Web 발신]\n" + "[당근마켓] 인증번호 [" + authCode + "] *타인에게 절대 알리지 마세요. (계정 도용 위험)";
 
@@ -58,6 +64,7 @@ public class SmsMessageService {
     return defaultMessageService.sendOne(new SingleMessageSendingRequest(message));
 */
 
+    // 실제 서비스에서는 삭제해야함.
     return authCode;
   }
 

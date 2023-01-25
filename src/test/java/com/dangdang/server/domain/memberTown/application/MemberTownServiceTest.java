@@ -15,7 +15,7 @@ import com.dangdang.server.domain.memberTown.exception.MemberTownNotFoundExcepti
 import com.dangdang.server.domain.memberTown.exception.NotAppropriateCountException;
 import com.dangdang.server.domain.memberTown.exception.NotAppropriateRangeException;
 import com.dangdang.server.domain.town.domain.entity.Town;
-import com.dangdang.server.domain.town.domain.entity.TownRepository;
+import com.dangdang.server.domain.town.domain.TownRepository;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

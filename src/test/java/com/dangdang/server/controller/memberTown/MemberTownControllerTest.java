@@ -14,7 +14,7 @@ import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRangeRequest;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRequest;
 import com.dangdang.server.domain.town.domain.entity.Town;
-import com.dangdang.server.domain.town.domain.entity.TownRepository;
+import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.global.security.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;

@@ -13,7 +13,7 @@ import com.dangdang.server.domain.memberTown.dto.response.MemberTownResponse;
 import com.dangdang.server.domain.memberTown.exception.MemberTownNotFoundException;
 import com.dangdang.server.domain.memberTown.exception.NotAppropriateCountException;
 import com.dangdang.server.domain.town.domain.entity.Town;
-import com.dangdang.server.domain.town.domain.entity.TownRepository;
+import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.List;

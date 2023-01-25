@@ -1,6 +1,6 @@
 package com.dangdang.server.domain.post.dto.request;
 
-import static com.dangdang.server.global.util.S3ConstantMessage.*;
+import static com.dangdang.server.global.util.S3ConstantMessage.DEFAULT_IMAGE_LINK;
 
 import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.entity.Member;
@@ -8,28 +8,29 @@ import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.domain.entity.Post;
 import com.dangdang.server.domain.postImage.dto.PostImageRequest;
 import com.dangdang.server.domain.town.domain.entity.Town;
-import com.dangdang.server.global.util.S3ConstantMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.math.BigDecimal;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
 public class PostSaveRequest {
 
-  @NotNull
+  private static final int VIEW_INIT_VALUE = 0;
+
+  @NotBlank
   @Max(value = 255)
   private String title;
 
-  @NotNull
+  @NotBlank
   @Max(value = 1000)
   private String content;
 
-  @NotNull
+  @NotBlank
   private Category category;
 
   @Min(value = 0)
@@ -42,13 +43,10 @@ public class PostSaveRequest {
 
   private BigDecimal desiredPlaceLatitude;
 
-  @Null
-  private Integer view;
-
   @NotNull
   private Boolean sharing;
 
-  @NotNull
+  @NotBlank
   @Size(max = 10)
   private String townName;
 
@@ -66,7 +64,6 @@ public class PostSaveRequest {
     this.desiredPlaceName = desiredPlaceName;
     this.desiredPlaceLongitude = desiredPlaceLongitude;
     this.desiredPlaceLatitude = desiredPlaceLatitude;
-    this.view = 0;
     this.sharing = sharing;
     this.townName = townName;
     this.postImageRequest = postImageRequest;
@@ -76,7 +73,7 @@ public class PostSaveRequest {
     return new Post(postSaveRequest.title, postSaveRequest.content, postSaveRequest.category,
         postSaveRequest.price, postSaveRequest.desiredPlaceName,
         postSaveRequest.getDesiredPlaceLongitude(), postSaveRequest.desiredPlaceLatitude,
-        postSaveRequest.view, postSaveRequest.sharing, loginMember, town,
+        VIEW_INIT_VALUE, postSaveRequest.sharing, loginMember, town,
         postSaveRequest.postImageRequest.getUrl().size() == 0 ? DEFAULT_IMAGE_LINK
             : postSaveRequest.postImageRequest.getUrl().get(0), StatusType.SELLING);
   }

@@ -24,5 +24,4 @@ public class GlobalExceptionHandler {
     HttpStatus httpStatus = HttpStatus.valueOf(e.getStatus());
     return ResponseEntity.status(httpStatus).body(e.getMessage());
   }
-
 }

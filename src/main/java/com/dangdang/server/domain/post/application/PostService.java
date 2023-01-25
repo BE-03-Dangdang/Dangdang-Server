@@ -45,16 +45,19 @@ public class PostService {
     /*
     TODO : Member 정보(town Id 등) 가져오기 기능 완료되면 파라미터 수정
      */
-    long townIdSelectedByUser = 1L;
-    int level = 1;
-    List<Long> adjacency = townRepository.findAdjacencyTownId(townIdSelectedByUser, level);
-    Slice<Post> posts = postRepository.findPostsByTownIdFetchJoinSortByCreatedAt(adjacency,
-        PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize(),
-            Sort.by("createdAt")));
-    return PostsSliceResponse.of(
-        posts.getContent().stream().map(post -> PostSliceResponse.from(post))
-            .collect(Collectors.toList()), posts.hasNext());
-  }
+//     long townIdSelectedByUser = 1L;
+//     int level = 1;
+//     List<Long> adjacency = townRepository.findAdjacencyTownIdByRangeTypeAndTownId(
+//         townIdSelectedByUser, level);
+//     Slice<Post> posts = postRepository.findPostsByTownIdFetchJoinSortByCreatedAt(
+//         adjacency,
+//         PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize(),
+//             Sort.by("createdAt")));
+//     return PostsSliceResponse.of(
+//         posts.getContent().stream().map(PostSliceResponse::from).collect(
+//             Collectors.toList()), posts.hasNext()
+//     );
+    return null;
 
   @Transactional
   public PostResponse savePost(PostSaveRequest postSaveRequest, Member loginMember) {
@@ -65,6 +68,8 @@ public class PostService {
     postImageService.savePostImage(savedPost, postSaveRequest.getPostImageRequest());
     return PostResponse.from(savedPost);
   }
+  
+  
 
   public PostDetailResponse findPostDetailById(Long postId) {
     Post foundPost = postRepository.findPostDetailById(postId)

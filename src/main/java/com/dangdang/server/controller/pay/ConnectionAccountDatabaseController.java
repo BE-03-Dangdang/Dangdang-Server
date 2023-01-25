@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 외부 API 연동 제외
  */
 @RestController
-@RequestMapping("/connection-account")
+@RequestMapping("/connection-accounts")
 public class ConnectionAccountDatabaseController {
 
   private final ConnectionAccountDatabaseService connectionAccountDataBaseService;

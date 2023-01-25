@@ -19,8 +19,8 @@ public class RedisSms {
   @TimeToLive
   private Long expiration;
 
-  public RedisSms(String phoneNumber, String authCode ) {
-    this.id = phoneNumber;
+  public RedisSms(String id, String authCode) {
+    this.id = id;
     this.authCode = authCode;
     this.expiration = SMS_TTL;
   }

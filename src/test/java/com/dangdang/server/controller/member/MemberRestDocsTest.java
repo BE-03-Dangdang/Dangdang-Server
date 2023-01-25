@@ -146,7 +146,7 @@ class MemberRestDocsTest {
     String phoneNuber = "01012345678";
 
     //휴대폰 인증 완료 등록
-    redisAuthCodeRepository.save(new RedisAuthCode(phoneNuber, true));
+    redisAuthCodeRepository.save(new RedisAuthCode(phoneNuber));
 
     //requestDto 생성
     String townName = "역삼동";

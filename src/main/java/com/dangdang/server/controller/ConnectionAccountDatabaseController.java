@@ -1,8 +1,8 @@
 package com.dangdang.server.controller;
 
-import com.dangdang.server.domain.connectionAccount.application.ConnectionAccountDatabaseService;
-import com.dangdang.server.domain.connectionAccount.dto.AddConnectionAccountRequest;
 import com.dangdang.server.domain.member.domain.entity.Member;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application.ConnectionAccountDatabaseService;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

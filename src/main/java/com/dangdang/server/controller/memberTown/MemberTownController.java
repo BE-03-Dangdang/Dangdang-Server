@@ -36,7 +36,8 @@ public class MemberTownController {
   }
 
   @DeleteMapping
-  public ResponseEntity<MemberTownResponse> deleteMemberTown(MemberTownRequest memberTownRequest,
+  public ResponseEntity<MemberTownResponse> deleteMemberTown(
+      @RequestBody @Valid MemberTownRequest memberTownRequest,
       Authentication authentication) {
     MemberTownResponse memberTownResponse = memberTownService
         .deleteMemberTown(memberTownRequest, (Member) authentication.getPrincipal());

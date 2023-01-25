@@ -11,6 +11,10 @@ public class SmsRequest {
   private SmsRequest() {
   }
 
+  public SmsRequest(String toPhoneNumber) {
+    this.toPhoneNumber = toPhoneNumber;
+  }
+
   public static RedisSms toRedisSms(SmsRequest smsRequest, String authCode) {
     return new RedisSms(smsRequest.toPhoneNumber, authCode);
   }

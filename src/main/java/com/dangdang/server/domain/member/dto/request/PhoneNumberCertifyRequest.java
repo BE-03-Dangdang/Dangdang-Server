@@ -25,6 +25,6 @@ public class PhoneNumberCertifyRequest {
   }
 
   public static RedisAuthCode toRedisAuthCode(PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
-    return new RedisAuthCode(phoneNumberCertifyRequest.phoneNumber, true);
+    return new RedisAuthCode(phoneNumberCertifyRequest.phoneNumber);
   }
 }

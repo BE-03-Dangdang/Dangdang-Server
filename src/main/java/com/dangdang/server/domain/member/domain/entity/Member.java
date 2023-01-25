@@ -2,6 +2,7 @@ package com.dangdang.server.domain.member.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
+import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.Collection;
@@ -9,10 +10,13 @@ import java.util.Collections;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,10 +44,9 @@ public class Member extends BaseEntity implements UserDetails {
 
   }
 
-  public Member(Long id, String phoneNumber, String profileImgUrl, String nickname) {
+  public Member(Long id, String phoneNumber, String nickname) {
     this.id = id;
     this.phoneNumber = phoneNumber;
-    this.profileImgUrl = profileImgUrl;
     this.nickname = nickname;
   }
 

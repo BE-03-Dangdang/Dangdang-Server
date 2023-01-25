@@ -1,9 +1,11 @@
 package com.dangdang.server.domain.pay.banks.trustAccount.domain.entity;
 
 import static com.dangdang.server.global.exception.ExceptionCode.INSUFFICIENT_BALANCE;
+import static com.dangdang.server.global.exception.ExceptionCode.TRUST_ACCOUNT_INACTIVE;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
+import com.dangdang.server.domain.pay.banks.trustAccount.exception.InactiveTrustAccountException;
 import com.dangdang.server.domain.pay.banks.trustAccount.exception.InsufficientTrustAccountException;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
@@ -51,11 +53,19 @@ public class TrustAccount extends BaseEntity {
     this.status = statusType;
   }
 
+  private void verifyTrustAccountStatus() {
+    if (this.status == StatusType.INACTIVE) {
+      throw new InactiveTrustAccountException(TRUST_ACCOUNT_INACTIVE);
+    }
+  }
+
   public void deposit(OpenBankingWithdrawRequest openBankingWithdrawRequest) {
+    verifyTrustAccountStatus();
     balance += openBankingWithdrawRequest.amount();
   }
 
   public void withdraw(OpenBankingDepositRequest openBankingDepositRequest) {
+    verifyTrustAccountStatus();
     if (balance < openBankingDepositRequest.amount()) {
       throw new InsufficientTrustAccountException(INSUFFICIENT_BALANCE);
     }

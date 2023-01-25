@@ -54,7 +54,6 @@ class BankAccountServiceTest {
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", balance,
             new PayMember("password", new Member("닉네임", "핸드폰")));
 
-        doReturn(1L).when(bankAccountService).getPayMemberIdFromAccount(any());
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
         bankAccountService.withdraw(openBankingWithdrawRequest);
@@ -76,7 +75,6 @@ class BankAccountServiceTest {
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 0,
             new PayMember("password", new Member("닉네임", "핸드폰")));
 
-        doReturn(1L).when(bankAccountService).getPayMemberIdFromAccount(any());
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
         assertThrows(InsufficientBankAccountException.class,
@@ -107,7 +105,6 @@ class BankAccountServiceTest {
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
             new PayMember("password", new Member("닉네임", "핸드폰")));
 
-        doReturn(1L).when(bankAccountService).getPayMemberIdFromAccount(any());
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
         assertThrows(BankAccountAuthenticationException.class,
@@ -135,7 +132,6 @@ class BankAccountServiceTest {
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", balance,
             new PayMember("password", new Member("닉네임", "핸드폰")));
 
-        doReturn(1L).when(bankAccountService).getPayMemberIdFromAccount(any());
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
         bankAccountService.deposit(openBankingDepositRequest);
@@ -169,8 +165,7 @@ class BankAccountServiceTest {
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
             new PayMember("password", new Member("닉네임", "핸드폰")));
-
-        doReturn(1L).when(bankAccountService).getPayMemberIdFromAccount(any());
+        
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
         assertThrows(BankAccountAuthenticationException.class,

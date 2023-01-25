@@ -1,15 +1,10 @@
 package com.dangdang.server.domain.pay.banks.bankAccount.application;
 
-import static com.dangdang.server.global.exception.ExceptionCode.BANK_ACCOUNT_AUTHENTICATION_FAIL;
-import static com.dangdang.server.global.exception.ExceptionCode.BANK_ACCOUNT_INACTIVE;
 import static com.dangdang.server.global.exception.ExceptionCode.BANK_ACCOUNT_NOT_FOUND;
 
-import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.BankAccountRepository;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccount;
 import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiResponse;
-import com.dangdang.server.domain.pay.banks.bankAccount.exception.BankAccountAuthenticationException;
-import com.dangdang.server.domain.pay.banks.bankAccount.exception.InactiveBankAccountException;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
@@ -35,13 +30,9 @@ public class BankAccountService {
   @Transactional(propagation = Propagation.MANDATORY)
   public BankOpenBankingApiResponse withdraw(
       OpenBankingWithdrawRequest openBankingWithdrawRequest) {
-    Long payMemberId = openBankingWithdrawRequest.payMemberId();
     Long fromBankAccountId = openBankingWithdrawRequest.fromBankAccountId();
 
     BankAccount bankAccount = findById(fromBankAccountId);
-    checkBankAccountStatus(bankAccount);
-    checkPayMemberId(bankAccount, payMemberId);
-
     bankAccount.withdraw(openBankingWithdrawRequest);
 
     return BankOpenBankingApiResponse.from(bankAccount);
@@ -50,30 +41,11 @@ public class BankAccountService {
   @Transactional(propagation = Propagation.MANDATORY)
   public BankOpenBankingApiResponse deposit(OpenBankingDepositRequest openBankingDepositRequest) {
     Long toBankAccountId = openBankingDepositRequest.toBankAccountId();
-    Long payMemberId = openBankingDepositRequest.payMemberId();
 
     BankAccount bankAccount = findById(toBankAccountId);
-    checkBankAccountStatus(bankAccount);
-    checkPayMemberId(bankAccount, payMemberId);
     bankAccount.deposit(openBankingDepositRequest);
 
     return BankOpenBankingApiResponse.from(bankAccount);
   }
 
-  private void checkBankAccountStatus(BankAccount bankAccount) {
-    if (bankAccount.getStatus() == StatusType.INACTIVE) {
-      throw new InactiveBankAccountException(BANK_ACCOUNT_INACTIVE);
-    }
-  }
-
-  public Long getPayMemberIdFromAccount(BankAccount bankAccount) {
-    return bankAccount.getPayMember().getId();
-  }
-
-  private void checkPayMemberId(BankAccount bankAccount, Long payMemberId) {
-    Long payMemberIdFromAccount = getPayMemberIdFromAccount(bankAccount);
-    if (!payMemberIdFromAccount.equals(payMemberId)) {
-      throw new BankAccountAuthenticationException(BANK_ACCOUNT_AUTHENTICATION_FAIL);
-    }
-  }
 }

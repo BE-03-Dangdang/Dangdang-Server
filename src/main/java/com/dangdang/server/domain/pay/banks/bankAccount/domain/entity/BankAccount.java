@@ -1,9 +1,13 @@
 package com.dangdang.server.domain.pay.banks.bankAccount.domain.entity;
 
+import static com.dangdang.server.global.exception.ExceptionCode.BANK_ACCOUNT_AUTHENTICATION_FAIL;
+import static com.dangdang.server.global.exception.ExceptionCode.BANK_ACCOUNT_INACTIVE;
 import static com.dangdang.server.global.exception.ExceptionCode.INSUFFICIENT_BALANCE;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
+import com.dangdang.server.domain.pay.banks.bankAccount.exception.BankAccountAuthenticationException;
+import com.dangdang.server.domain.pay.banks.bankAccount.exception.InactiveBankAccountException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.InsufficientBankAccountException;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
@@ -61,7 +65,22 @@ public class BankAccount extends BaseEntity {
     this.status = statusType;
   }
 
+  private void verifyStatus() {
+    if (this.status == StatusType.INACTIVE) {
+      throw new InactiveBankAccountException(BANK_ACCOUNT_INACTIVE);
+    }
+  }
+
+  private void verifyPayMemberId(long requestPayMemberId) {
+    Long payMemberId = this.payMember.getId();
+    if (!payMemberId.equals(requestPayMemberId)) {
+      throw new BankAccountAuthenticationException(BANK_ACCOUNT_AUTHENTICATION_FAIL);
+    }
+  }
+
   public void withdraw(OpenBankingWithdrawRequest openBankingWithdrawRequest) {
+    verifyStatus();
+    verifyPayMemberId(openBankingWithdrawRequest.payMemberId());
     Integer requestAmount = openBankingWithdrawRequest.amount();
     if (balance < requestAmount) {
       throw new InsufficientBankAccountException(INSUFFICIENT_BALANCE);
@@ -70,6 +89,8 @@ public class BankAccount extends BaseEntity {
   }
 
   public void deposit(OpenBankingDepositRequest openBankingDepositRequest) {
+    verifyStatus();
+    verifyPayMemberId(openBankingDepositRequest.payMemberId());
     balance += openBankingDepositRequest.amount();
   }
 }

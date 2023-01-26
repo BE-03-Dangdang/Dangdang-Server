@@ -58,17 +58,19 @@ class PostServiceTest {
     Town town = new Town("서현동", null, null);
     townRepository.save(town);
 
-    PostImageRequest postImageRequest = new PostImageRequest(List.of("http://s3.amazonaws.com/test1.png", "http://s3.amazonaws.com/test2.png"));
+    PostImageRequest postImageRequest = new PostImageRequest(
+        List.of("http://s3.amazonaws.com/test1.png", "http://s3.amazonaws.com/test2.png"));
 
     PostSaveRequest postSaveRequest = new PostSaveRequest("title1", "content1", Category.디지털기기,
         1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "서현동",
         postImageRequest);
-    PostResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
+    PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
 
-    PostDetailResponse postDetailResponse = postService.findPostDetailById(
-        savedPostResponse.getId());
-    assertThat(savedPostResponse).usingRecursiveComparison()
-        .isEqualTo(postDetailResponse.getPostResponse());
+    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getPostId());
+    assertThat(savedPostResponse.getPostResponse()).usingRecursiveComparison()
+        .isEqualTo(foundPost.getPostResponse());
+    assertThat(savedPostResponse.getMember()).usingRecursiveComparison()
+        .isEqualTo(foundPost.getMember());
   }
 
   @Test
@@ -78,7 +80,6 @@ class PostServiceTest {
 
     assertThatThrownBy(() -> postService.findPostDetailById(wrongId)).isInstanceOf(
         PostNotFoundException.class);
-
   }
 
   @Test
@@ -89,18 +90,18 @@ class PostServiceTest {
     Town town = new Town("서현동", null, null);
     townRepository.save(town);
 
-    PostImageRequest postImageRequest = new PostImageRequest(Arrays.asList("http://s3.amazonaws.com/test1.png", "http://s3.amazonaws.com/test2.png"));
+    PostImageRequest postImageRequest = new PostImageRequest(
+        Arrays.asList("http://s3.amazonaws.com/test1.png", "http://s3.amazonaws.com/test2.png"));
 
     PostSaveRequest postSaveRequest = new PostSaveRequest("title1", "content1", Category.디지털기기,
         1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "서현동",
         postImageRequest);
 
-    PostResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
+    PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
 
-    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getId());
+    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getPostId());
     assertThat(foundPost).isNotNull();
     assertThat(foundPost.getImageUrls()).hasSize(2);
-    assertThat(foundPost.getImageUrls()).usingRecursiveComparison();
   }
 
   @Test
@@ -119,9 +120,9 @@ class PostServiceTest {
         1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "서현동",
         postImageRequest);
 
-    PostResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
+    PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
 
-    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getId());
+    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getPostId());
     Assertions.assertThat(foundPost.getImageUrls()).hasSize(2);
   }
 
@@ -139,10 +140,10 @@ class PostServiceTest {
         1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "서현동",
         wrongPostImageRequest);
 
-    PostResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
+    PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
 
     assertThatThrownBy(
-            () -> postService.findPostDetailById(savedPostResponse.getId()))
+        () -> postService.findPostDetailById(savedPostResponse.getPostId()))
         .isInstanceOf(UrlInValidException.class);
   }
 }

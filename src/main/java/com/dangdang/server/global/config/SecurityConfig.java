@@ -39,7 +39,7 @@ public class SecurityConfig {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeRequests()
-        .antMatchers(HttpMethod.POST, "/smsMessage/**").permitAll()
+        .antMatchers(HttpMethod.POST, "/sms-message/**").permitAll()
         .antMatchers(HttpMethod.POST, "/members/**").permitAll()
         .antMatchers(HttpMethod.GET, "/mongo/**").permitAll()
         .anyRequest().authenticated()

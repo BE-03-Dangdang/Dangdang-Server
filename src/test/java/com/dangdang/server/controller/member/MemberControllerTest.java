@@ -57,7 +57,7 @@ class MemberControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .characterEncoding("UTF-8")
             .content(objectMapper.writeValueAsString(memberSignUpRequest)))
-        .andExpect(status().isUnauthorized())
+        .andExpect(status().isNotFound())
         .andDo(print());
 
   }

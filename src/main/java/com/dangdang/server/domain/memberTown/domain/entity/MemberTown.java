@@ -1,6 +1,9 @@
 package com.dangdang.server.domain.memberTown.domain.entity;
 
+import static com.dangdang.server.domain.memberTown.domain.entity.TownAuthStatus.TOWN_UNCERTIFIED;
+
 import com.dangdang.server.domain.common.BaseEntity;
+import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import javax.persistence.Column;
@@ -15,8 +18,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.Getter;
 
-@Entity
 @Getter
+@Entity
 public class MemberTown extends BaseEntity {
 
   @Id
@@ -25,7 +28,7 @@ public class MemberTown extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
+  @JoinColumn(name = "member_id", nullable = false)
   private Member member;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -33,11 +36,44 @@ public class MemberTown extends BaseEntity {
   private Town town;
 
   @Enumerated(EnumType.STRING)
-  @Column(length = 20, nullable = false)
+  @Column(nullable = false)
   private RangeType rangeType;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private TownAuthStatus townAuthStatus;
 
   protected MemberTown() {
   }
 
+  public MemberTown(Member member, Town town) {
+    this.member = member;
+    this.town = town;
+    this.rangeType = RangeType.LEVEL2;
+    this.status = StatusType.ACTIVE;
+    this.townAuthStatus = TOWN_UNCERTIFIED;
+  }
+
+  public MemberTown(Long id, Member member, Town town, RangeType rangeType,
+      TownAuthStatus townAuthStatus) {
+    this.id = id;
+    this.member = member;
+    this.town = town;
+    this.rangeType = rangeType;
+    this.townAuthStatus = townAuthStatus;
+  }
+
+  // Member 추가시 MemberTown 추가됨
+//  public void
+
+  // Town 상태를 Active or Inactive
+  public void updateMemberTownStatus(StatusType statusType) {
+    this.status = statusType;
+  }
+
+  // Town range 설정
+  public void updateMemberTownRange(RangeType rangeType) {
+    this.rangeType = rangeType;
+  }
 
 }

@@ -13,6 +13,7 @@ import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.applica
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.ConnectionAccountRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetAllConnectionAccountResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import java.util.List;
@@ -101,4 +102,62 @@ class ConnectionAccountDatabaseServiceTest {
               addConnectionAccountRequest));
     }
   }
+
+  @Nested
+  @DisplayName("연결계좌 리스트를 조회했을 때")
+  class getAllConnectionAccountTest {
+
+    int allBankAccountSize = 0;
+    List<BankAccount> allBankAccount;
+
+    @BeforeEach
+    void setUp() {
+      allBankAccount = bankAccountRepository.findAll();
+      allBankAccountSize = allBankAccount.size();
+    }
+
+    @Nested
+    @DisplayName("성공")
+    class Success {
+
+      @Nested
+      @DisplayName("고객의 당근페이 연결계좌가 존재할 경우")
+      class WhenExistConnectionAccount {
+
+        @Test
+        @DisplayName("전체 리스트가 조회된다.")
+        void getAllConnectionAccountList() {
+          for (BankAccount account : allBankAccount) {
+            ConnectionAccount connectionAccount = new ConnectionAccount(account, payMember);
+            connectionAccountRepository.save(connectionAccount);
+          }
+
+          Long memberId = member.getId();
+
+          List<GetAllConnectionAccountResponse> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
+              memberId);
+
+          assertThat(allConnectionAccount).hasSize(allBankAccountSize);
+        }
+      }
+
+
+      @Nested
+      @DisplayName("고객의 당근페이 연결계좌가 존재하지 않을 경우")
+      class WhenZeroConnectionAccount {
+
+        @Test
+        @DisplayName("빈 리스트가 조회된다.")
+        void getZeroList() {
+          Long memberId = member.getId();
+
+          List<GetAllConnectionAccountResponse> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
+              memberId);
+
+          assertThat(allConnectionAccount).isEmpty();
+        }
+      }
+    }
+  }
+
 }

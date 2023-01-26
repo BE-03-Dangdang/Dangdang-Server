@@ -1,7 +1,9 @@
 package com.dangdang.server.domain.town.domain;
 
 import com.dangdang.server.domain.town.domain.entity.Town;
-
+import com.dangdang.server.domain.town.dto.AdjacentTownResponse;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,13 +11,29 @@ import org.springframework.data.repository.query.Param;
 
 public interface TownRepository extends JpaRepository<Town, Long> {
 
-  /*
-    @author : 김영빈, 김기웅
-    @description : 게시글 전체 조회 로직에서 조회 대상이 될 동 id를 가져오기 위해 임시로 작성한 메서드입니다.
-    실제 동작하지 않으므로 편의에 맞게 수정해주세요. 인터페이스만 만들어둔 것입니다.
-   */
-//  public List<Long> findAdjacencyTownIdByRangeTypeAndTownId(long townId, int range);
-  
-    Optional<Town> findByName(String townName);
+  Optional<Town> findByName(String townName);
 
+  @Query(value =
+      """
+          SELECT t.town_id as townId, t.name, 
+          (6371 * acos ( cos ( radians(:latitude) )  * cos( radians( latitude) ) 
+          * cos( radians( longitude) - radians(:longitude) )  + sin ( radians(:latitude) ) 
+          * sin(radians(latitude)))) as distance 
+          FROM town t 
+          HAVING distance <= :distanceLevel 
+          ORDER BY name 
+          """, nativeQuery = true)
+  List<AdjacentTownResponse> findAdjacentTownsByPoint(@Param("latitude") BigDecimal latitude,
+      @Param("longitude") BigDecimal longitude,
+      @Param("distanceLevel") int distanceLevel);
+
+  @Query(value =
+      """
+          SELECT t.town_id as townId, t.name, t.longitude, t.latitude, ST_Distance_Sphere(POINT(:longitude, :latitude), 
+          POINT(t.longitude, t.latitude)) as distance from town t where ST_Distance_Sphere(POINT( 
+          :longitude, :latitude), POINT(t.longitude, t.latitude)) <= 
+          :distanceLevel ORDER BY t.name
+          """, nativeQuery = true)
+  List<AdjacentTownResponse> findTowns(@Param("longitude") BigDecimal longitude,
+      @Param("latitude") BigDecimal latitude, @Param("distanceLevel") int distanceLevel);
 }

@@ -40,6 +40,9 @@ public class Member extends BaseEntity implements UserDetails {
   @Lob
   private String profileImgUrl;
 
+  @Column(nullable = true)
+  private String refreshToken;
+
   protected Member() {
 
   }
@@ -105,5 +108,9 @@ public class Member extends BaseEntity implements UserDetails {
     if (!Objects.equals(this.id, memberId)) {
       throw new BusinessException(ExceptionCode.NOT_PERMISSION);
     }
+  }
+
+  public void setRefreshToken(String refreshToken) {
+    this.refreshToken = refreshToken;
   }
 }

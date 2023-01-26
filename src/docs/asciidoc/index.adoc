@@ -7,3 +7,20 @@ backtony.github.io(Rest Docs)
 :toclevels: 2
 :sectlinks:
 
+== Base Url
+/api/v1
+
+= Member Docs
+== Member
+=== /signup-certify
+==== request
+include::{snippets}/MemberController/signupCertify/http-request.adoc[]
+==== request field
+include::{snippets}/MemberController/signupCertify/request-fields.adoc[]
+==== response
+include::{snippets}/MemberController/signupCertify/http-response.adoc[]
+==== response field
+include::{snippets}/MemberController/signupCertify/response-fields.adoc[]
+
+
+

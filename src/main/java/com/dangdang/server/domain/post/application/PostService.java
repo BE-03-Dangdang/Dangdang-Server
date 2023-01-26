@@ -68,7 +68,7 @@ public class PostService {
     List<String> imageUrls = postImageService.savePostImage(savedPost,
         postSaveRequest.getPostImageRequest());
 
-    return PostDetailResponse.from(savedPost, imageUrls);
+    return PostDetailResponse.from(savedPost, loginMember, imageUrls);
   }
 
   public PostDetailResponse findPostDetailById(Long postId) {
@@ -76,13 +76,12 @@ public class PostService {
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 
     List<String> imageUrls = postImageService.findPostImagesByPostId(postId);
-
-    return PostDetailResponse.from(foundPost, imageUrls);
+    return PostDetailResponse.from(foundPost, foundPost.getMember(), imageUrls);
   }
 
   @Transactional
   public PostDetailResponse updatePostStatus(Long postId, PostUpdateStatusRequest postUpdateStatusRequest, Long authorId) {
-    Post post = postRepository.findById(postId)
+    Post post = postRepository.findPostDetailById(postId)
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 
     if(!Objects.equals(post.getMemberId(), authorId)) {
@@ -91,6 +90,6 @@ public class PostService {
 
     post.changeStatus(postUpdateStatusRequest.status());
     List<String> imageUrls = postImageService.findPostImagesByPostId(postId);
-    return PostDetailResponse.from(post, imageUrls);
+    return PostDetailResponse.from(post, post.getMember(), imageUrls);
   }
 }

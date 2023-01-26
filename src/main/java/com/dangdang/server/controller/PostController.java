@@ -1,4 +1,4 @@
-package com.dangdang.server.controller.post;
+package com.dangdang.server.controller;
 
 import static com.dangdang.server.global.exception.ExceptionCode.POST_STATUS_IS_NULL;
 
@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,7 +47,7 @@ public class PostController {
   @PatchMapping("/{id}")
   public ResponseEntity<PostDetailResponse> updatePostStatus(
       @PathVariable("id") long postId,
-      @Valid PostUpdateStatusRequest postUpdateStatusRequest,
+      @RequestBody @Valid PostUpdateStatusRequest postUpdateStatusRequest,
       Authentication authentication,
       BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {

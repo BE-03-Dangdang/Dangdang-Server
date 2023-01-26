@@ -1,7 +1,5 @@
 package com.dangdang.server.controller.member;
 
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -17,9 +15,9 @@ import com.dangdang.server.domain.member.application.SmsMessageService;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.RedisAuthCodeRepository;
 import com.dangdang.server.domain.member.domain.RedisSendSmsRepository;
-import com.dangdang.server.domain.member.domain.RedisSmsRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
+import com.dangdang.server.domain.member.dto.request.MemberRefreshRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.request.SmsRequest;
@@ -29,7 +27,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -208,16 +205,21 @@ class MemberRestDocsTest {
   @DisplayName("/api/v1/refresh -> ")
   void refresh() throws Exception {
     //회원 가입된 정보 생성
-    Member member = new Member( "01012345678", "cloudwi");
-    memberRepository.save(member);
+    Member member = new Member("01012345678", "cloudwi");
+    Member save = memberRepository.save(member);
 
-    String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
+    String refreshToken = jwtTokenProvider.createRefreshToken(save.getId());
+    member.setRefreshToken(refreshToken);
+
+    MemberRefreshRequest memberRefreshRequest = new MemberRefreshRequest(refreshToken);
+
+    String json = objectMapper.writeValueAsString(memberRefreshRequest);
 
     mockMvc.perform(
             post("/members/refresh")
                 .contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
-                .header("RefreshToken", "Bearer " + refreshToken)
+                .content(json)
         )
         .andExpect(status().isOk())
         .andDo(
@@ -225,8 +227,8 @@ class MemberRestDocsTest {
                 "MemberController/signup",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
-                requestHeaders(
-                    headerWithName("RefreshToken").description("리플레쉬 토큰")
+                requestFields(
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("리플레쉬 토큰")
                 ),
                 responseFields(
                     fieldWithPath("accessToken").type(JsonFieldType.STRING)

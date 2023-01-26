@@ -9,26 +9,26 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtRefreshTokenFilter extends OncePerRequestFilter {
 
   private final JwtTokenProvider jwtTokenProvider;
 
-  public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+  public JwtRefreshTokenFilter(JwtTokenProvider jwtTokenProvider) {
     this.jwtTokenProvider = jwtTokenProvider;
   }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    String token = jwtTokenProvider.resolveAccessToken(request);
-    if (token != null && jwtTokenProvider.validateAccessToken(token)) {
+    String token = jwtTokenProvider.resolveRefreshToken(request);
+
+    if (token != null && jwtTokenProvider.validateRefreshToken(token)) {
       token = jwtTokenProvider.bearerRemove(token);
-      Authentication authentication = jwtTokenProvider.getAuthentication(token);
+      Authentication authentication = jwtTokenProvider.getRefreshTokenAuthentication(token);
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     filterChain.doFilter(request, response);
+
   }
-
-
 }

@@ -1,5 +1,6 @@
 package com.dangdang.server.global.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,5 +24,11 @@ public class GlobalExceptionHandler {
     log.info(e.getMessage(), e);
     HttpStatus httpStatus = HttpStatus.valueOf(e.getStatus());
     return ResponseEntity.status(httpStatus).body(e.getMessage());
+  }
+
+  @ExceptionHandler(ExpiredJwtException.class)
+  public ResponseEntity<String> expiredJwtException(Exception e) {
+    e.printStackTrace();
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT의 유효기간이 초과하였습니다.");
   }
 }

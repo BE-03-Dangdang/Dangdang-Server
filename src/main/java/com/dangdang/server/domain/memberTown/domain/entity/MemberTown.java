@@ -1,5 +1,7 @@
 package com.dangdang.server.domain.memberTown.domain.entity;
 
+import static com.dangdang.server.domain.memberTown.domain.entity.TownAuthStatus.TOWN_UNCERTIFIED;
+
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.entity.Member;
@@ -14,11 +16,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import lombok.Getter;
 
-@Entity
 @Getter
+@Entity
 public class MemberTown extends BaseEntity {
 
   @Id
@@ -35,8 +36,12 @@ public class MemberTown extends BaseEntity {
   private Town town;
 
   @Enumerated(EnumType.STRING)
-  @Column(length = 20, nullable = false)
+  @Column(nullable = false)
   private RangeType rangeType;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private TownAuthStatus townAuthStatus;
 
   protected MemberTown() {
   }
@@ -46,25 +51,29 @@ public class MemberTown extends BaseEntity {
     this.town = town;
     this.rangeType = RangeType.LEVEL2;
     this.status = StatusType.ACTIVE;
+    this.townAuthStatus = TOWN_UNCERTIFIED;
   }
 
-  public MemberTown(Long id, Member member, Town town, RangeType rangeType) {
+  public MemberTown(Long id, Member member, Town town, RangeType rangeType,
+      TownAuthStatus townAuthStatus) {
     this.id = id;
     this.member = member;
     this.town = town;
     this.rangeType = rangeType;
+    this.townAuthStatus = townAuthStatus;
   }
 
-  public MemberTown(StatusType statusType) {
+  // Member 추가시 MemberTown 추가됨
+//  public void
+
+  // Town 상태를 Active or Inactive
+  public void updateMemberTownStatus(StatusType statusType) {
     this.status = statusType;
   }
 
-  public void isOwner(Long memberId) {
-    this.member.isId(memberId);
-  }
-
-  public void update(MemberTown updateMemberTown) {
-    this.status = updateMemberTown.getStatus();
+  // Town range 설정
+  public void updateMemberTownRange(RangeType rangeType) {
+    this.rangeType = rangeType;
   }
 
 }

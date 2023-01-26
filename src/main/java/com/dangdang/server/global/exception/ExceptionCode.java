@@ -3,8 +3,11 @@ package com.dangdang.server.global.exception;
 import org.springframework.http.HttpStatus;
 
 public enum ExceptionCode {
+
   CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 카테고리가 존재하지 않습니다."),
   TOWN_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 도시가 존재하지 않습니다."),
+  CERTIFIED_FAIL(HttpStatus.UNAUTHORIZED.value(), "인증에 실패히였습니다"),
+  TOWN_NOT_FOUND(HttpStatus.NOT_FOUND.value(),"타운을 찾지 못하였습니다"),
   BINDING_WRONG(HttpStatus.BAD_REQUEST.value(), "요청하신 필드값의 유효성이 잘못되었습니다."),
   IMAGE_URL_INVALID(HttpStatus.BAD_REQUEST.value(), "이미지 주소가 잘못되었습니다."),
   POST_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 게시글이 존재하지 않습니다."),
@@ -14,6 +17,15 @@ public enum ExceptionCode {
   OVER_COUNT(HttpStatus.METHOD_NOT_ALLOWED.value(), "허용 가능한 갯수가 아닙니다!"),
   NOT_PERMISSION(HttpStatus.FORBIDDEN.value(), "권한이 없습니다."),
 
+  IMAGE_URL_INVALID(HttpStatus.BAD_REQUEST.value(), "이미지 주소가 잘못되었습니다."),
+  POST_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 게시글이 존재하지 않습니다."),
+  MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "멤버를 찾지 못하였습니다"),
+  MEMBER_TOWN_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "멤버 타운을 찾지 못하였습니다"),
+  NOT_APPROPRIATE_COUNT(HttpStatus.BAD_REQUEST.value(), "허용 가능한 갯수가 아닙니다"),
+  NOT_PERMISSION(HttpStatus.FORBIDDEN.value(), "권한이 없습니다"),
+  NOT_EXIST_LEVEL(HttpStatus.BAD_REQUEST.value(), "레벨이 잘못된 범위입니다"),
+
+  // pay
   TRUST_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "신탁 계좌를 찾지 못했습니다."),
   TRUST_ACCOUNT_INACTIVE(HttpStatus.BAD_REQUEST.value(), "사용할 수 없는 신탁계좌입니다."),
   BANK_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "은행 계좌를 찾지 못했습니다."),
@@ -26,6 +38,8 @@ public enum ExceptionCode {
   MEMBER_UNMATCH_AUTHOR(HttpStatus.FORBIDDEN.value(), "글 작성자가 아닙니다."),
   POST_STATUS_IS_NULL(HttpStatus.BAD_REQUEST.value(), "글 상태값은 비어있을 수 없습니다."),
   SLICE_PARAMETER_UNDER_ZERO(HttpStatus.BAD_REQUEST.value(), "글 페이지, 사이즈는 음수일 수 없습니다.");
+  BANK_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "금융기관을 찾지 못했습니다.");
+
   int status;
   String message;
 

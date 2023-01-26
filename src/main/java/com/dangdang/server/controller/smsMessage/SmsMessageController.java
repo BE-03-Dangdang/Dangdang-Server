@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/smsMessage")
+@RequestMapping("/sms-message")
 public class SmsMessageController {
 
   private final SmsMessageService smsMessageService;
@@ -19,7 +19,7 @@ public class SmsMessageController {
     this.smsMessageService = smsMessageService;
   }
 
-  @PostMapping()
+  @PostMapping
   public ResponseEntity<TestSendMessageResponse> sendMessage(@RequestBody SmsRequest smsRequest) {
     String authCode = smsMessageService.sendMessage(smsRequest);
     TestSendMessageResponse testSendMessageResponse = new TestSendMessageResponse(authCode);

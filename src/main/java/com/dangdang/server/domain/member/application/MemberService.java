@@ -12,13 +12,16 @@ import com.dangdang.server.domain.member.domain.entity.RedisSms;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
+import com.dangdang.server.domain.member.exception.MemberCertifiedFailException;
+import com.dangdang.server.domain.member.exception.MemberNotFoundException;
+import com.dangdang.server.domain.member.exception.TownNotFoundException;
 import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
-import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import com.dangdang.server.global.security.JwtTokenProvider;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,12 +52,11 @@ public class MemberService {
     phoneNumberCertify(phoneNumberCertifyRequest);
 
     // 시작하기 -> User DB에 있는 경우 -> token 발급
-    if (memberRepository.findByPhoneNumber(phoneNumberCertifyRequest.getPhoneNumber())
-        .isPresent()) {
-      Member member = memberRepository.findByPhoneNumber(
-              phoneNumberCertifyRequest.getPhoneNumber())
-          .orElseThrow(() -> new BusinessException(ExceptionCode.MEMBER_NOT_FOUND));
-      return getMemberCertifyResponse(member.getId());
+    Optional<Member> member = memberRepository.findByPhoneNumber(
+        phoneNumberCertifyRequest.getPhoneNumber());
+
+    if (member.isPresent()) {
+      return getMemberCertifyResponse(member.get().getId());
     }
 
     RedisAuthCode redisAuthCode = toRedisAuthCode(
@@ -69,7 +71,7 @@ public class MemberService {
     phoneNumberCertify(phoneNumberCertifyRequest);
 
     Member member = memberRepository.findByPhoneNumber(phoneNumberCertifyRequest.getPhoneNumber())
-        .orElseThrow(() -> new BusinessException(ExceptionCode.MEMBER_NOT_FOUND));
+        .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
 
     return getMemberCertifyResponse(member.getId());
   }
@@ -78,7 +80,7 @@ public class MemberService {
   public MemberCertifyResponse signup(MemberSignUpRequest memberSignupRequest) {
     RedisAuthCode redisAuthCode = redisAuthCodeRepository.findById(
             memberSignupRequest.getPhoneNumber())
-        .orElseThrow(() -> new BusinessException(ExceptionCode.CERTIFIED_FAIL));
+        .orElseThrow(() -> new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL));
 
     redisAuthCodeRepository.deleteById(redisAuthCode.getId());
 
@@ -86,7 +88,7 @@ public class MemberService {
     member = memberRepository.save(member);
 
     Town town = townRepository.findByName(memberSignupRequest.getTownName())
-        .orElseThrow(() -> new BusinessException(ExceptionCode.TOWN_NOT_FOUND));
+        .orElseThrow(() -> new TownNotFoundException(ExceptionCode.TOWN_NOT_FOUND));
 
     MemberTown memberTown = new MemberTown(member, town);
     memberTownRepository.save(memberTown);
@@ -97,15 +99,13 @@ public class MemberService {
   private void phoneNumberCertify(PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
     RedisSms redisSms = redisSmsRepository.findById(phoneNumberCertifyRequest.getPhoneNumber())
         .orElseThrow(() ->
-            new BusinessException(ExceptionCode.CERTIFIED_FAIL)
+            new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL)
         );
-
-    redisSmsRepository.deleteById(phoneNumberCertifyRequest.getPhoneNumber());
 
     String authCode = redisSms.getAuthCode();
 
     if (!authCode.equals(phoneNumberCertifyRequest.getAuthCode())) {
-      throw new BusinessException(ExceptionCode.CERTIFIED_FAIL);
+      throw new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL);
     }
 
     redisSmsRepository.deleteById(phoneNumberCertifyRequest.getPhoneNumber());

@@ -19,6 +19,8 @@ public class JwtTokenProvider  {
 
   private String secretKey;
 
+  private final Long EXPIRED_TIME = 1000 * 60 * 30L;
+
   private final CustomUserDetailsService customUserDetailsService;
 
   public JwtTokenProvider(@Value("${spring.jwt.secretKey}")
@@ -34,13 +36,12 @@ public class JwtTokenProvider  {
 
     Date date = new Date();
 
-    long expiredTime = 1000 * 60 * 30L;
     return Jwts.builder()
         .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
         .setClaims(claims)
         .setIssuedAt(date)
         .setIssuer("Dangdang-server")
-        .setExpiration(new Date(date.getTime() + expiredTime))
+        .setExpiration(new Date(date.getTime() + EXPIRED_TIME))
         .signWith(SignatureAlgorithm.HS256, secretKey)
         .compact();
   }

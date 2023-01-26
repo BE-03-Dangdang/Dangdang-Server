@@ -30,12 +30,8 @@ public class JwtTokenProvider  {
   String accessTokenSecretKey,
       @Value("${spring.jwt.RefreshTokenSecretKey}") String refreshTokenSecretKey,
       CustomUserDetailsService customUserDetailsService) {
-    this.accessTokenSecretKey = Base64
-        .getEncoder()
-        .encodeToString(accessTokenSecretKey.getBytes());
-    this.refreshTokenSecretKey = Base64
-        .getEncoder()
-        .encodeToString(refreshTokenSecretKey.getBytes());
+    this.accessTokenSecretKey = getTokenSecretKey(accessTokenSecretKey);
+    this.refreshTokenSecretKey = getTokenSecretKey(refreshTokenSecretKey);
     this.customUserDetailsService = customUserDetailsService;
   }
 
@@ -43,7 +39,7 @@ public class JwtTokenProvider  {
     return getToken(memberId, ACCESS_TOKEN_EXPIRED_TIME, accessTokenSecretKey);
   }
 
-  public String createRefreshToken(Long memberId) {
+  public String createRefreshToken(long memberId) {
     return getToken(memberId, REFRESH_TOKEN_EXPIRED_TIME, refreshTokenSecretKey);
   }
   
@@ -64,10 +60,6 @@ public class JwtTokenProvider  {
 
   public String resolveAccessToken(HttpServletRequest request) {
     return request.getHeader("AccessToken");
-  }
-
-  public String resolveRefreshToken(HttpServletRequest request) {
-    return request.getHeader("RefreshToken");
   }
 
   public boolean validateAccessToken(String token) {
@@ -97,13 +89,19 @@ public class JwtTokenProvider  {
         .compact();
   }
 
-  private boolean extracted(String token, String accessTokenSecretKey) {
+  private boolean extracted(String token, String secretKey) {
     token = bearerRemove(token);
     try {
-      Jws<Claims> claims = Jwts.parser().setSigningKey(accessTokenSecretKey).parseClaimsJws(token);
+      Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
       return !claims.getBody().getExpiration().before(new Date());
     } catch (Exception e) {
       return false;
     }
+  }
+
+  private static String getTokenSecretKey(String accessTokenSecretKey) {
+    return Base64
+        .getEncoder()
+        .encodeToString(accessTokenSecretKey.getBytes());
   }
 }

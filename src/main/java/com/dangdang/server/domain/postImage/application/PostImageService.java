@@ -27,7 +27,7 @@ public class PostImageService {
     urls.stream().map(url -> PostImageRequest.toPostImage(post, url))
         .forEach(postImageRepository::save);
     return postImageRepository.findPostImagesByPostId(post.getId()).stream()
-        .map(postImage -> postImage.getUrl())
+        .map(PostImage::getUrl)
         .collect(Collectors.toList());
   }
 

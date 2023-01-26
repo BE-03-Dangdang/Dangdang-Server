@@ -1,6 +1,6 @@
 package com.dangdang.server.global.config;
 
-import com.dangdang.server.global.security.JwtAuthenticationFilter;
+import com.dangdang.server.global.security.JwtAccessTokenFilter;
 import com.dangdang.server.global.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +43,7 @@ public class SecurityConfig {
         .antMatchers(HttpMethod.POST, "/members/**").permitAll()
         .anyRequest().authenticated()
         .and()
-        .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+        .addFilterBefore(new JwtAccessTokenFilter(jwtTokenProvider),
             UsernamePasswordAuthenticationFilter.class);
 
     return http.build();

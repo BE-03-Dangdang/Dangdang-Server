@@ -6,11 +6,10 @@ import static com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRe
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.RedisAuthCodeRepository;
 import com.dangdang.server.domain.member.domain.RedisSmsRepository;
-import com.dangdang.server.domain.member.domain.RefreshTokenRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
 import com.dangdang.server.domain.member.domain.entity.RedisSms;
-import com.dangdang.server.domain.member.domain.entity.RefreshToken;
+import com.dangdang.server.domain.member.dto.request.MemberRefreshRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
@@ -37,19 +36,16 @@ public class MemberService {
   private final JwtTokenProvider jwtTokenProvider;
   private final RedisSmsRepository redisSmsRepository;
   private final RedisAuthCodeRepository redisAuthCodeRepository;
-  private final RefreshTokenRepository refreshTokenRepository;
 
   public MemberService(MemberRepository memberRepository, TownRepository townRepository,
       MemberTownRepository memberTownRepository, JwtTokenProvider jwtTokenProvider,
-      RedisSmsRepository redisSmsRepository, RedisAuthCodeRepository redisAuthCodeRepository,
-      RefreshTokenRepository refreshTokenRepository) {
+      RedisSmsRepository redisSmsRepository, RedisAuthCodeRepository redisAuthCodeRepository) {
     this.memberRepository = memberRepository;
     this.townRepository = townRepository;
     this.memberTownRepository = memberTownRepository;
     this.jwtTokenProvider = jwtTokenProvider;
     this.redisSmsRepository = redisSmsRepository;
     this.redisAuthCodeRepository = redisAuthCodeRepository;
-    this.refreshTokenRepository = refreshTokenRepository;
   }
 
   @Transactional
@@ -111,23 +107,34 @@ public class MemberService {
     redisSmsRepository.deleteById(phoneNumberCertifyRequest.phoneNumber());
   }
 
-  private MemberCertifyResponse getMemberCertifyResponse(Member member) {
+  @Transactional
+  public MemberCertifyResponse getMemberCertifyResponse(Member member) {
     String accessToken = jwtTokenProvider.createAccessToken(member.getId());
     String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
 
-    RefreshToken refreshTokenEntity = new RefreshToken(member,refreshToken);
-    refreshTokenRepository.save(refreshTokenEntity);
+    member.setRefreshToken(refreshToken);
 
     return MemberCertifyResponse.from(accessToken, refreshToken, true);
   }
 
-  public MemberCertifyResponse refresh(long memberId) {
-    Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND)
-        );
+  @Transactional
+  public MemberCertifyResponse refresh(MemberRefreshRequest memberRefreshRequest) {
+    String refreshToken = memberRefreshRequest.refreshToken();
 
-    refreshTokenRepository.deleteByMemberId(memberId);
+    if (jwtTokenProvider.validateRefreshToken(refreshToken)) {
+      throw new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL);
+    }
 
-    return getMemberCertifyResponse(member);
+    Member principal = ((Member) jwtTokenProvider.getRefreshTokenAuthentication(refreshToken)
+        .getPrincipal());
+
+    Member member = memberRepository.findById(principal.getId())
+        .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
+
+    if (!member.getRefreshToken().equals(refreshToken)) {
+      throw new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL);
+    }
+
+    return getMemberCertifyResponse(principal);
   }
 }

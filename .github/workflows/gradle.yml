@@ -18,6 +18,7 @@ env:
   CODE_DEPLOY_APPLICATION_NAME: dangdang
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: dangdang-group
 
+
 permissions:
   contents: read
 

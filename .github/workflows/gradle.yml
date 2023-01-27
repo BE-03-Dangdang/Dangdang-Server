@@ -32,7 +32,7 @@ jobs:
       - name: application.yml created
         uses: actions/checkout@v3
       - run: touch ./src/main/resources/application.yml
-      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resourcess/application.yml
+      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
       - uses: actions/upload-artifact@v3
         with:
           name: application.yml

@@ -18,7 +18,7 @@ public class TrustAccount extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "bank_account_id")
+  @Column(name = "trust_account_id")
   private Long id;
 
   @Column(length = 100)

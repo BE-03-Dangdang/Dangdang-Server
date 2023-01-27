@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.daangnpay.connectionAccount.application;
+package com.dangdang.server.domain.pay.daangnpay.connectionAccount;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -140,7 +140,6 @@ class ConnectionAccountDatabaseServiceTest {
           assertThat(allConnectionAccount).hasSize(allBankAccountSize);
         }
       }
-
 
       @Nested
       @DisplayName("고객의 당근페이 연결계좌가 존재하지 않을 경우")

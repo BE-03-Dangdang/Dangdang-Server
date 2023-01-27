@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.banks.bankAccount.application;
+package com.dangdang.server.domain.pay.banks.bankAccount;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BankAccountService 단위 테스트")
-class BankAccountServiceTest {
+class BankAccountServiceUnitTest {
 
   @Mock
   BankAccountRepository bankAccountRepository;

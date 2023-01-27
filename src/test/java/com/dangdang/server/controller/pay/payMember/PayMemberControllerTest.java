@@ -75,7 +75,7 @@ class PayMemberControllerTest {
     String json = objectMapper.writeValueAsString(payRequest);
     PayResponse payResponse = new PayResponse("신한은행", "234716230423", 20000, LocalDateTime.now());
 
-    doReturn(payResponse).when(payMemberService).charge(any(), any(), any());
+    doReturn(payResponse).when(payMemberService).charge(any(), any());
 
     mockMvc.perform(
             patch("/pay-members/money/charge")
@@ -116,7 +116,7 @@ class PayMemberControllerTest {
     String json = objectMapper.writeValueAsString(payRequest);
     PayResponse payResponse = new PayResponse("신한은행", "234716230423", 20000, LocalDateTime.now());
 
-    doReturn(payResponse).when(payMemberService).withdraw(any(), any(), any());
+    doReturn(payResponse).when(payMemberService).withdraw(any(), any());
 
     mockMvc.perform(
             patch("/pay-members/money/withdraw")

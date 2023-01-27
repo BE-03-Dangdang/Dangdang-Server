@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.banks.bankAccount.application;
+package com.dangdang.server.domain.pay.banks.bankAccount;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

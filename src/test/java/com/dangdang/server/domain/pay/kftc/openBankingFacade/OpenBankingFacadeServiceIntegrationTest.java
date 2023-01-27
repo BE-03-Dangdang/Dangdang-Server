@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.kftc.openBankingFacade.application;
+package com.dangdang.server.domain.pay.kftc.openBankingFacade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
-import com.dangdang.server.domain.pay.banks.bankAccount.application.BankAccountService;
+import com.dangdang.server.domain.pay.banks.bankAccount.BankAccountService;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.BankAccountRepository;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccount;
 import com.dangdang.server.domain.pay.banks.bankAccount.exception.BankAccountAuthenticationException;
@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @DisplayName("오픈뱅킹 API 통합테스트")
-class OpenBankingFacadeServiceTest {
+class OpenBankingFacadeServiceIntegrationTest {
 
   @Autowired
   MemberRepository memberRepository;

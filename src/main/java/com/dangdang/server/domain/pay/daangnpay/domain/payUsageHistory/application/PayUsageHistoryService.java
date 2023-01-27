@@ -25,11 +25,7 @@ public class PayUsageHistoryService {
   @Transactional
   public void addUsageHistory(PayType payType, OpenBankingResponse openBankingResponse, int money,
       PayMember payMember) {
-    String bankName = openBankingResponse.bankName();
-    String accountNumber = openBankingResponse.accountNumber();
-
-    String usageHistoryTitle = bankName + " " + accountNumber;
-
+    String usageHistoryTitle = createUsageHistoryTitle(openBankingResponse);
     PayUsageHistory payUsageHistory = new PayUsageHistory(usageHistoryTitle, money, payMember,
         payType);
     payUsageHistoryRepository.save(payUsageHistory);
@@ -41,5 +37,9 @@ public class PayUsageHistoryService {
 //  public void getUsageHistory() {
   //    accountNumber = accountNumber.substring(accountNumber.length() - USAGE_HISTORY_ACCOUNT_LENGTH);
 //  }
-
+  private String createUsageHistoryTitle(OpenBankingResponse openBankingResponse) {
+    String bankName = openBankingResponse.bankName();
+    String accountNumber = openBankingResponse.accountNumber();
+    return bankName + " " + accountNumber;
+  }
 }

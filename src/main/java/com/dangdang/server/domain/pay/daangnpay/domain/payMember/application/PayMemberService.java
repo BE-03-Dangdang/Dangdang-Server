@@ -13,7 +13,7 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.MinAmountException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application.PayUsageHistoryService;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.application.OpenBankingFacadeService;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.OpenBankingFacadeService;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;

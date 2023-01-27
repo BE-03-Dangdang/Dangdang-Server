@@ -1,10 +1,14 @@
 name: Deploy to Amazon EC2
 
 on:
-  push:용
-    branches: [ "develop/v1.0.0", "main" ]
+  push:
+    branches:
+      - main
+      - develop/v1.0.0
   pull_request:
-    branches: [ "develop/v1.0.0", "main" ]
+    branches:
+      - main
+      - develop/v1.0.0
 
 # 본인이 설정한 값을 여기서 채워넣습니다.
 # 리전, 버킷 이름, CodeDeploy 앱 이름, CodeDeploy 배포 그룹 이름

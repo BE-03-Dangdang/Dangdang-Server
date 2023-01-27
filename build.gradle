@@ -65,36 +65,44 @@ dependencies {
     // validation
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 }
-
-bootJar {
-    dependsOn asciidoctor
-    copy {
-        from "${asciidoctor.outputDir}"
-        into 'BOOT-INF/classes/static/docs'
-    }
-}
+//
+//bootJar {
+//    dependsOn asciidoctor
+//    copy {
+//        from "${asciidoctor.outputDir}"
+//        into 'BOOT-INF/classes/static/docs'
+//    }
+//}
+//
+//tasks.named('test') {
+//    outputs.dir snippetsDir
+//    useJUnitPlatform()
+//}
+//
+//tasks.named('asciidoctor') {
+//    inputs.dir snippetsDir
+//    configurations 'asciidoctorExtensions'
+//    dependsOn test
+//}
+//
+//asciidoctor.doFirst {
+//    delete file('src/main/resources/static/docs')
+//}
+//
+//task copyDocument(type: Copy) {
+//    dependsOn asciidoctor
+//    from file("build/docs/asciidoc")
+//    into file("src/main/resources/static/docs")
+//}
+//
+//build {
+//    dependsOn copyDocument
+//}
 
 tasks.named('test') {
-    outputs.dir snippetsDir
     useJUnitPlatform()
 }
 
-tasks.named('asciidoctor') {
-    inputs.dir snippetsDir
-    configurations 'asciidoctorExtensions'
-    dependsOn test
-}
-
-asciidoctor.doFirst {
-    delete file('src/main/resources/static/docs')
-}
-
-task copyDocument(type: Copy) {
-    dependsOn asciidoctor
-    from file("build/docs/asciidoc")
-    into file("src/main/resources/static/docs")
-}
-
-build {
-    dependsOn copyDocument
+jar {
+    enabled = false
 }

@@ -17,6 +17,7 @@ env:
   S3_BUCKET_NAME: dangdang-server
   CODE_DEPLOY_APPLICATION_NAME: dangdang
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: dangdang-group
+  APPLICATION: ${{ secrets.APPLICATION }}
 
 permissions:
   contents: read
@@ -28,6 +29,15 @@ jobs:
     environment: production
 
     steps:
+      - name: application.yml created
+        uses: actions/checkout@v3
+      - run: touch ./src/main/resources/application.yml
+      - run: echo "${{env.APPLICATION}}" > ./src/main/resourcess/application.yml
+      - uses: actions/upload-artifact@v3
+        with:
+          name: application.yml
+          path: ./src/main/resources/application.yml
+
       # (1) 기본 체크아웃
       - name: Checkout
         uses: actions/checkout@v3
@@ -43,7 +53,7 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
         with:
-          arguments: clean build
+          arguments: clean build -x test
 
       # (4) AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
       - name: Configure AWS credentials

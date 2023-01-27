@@ -1,7 +1,12 @@
 package com.dangdang.server.domain.pay.banks.trustAccount.domain.entity;
 
+import static com.dangdang.server.global.exception.ExceptionCode.INSUFFICIENT_BALANCE;
+import static com.dangdang.server.global.exception.ExceptionCode.TRUST_ACCOUNT_INACTIVE;
+
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
+import com.dangdang.server.domain.pay.banks.trustAccount.exception.InactiveTrustAccountException;
+import com.dangdang.server.domain.pay.banks.trustAccount.exception.InsufficientTrustAccountException;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import javax.persistence.Column;
@@ -21,14 +26,14 @@ public class TrustAccount extends BaseEntity {
   @Column(name = "trust_account_id")
   private Long id;
 
-  @Column(length = 100)
+  @Column(length = 100, nullable = false)
   private String accountNumber;
 
-  @Column(columnDefinition = "INT UNSIGNED")
+  @Column(columnDefinition = "INT UNSIGNED", nullable = false)
   @ColumnDefault("0")
   private Integer balance;
 
-  @Column(length = 100)
+  @Column(length = 100, nullable = false)
   private String customer;
 
   protected TrustAccount() {
@@ -48,11 +53,23 @@ public class TrustAccount extends BaseEntity {
     this.status = statusType;
   }
 
+  private void verifyTrustAccountStatus() {
+    if (this.status == StatusType.INACTIVE) {
+      throw new InactiveTrustAccountException(TRUST_ACCOUNT_INACTIVE);
+    }
+  }
+
   public void deposit(OpenBankingWithdrawRequest openBankingWithdrawRequest) {
+    verifyTrustAccountStatus();
     balance += openBankingWithdrawRequest.amount();
   }
 
   public void withdraw(OpenBankingDepositRequest openBankingDepositRequest) {
+    verifyTrustAccountStatus();
+    if (balance < openBankingDepositRequest.amount()) {
+      throw new InsufficientTrustAccountException(INSUFFICIENT_BALANCE);
+    }
+
     balance -= openBankingDepositRequest.amount();
   }
 }

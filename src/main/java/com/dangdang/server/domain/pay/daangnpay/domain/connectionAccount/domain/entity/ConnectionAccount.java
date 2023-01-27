@@ -22,10 +22,10 @@ public class ConnectionAccount extends BaseEntity {
   @Column(name = "connection_account_id")
   private Long id;
 
-  @Column(length = 20)
+  @Column(length = 20, nullable = false)
   private String bank;
 
-  @Column(length = 100)
+  @Column(length = 100, nullable = false)
   private String bankAccountNumber;
 
   @ManyToOne(fetch = FetchType.LAZY)

@@ -86,7 +86,7 @@ class MemberTownServiceTest {
     MemberTownRequest memberTownRequest = new MemberTownRequest("삼성1동");
 
     // when, then
-    assertThatThrownBy(() -> memberTownService.deleteMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.createMemberTown(memberTownRequest, member))
         .isInstanceOf(NotAppropriateCountException.class);
   }
 

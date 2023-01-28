@@ -65,12 +65,14 @@ public class MemberTown extends BaseEntity {
     this.townAuthStatus = townAuthStatus;
   }
 
-  // Town 상태를 Active or Inactive
+  public String getMemberTownName() {
+    return this.getTown().getName();
+  }
+
   public void updateMemberTownStatus(StatusType statusType) {
     this.status = statusType;
   }
 
-  // Town range 설정
   public void updateMemberTownRange(RangeType rangeType) {
     this.rangeType = rangeType;
   }

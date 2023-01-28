@@ -241,7 +241,6 @@ class MemberTownServiceTest {
     assertThat(foundMemberTown.getRangeType()).isEqualTo(RangeType.LEVEL3);
   }
 
-  // 실패 1 - member town 없는 경우
   @Test
   @DisplayName("멤버 타운 range 변경 실패 - 멤버 타운 없는 경우")
   @Transactional

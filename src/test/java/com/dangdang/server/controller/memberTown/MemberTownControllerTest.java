@@ -1,41 +1,50 @@
 package com.dangdang.server.controller.memberTown;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRangeRequest;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRequest;
-import com.dangdang.server.domain.town.domain.entity.Town;
 import com.dangdang.server.domain.town.domain.TownRepository;
+import com.dangdang.server.domain.town.domain.entity.Town;
 import com.dangdang.server.global.security.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
+@ExtendWith(RestDocumentationExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 class MemberTownControllerTest {
-
-  @Autowired
-  WebApplicationContext context;
 
   @Autowired
   MockMvc mockMvc;
@@ -64,11 +73,6 @@ class MemberTownControllerTest {
     member = new Member("01012345678", null, "Albatross");
     Member save = memberRepository.save(member);
     accessToken = "Bearer " + jwtTokenProvider.createAccessToken(save.getId());
-    mockMvc = MockMvcBuilders
-        .webAppContextSetup(context)
-        .alwaysDo(print())
-        .apply(springSecurity())
-        .build();
   }
 
   @AfterEach
@@ -93,6 +97,52 @@ class MemberTownControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(memberTownRequest)))
         .andExpect(status().isOk())
+        .andDo(
+            document("api/v1/post/member-town",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("AccessToken").description("Access Token")
+                ),
+                requestFields(
+                    fieldWithPath("townName").description("동네 이름")
+                ),
+                responseFields(
+                    fieldWithPath("townName").description("동네 이름")
+                )
+            ));
+  }
+
+  @Test
+  @DisplayName("멤버 타운 생성 실패 - member town 1개가 아닌 경우")
+  @Transactional
+  void createMemberTown_fail() throws Exception {
+    MemberTownRequest memberTownRequest = new MemberTownRequest("삼성1동");
+
+    mockMvc.perform(post("/member-town")
+            .header("AccessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(memberTownRequest)))
+        .andExpect(status().isBadRequest())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("멤버 타운 생성 실패 - town 없는 경우")
+  @Transactional
+  void createMemberTown_fail_byNotFoundTown() throws Exception{
+    // given
+    // member-town 1개 생성되어 있어야 (가입할 때 되어 있는 부분)
+    Town existingTown = townRepository.findByName("삼성2동").get();
+    MemberTown existingMemberTown = new MemberTown(member, existingTown);
+    memberTownRepository.save(existingMemberTown);
+    MemberTownRequest memberTownRequest = new MemberTownRequest("삼성7동");
+
+    mockMvc.perform(post("/member-town")
+            .header("AccessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(memberTownRequest)))
+        .andExpect(status().isNotFound())
         .andDo(print());
   }
 
@@ -111,13 +161,58 @@ class MemberTownControllerTest {
     memberTownRepository.save(existingMemberTown2);
 
     MemberTownRequest memberTownRequest = new MemberTownRequest("삼성2동");
-    System.out.println(memberTownRequest.townName());
 
     mockMvc.perform(delete("/member-town")
             .header("AccessToken", accessToken)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(memberTownRequest)))
         .andExpect(status().isOk())
+        .andDo(
+            document("api/v1/delete/member-town",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("AccessToken").description("Access Token")
+                ),
+                requestFields(
+                    fieldWithPath("townName").description("동네 이름")
+                )
+            ));
+
+  }
+
+  @Test
+  @DisplayName("멤버 타운 삭제 실패 - 멤버 타운 개수가 2개가 아닌 경우")
+  void deleteMemberTown_fail_byMemberTownSizeNot2() throws Exception{
+    MemberTownRequest memberTownRequest = new MemberTownRequest("삼성2동");
+
+    mockMvc.perform(delete("/member-town")
+            .header("AccessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(memberTownRequest)))
+        .andExpect(status().isBadRequest())
+        .andDo(print());
+  }
+
+  @Test
+  @DisplayName("멤버 타운 삭제 실패 - 잘못된 멤버 타운 이름인 경우")
+  @Transactional
+  void deleteMemberTown_fail_byWrongMemberTownName() throws Exception{
+    Town existingTown1 = townRepository.findByName("삼성1동").get();
+    MemberTown existingMemberTown1 = new MemberTown(member, existingTown1);
+    memberTownRepository.save(existingMemberTown1);
+
+    Town existingTown2 = townRepository.findByName("삼성2동").get();
+    MemberTown existingMemberTown2 = new MemberTown(member, existingTown2);
+    memberTownRepository.save(existingMemberTown2);
+
+    MemberTownRequest memberTownRequest = new MemberTownRequest("삼성7동");
+
+    mockMvc.perform(delete("/member-town")
+            .header("AccessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(memberTownRequest)))
+        .andExpect(status().isNotFound())
         .andDo(print());
   }
 
@@ -126,9 +221,9 @@ class MemberTownControllerTest {
   @Transactional
   void changeActiveMemberTown() throws Exception {
     // given
-    // member-town 2개 있어야 함 (삼성1동이 Inactive 가 된다)
     Town existingTown1 = townRepository.findByName("삼성1동").get();
     MemberTown existingMemberTown1 = new MemberTown(member, existingTown1);
+    existingMemberTown1.updateMemberTownStatus(StatusType.INACTIVE);
     memberTownRepository.save(existingMemberTown1);
 
     Town existingTown2 = townRepository.findByName("삼성2동").get();
@@ -143,6 +238,37 @@ class MemberTownControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(memberTownRequest)))
         .andExpect(status().isOk())
+        .andDo(
+            document("api/v1/put/member-town/active",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("AccessToken").description("Access Token")
+                ),
+                requestFields(
+                    fieldWithPath("townName").description("동네 이름")
+                ),
+                responseFields(
+                    fieldWithPath("townName").description("동네 이름")
+                )
+            ));
+  }
+
+  @Test
+  @DisplayName("멤버 타운 활성화 변경 실패 - 멤버 타운 개수가 2개가 아닌 경우")
+  @Transactional
+  void changeActiveMemberTown_fail_byMemberTownSizeNot2() throws Exception{
+    Town existingTown1 = townRepository.findByName("삼성1동").get();
+    MemberTown existingMemberTown1 = new MemberTown(member, existingTown1);
+    memberTownRepository.save(existingMemberTown1);
+
+    MemberTownRequest memberTownRequest = new MemberTownRequest("삼성2동");
+
+    mockMvc.perform(put("/member-town/active")
+            .header("AccessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(memberTownRequest)))
+        .andExpect(status().isBadRequest())
         .andDo(print());
   }
 
@@ -162,6 +288,41 @@ class MemberTownControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(memberTownRangeRequest)))
         .andExpect(status().isOk())
+        .andDo(
+            document("api/v1/put/member-town/range",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("AccessToken").description("Access Token")
+                ),
+                requestFields(
+                    fieldWithPath("townName").description("동네 이름"),
+                    fieldWithPath("level").description("동네 범위 레벨[1-4]")
+                ),
+                responseFields(
+                    fieldWithPath("townName").description("동네 이름"),
+                    fieldWithPath("level").description("동네 범위 레벨[1-4]")
+                )
+            ));
+  }
+
+  @Test
+  @DisplayName("멤버 타운 range 변경 실패 - range 범위가 잘못된 경우")
+  @Transactional
+  void changeMemberTownRange_fail_byWrongMemberTownRange() throws Exception{
+    // given
+    Town existingTown1 = townRepository.findByName("삼성1동").get();
+    MemberTown existingMemberTown1 = new MemberTown(member, existingTown1);
+    memberTownRepository.save(existingMemberTown1);
+
+    MemberTownRangeRequest memberTownRangeRequest = new MemberTownRangeRequest("삼성1동", 7);
+
+    mockMvc.perform(put("/member-town/range")
+            .header("AccessToken", accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(memberTownRangeRequest)))
+        .andExpect(status().isBadRequest())
         .andDo(print());
+
   }
 }

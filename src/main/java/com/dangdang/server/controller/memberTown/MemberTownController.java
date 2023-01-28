@@ -36,12 +36,10 @@ public class MemberTownController {
   }
 
   @DeleteMapping
-  public ResponseEntity<MemberTownResponse> deleteMemberTown(
+  public void deleteMemberTown(
       @RequestBody @Valid MemberTownRequest memberTownRequest,
       Authentication authentication) {
-    MemberTownResponse memberTownResponse = memberTownService
-        .deleteMemberTown(memberTownRequest, (Member) authentication.getPrincipal());
-    return ResponseEntity.ok(memberTownResponse);
+     memberTownService.deleteMemberTown(memberTownRequest, (Member) authentication.getPrincipal());
   }
 
   @PutMapping("/active")
@@ -54,7 +52,7 @@ public class MemberTownController {
     return ResponseEntity.ok(memberTownResponse);
   }
 
-  @PutMapping("range")
+  @PutMapping("/range")
   public ResponseEntity<MemberTownRangeResponse> changeMemberTownRange(
       @RequestBody @Valid MemberTownRangeRequest memberTownRangeRequest,
       Authentication authentication) {

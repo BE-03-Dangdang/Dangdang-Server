@@ -22,14 +22,14 @@ public class PayMember extends BaseEntity {
   @Column(name = "pay_user_id")
   private Long id;
 
-  @Column(length = 200)
+  @Column(length = 200, nullable = false)
   private String password;
 
-  @Column(columnDefinition = "INT UNSIGNED")
+  @Column(columnDefinition = "INT UNSIGNED", nullable = false)
   @ColumnDefault("0")
   private Integer money = 0;
 
-  @Column(columnDefinition = "INT UNSIGNED")
+  @Column(columnDefinition = "INT UNSIGNED", nullable = false)
   @ColumnDefault("5")
   private Integer feeCount = 5;
 
@@ -45,8 +45,19 @@ public class PayMember extends BaseEntity {
     this.member = member;
   }
 
+  public PayMember(String password, Integer money, Member member) {
+    this.password = password;
+    this.money = money;
+    this.member = member;
+  }
+
   public int addMoney(int amount) {
     money += amount;
+    return money;
+  }
+
+  public int minusMoney(int amount) {
+    money -= amount;
     return money;
   }
 }

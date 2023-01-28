@@ -5,6 +5,7 @@ import static com.dangdang.server.global.exception.ExceptionCode.PAY_MEMBER_NOT_
 
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayType;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
@@ -55,22 +56,46 @@ public class PayMemberService {
    * 당근머니 충전
    */
   @Transactional
-  public PayResponse charge(Long memberId, PayRequest payRequest) {
+  public PayResponse charge(PayType payType, Long memberId, PayRequest payRequest) {
     PayMember payMember = getPayMember(memberId);
     OpenBankingWithdrawRequest openBankingWithdrawRequest = createOpenBankingWithdrawRequest(
         payMember.getId(), payRequest);
     OpenBankingResponse openBankingResponse = openBankingFacadeService.withdraw(
         openBankingWithdrawRequest);
 
-    int balanceMoney = payMemberAddMoney(payMember, payRequest);
+    int balanceMoney = addPayMemberMoney(payMember, payRequest);
 
-    payUsageHistoryService.addUsageHistory(openBankingResponse, balanceMoney, payMember);
+    payUsageHistoryService.addUsageHistory(payType, openBankingResponse, balanceMoney, payMember);
 
     return PayResponse.from(openBankingResponse, balanceMoney);
   }
 
-  private int payMemberAddMoney(PayMember payMember, PayRequest payRequest) {
+  private int addPayMemberMoney(PayMember payMember, PayRequest payRequest) {
     int amount = payRequest.amount();
     return payMember.addMoney(amount);
+  }
+
+  /**
+   * 당근머니 출금
+   */
+  @Transactional
+  public PayResponse withdraw(PayType payType, Long memberId, PayRequest payRequest) {
+    PayMember payMember = getPayMember(memberId);
+    OpenBankingDepositRequest openBankingDepositRequestFromWithdraw = createOpenBankingDepositRequest(
+        payMember.getId(), payRequest);
+
+    OpenBankingResponse openBankingResponse = openBankingFacadeService.deposit(
+        openBankingDepositRequestFromWithdraw);
+
+    int balanceMoney = minusPayMemberMoney(payMember, payRequest);
+
+    payUsageHistoryService.addUsageHistory(payType, openBankingResponse, balanceMoney, payMember);
+
+    return PayResponse.from(openBankingResponse, balanceMoney);
+  }
+
+  private int minusPayMemberMoney(PayMember payMember, PayRequest payRequest) {
+    int amount = payRequest.amount();
+    return payMember.minusMoney(amount);
   }
 }

@@ -1,0 +1,34 @@
+= Spring REST Docs
+backtony.github.io(Rest Docs)
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs // 문서에 표기되는 코드들의 하이라이팅을 highlightjs를 사용
+:toc: left // toc (Table Of Contents)를 문서의 좌측에 두기
+:toclevels: 2
+:sectlinks:
+
+[[PayMember-API]]
+== PayMember API
+
+[[PayMember-당근머니-충전]]
+=== PayMember 당근머니 충전
+
+operation::PayMemberController/charge[snippets='http-request,request-headers,http-response,response-fields']
+
+[[PayMember-당근머니-출금]]
+=== PayMember 당근머니 출금
+
+operation::PayMemberController/charge[snippets='http-request,request-headers,http-response,response-fields']
+
+[[ConnectionAccount-API]]
+== ConnectionAccount API
+
+[[ConnectionAccount-연결계좌-추가]]
+=== ConnectionAccount 연결계좌 추가
+
+operation::ConnectionAccountDatabaseController/addConnectionAccount[snippets='http-request,request-headers,http-response']
+
+[[ConnectionAccount-전체-연결계좌-조회]]
+=== ConnectionAccount 전체 연결계좌 조회
+
+operation::ConnectionAccountDatabaseController/getAllConnectionAccountResponse[snippets='http-request,request-headers,http-response,response-fields']

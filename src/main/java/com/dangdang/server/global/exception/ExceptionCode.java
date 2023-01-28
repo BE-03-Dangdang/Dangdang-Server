@@ -28,8 +28,8 @@ public enum ExceptionCode {
   INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST.value(), "계좌의 잔액이 부족합니다."),
   BANK_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "금융기관을 찾지 못했습니다.");
 
-  int status;
-  String message;
+  private final int status;
+  private final String message;
 
   ExceptionCode(int status, String message) {
     this.status = status;

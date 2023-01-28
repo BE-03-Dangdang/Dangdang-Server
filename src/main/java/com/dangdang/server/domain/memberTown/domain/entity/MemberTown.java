@@ -54,6 +54,8 @@ public class MemberTown extends BaseEntity {
     this.townAuthStatus = TOWN_UNCERTIFIED;
   }
 
+
+
   public MemberTown(Long id, Member member, Town town, RangeType rangeType,
       TownAuthStatus townAuthStatus) {
     this.id = id;
@@ -63,15 +65,14 @@ public class MemberTown extends BaseEntity {
     this.townAuthStatus = townAuthStatus;
   }
 
-  // Member 추가시 MemberTown 추가됨
-//  public void
+  public String getMemberTownName() {
+    return this.getTown().getName();
+  }
 
-  // Town 상태를 Active or Inactive
   public void updateMemberTownStatus(StatusType statusType) {
     this.status = statusType;
   }
 
-  // Town range 설정
   public void updateMemberTownRange(RangeType rangeType) {
     this.rangeType = rangeType;
   }

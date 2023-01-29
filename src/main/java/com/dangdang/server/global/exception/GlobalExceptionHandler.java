@@ -25,10 +25,4 @@ public class GlobalExceptionHandler {
     HttpStatus httpStatus = HttpStatus.valueOf(e.getStatus());
     return ResponseEntity.status(httpStatus).body(e.getMessage());
   }
-
-  @ExceptionHandler(ExpiredJwtException.class)
-  public ResponseEntity<String> expiredJwtException(Exception e) {
-    e.printStackTrace();
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT의 유효기간이 초과하였습니다.");
-  }
 }

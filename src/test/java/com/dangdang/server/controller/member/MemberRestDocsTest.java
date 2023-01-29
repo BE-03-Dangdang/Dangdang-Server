@@ -202,7 +202,7 @@ class MemberRestDocsTest {
   }
 
   @Test
-  @DisplayName("/api/v1/refresh -> ")
+  @DisplayName("/api/v1/refresh -> 회원은 리플레쉬 토큰으로 2개의 토큰을 재 발급 받을 수 있다.")
   void refresh() throws Exception {
     //회원 가입된 정보 생성
     Member member = new Member("01012345678", "cloudwi");

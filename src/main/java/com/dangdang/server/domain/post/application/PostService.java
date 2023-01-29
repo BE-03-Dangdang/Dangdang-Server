@@ -64,8 +64,6 @@ public class PostService {
     postImageService.savePostImage(savedPost, postSaveRequest.getPostImageRequest());
     return PostResponse.from(savedPost);
   }
-  
-  
 
   public PostDetailResponse findPostDetailById(Long postId) {
     Post foundPost = postRepository.findPostDetailById(postId)
@@ -74,5 +72,13 @@ public class PostService {
     List<String> postImageUrls = postImageService.findPostImagesByPostId(postId);
 
     return PostDetailResponse.from(foundPost, postImageUrls);
+  }
+
+  @Transactional
+  public void viewUpdate(Long postId) {
+    Post foundPost = postRepository.findByIdForUpdate(postId)
+        .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
+
+    foundPost.upView();
   }
 }

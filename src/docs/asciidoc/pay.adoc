@@ -20,6 +20,11 @@ operation::PayMemberController/charge[snippets='http-request,request-headers,htt
 
 operation::PayMemberController/charge[snippets='http-request,request-headers,http-response,response-fields']
 
+[[PayMember-수취조회]]
+=== PayMember 수취 조회
+
+operation::PayMemberController/inquiryReceive[snippets='http-request,request-headers,request-body,http-response,response-fields']
+
 [[ConnectionAccount-API]]
 == ConnectionAccount API
 

@@ -25,10 +25,10 @@ public class Town extends BaseEntity {
   private String name;
 
   @Column(precision = 18, scale = 10)
-  private BigDecimal longitude;
+  private BigDecimal latitude;
 
   @Column(precision = 18, scale = 10)
-  private BigDecimal latitude;
+  private BigDecimal longitude;
 
   @OneToMany(mappedBy = "town")
   private List<MemberTown> memberTownList;
@@ -36,9 +36,9 @@ public class Town extends BaseEntity {
   protected Town() {
   }
 
-  public Town(String name, BigDecimal longitude, BigDecimal latitude) {
+  public Town(String name, BigDecimal latitude, BigDecimal longitude) {
     this.name = name;
-    this.longitude = longitude;
     this.latitude = latitude;
+    this.longitude = longitude;
   }
 }

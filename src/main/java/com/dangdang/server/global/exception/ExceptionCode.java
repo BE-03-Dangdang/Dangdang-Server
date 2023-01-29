@@ -6,7 +6,7 @@ public enum ExceptionCode {
 
   CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 카테고리가 존재하지 않습니다."),
   CERTIFIED_FAIL(HttpStatus.UNAUTHORIZED.value(), "인증에 실패히였습니다"),
-  TOWN_NOT_FOUND(HttpStatus.NOT_FOUND.value(),"타운을 찾지 못하였습니다"),
+  TOWN_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "타운을 찾지 못하였습니다"),
   BINDING_WRONG(HttpStatus.BAD_REQUEST.value(), "요청하신 필드값의 유효성이 잘못되었습니다."),
   IMAGE_URL_INVALID(HttpStatus.BAD_REQUEST.value(), "이미지 주소가 잘못되었습니다."),
   POST_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 게시글이 존재하지 않습니다."),
@@ -28,8 +28,8 @@ public enum ExceptionCode {
   INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST.value(), "계좌의 잔액이 부족합니다."),
   BANK_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "금융기관을 찾지 못했습니다.");
 
-  int status;
-  String message;
+  private final int status;
+  private final String message;
 
   ExceptionCode(int status, String message) {
     this.status = status;

@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application;
+package com.dangdang.server.domain.pay.daangnpay.payUsageHistory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,21 +7,22 @@ import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayType;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
+import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application.PayUsageHistoryService;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.PayUsageHistoryRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.entity.PayUsageHistory;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.domain.BankType;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
 import java.time.LocalDateTime;
-import javax.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @SpringBootTest
-class PayUsageHistoryServiceTest {
+class PayUsageHistoryServiceIntegrationTest {
 
   static Member member;
   static PayMember payMember;

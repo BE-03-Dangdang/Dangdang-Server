@@ -1,6 +1,6 @@
-package com.dangdang.server.domain.pay.kftc.openBankingFacade.application;
+package com.dangdang.server.domain.pay.kftc.openBankingFacade;
 
-import com.dangdang.server.domain.pay.banks.bankAccount.application.BankAccountService;
+import com.dangdang.server.domain.pay.banks.bankAccount.BankAccountService;
 import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiResponse;
 import com.dangdang.server.domain.pay.banks.trustAccount.application.TrustAccountService;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;

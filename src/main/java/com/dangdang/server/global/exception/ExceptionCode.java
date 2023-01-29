@@ -15,7 +15,7 @@ public enum ExceptionCode {
   NOT_APPROPRIATE_COUNT(HttpStatus.BAD_REQUEST.value(), "허용 가능한 갯수가 아닙니다"),
   NOT_PERMISSION(HttpStatus.FORBIDDEN.value(), "권한이 없습니다"),
   NOT_EXIST_LEVEL(HttpStatus.BAD_REQUEST.value(), "레벨이 잘못된 범위입니다"),
-
+  BAD_REQUEST(HttpStatus.BAD_REQUEST.value(), "요청이 잘못되었습니다."),
   // pay
   TRUST_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "신탁 계좌를 찾지 못했습니다."),
   TRUST_ACCOUNT_INACTIVE(HttpStatus.BAD_REQUEST.value(), "사용할 수 없는 신탁계좌입니다."),
@@ -26,7 +26,7 @@ public enum ExceptionCode {
   CHARGE_LESS_THAN_MIN_AMOUNT(HttpStatus.BAD_REQUEST.value(), "최소 충전금액은 10,000원입니다."),
   WITHDRAW_LESS_THAN_MIN_AMOUNT(HttpStatus.BAD_REQUEST.value(), "최소 출금금액은 1원입니다."),
   INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST.value(), "계좌의 잔액이 부족합니다."),
-  BANK_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "금융기관을 찾지 못했습니다.");
+  BANK_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "금융기관을 찾지 못했습니다."), ;
 
   private final int status;
   private final String message;

@@ -53,14 +53,13 @@ public class MemberService {
 
     // 시작하기 -> User DB에 있는 경우 -> token 발급
     Optional<Member> member = memberRepository.findByPhoneNumber(
-        phoneNumberCertifyRequest.getPhoneNumber());
+        phoneNumberCertifyRequest.phoneNumber());
 
     if (member.isPresent()) {
       return getMemberCertifyResponse(member.get().getId());
     }
 
-    RedisAuthCode redisAuthCode = toRedisAuthCode(
-        phoneNumberCertifyRequest);
+    RedisAuthCode redisAuthCode = toRedisAuthCode(phoneNumberCertifyRequest);
     redisAuthCodeRepository.save(redisAuthCode);
 
     return new MemberCertifyResponse(null,true);
@@ -70,7 +69,7 @@ public class MemberService {
   public MemberCertifyResponse loginCertify(PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
     phoneNumberCertify(phoneNumberCertifyRequest);
 
-    Member member = memberRepository.findByPhoneNumber(phoneNumberCertifyRequest.getPhoneNumber())
+    Member member = memberRepository.findByPhoneNumber(phoneNumberCertifyRequest.phoneNumber())
         .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
 
     return getMemberCertifyResponse(member.getId());
@@ -97,18 +96,14 @@ public class MemberService {
   }
 
   private void phoneNumberCertify(PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
-    RedisSms redisSms = redisSmsRepository.findById(phoneNumberCertifyRequest.getPhoneNumber())
+    RedisSms redisSms = redisSmsRepository.findById(phoneNumberCertifyRequest.phoneNumber())
         .orElseThrow(() ->
             new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL)
         );
 
-    String authCode = redisSms.getAuthCode();
+    redisSms.validateAuthCode(phoneNumberCertifyRequest.authCode());
 
-    if (!authCode.equals(phoneNumberCertifyRequest.getAuthCode())) {
-      throw new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL);
-    }
-
-    redisSmsRepository.deleteById(phoneNumberCertifyRequest.getPhoneNumber());
+    redisSmsRepository.deleteById(phoneNumberCertifyRequest.phoneNumber());
   }
 
   private MemberCertifyResponse getMemberCertifyResponse(Long memberId) {

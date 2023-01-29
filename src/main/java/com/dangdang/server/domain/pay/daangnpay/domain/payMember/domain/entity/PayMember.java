@@ -79,11 +79,16 @@ public class PayMember extends BaseEntity {
     return Math.max(expectChargeAmount, minChargeAmount);
   }
 
-  public FeeInfo changeFeeCountAndGetFeeInfo() {
+  public FeeInfo getFeeInfo() {
     if (freeMonthlyFeeCount == 0) {
       return new FeeInfo(BASIC_FEE_AMOUNT, freeMonthlyFeeCount);
     }
-    freeMonthlyFeeCount -= 1;
-    return new FeeInfo(0, freeMonthlyFeeCount);
+    return new FeeInfo(0, freeMonthlyFeeCount - 1);
+  }
+
+  public void changeFeeCount() {
+    if (freeMonthlyFeeCount > 0) {
+      freeMonthlyFeeCount -= 1;
+    }
   }
 }

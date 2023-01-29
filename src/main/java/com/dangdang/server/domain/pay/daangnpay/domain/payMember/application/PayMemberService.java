@@ -125,7 +125,7 @@ public class PayMemberService {
         payMemberId, receiveRequest);
 
     int autoChargeAmount = payMember.calculateAutoChargeAmount(receiveRequest.depositAmount());
-    FeeInfo feeInfo = payMember.changeFeeCountAndGetFeeInfo();
+    FeeInfo feeInfo = payMember.getFeeInfo();
     return ReceiveResponse.of(openBankingInquiryReceiveResponse,
         getConnectionAccountReceiveResponse, autoChargeAmount, feeInfo);
   }

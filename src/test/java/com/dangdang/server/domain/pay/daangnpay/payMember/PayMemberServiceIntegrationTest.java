@@ -143,7 +143,7 @@ class PayMemberServiceIntegrationTest {
 
       private void updateFreeMonthlyFeeCountIsZero(PayMember payMember) {
         while (payMember.getFreeMonthlyFeeCount() > 0) {
-          payMember.changeFeeCountAndGetFeeInfo();
+          payMember.changeFeeCount();
         }
       }
 

@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.banks.bankAccount.application;
+package com.dangdang.server.domain.pay.banks.bankAccount;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BankAccountService 단위 테스트")
-class BankAccountServiceTest {
+class BankAccountServiceUnitTest {
 
   @Mock
   BankAccountRepository bankAccountRepository;
@@ -53,7 +53,7 @@ class BankAccountServiceTest {
             1L,
             1L, amountReq);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", balance,
-            payMember);
+            payMember, "홍길동");
 
         doReturn(1L).when(payMember).getId();
         doReturn(bankAccount).when(bankAccountService).findById(any());
@@ -75,7 +75,7 @@ class BankAccountServiceTest {
             1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 0,
-            payMember);
+            payMember, "홍길동");
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
         doReturn(1L).when(payMember).getId();
@@ -91,7 +91,7 @@ class BankAccountServiceTest {
             1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
-            payMember, StatusType.INACTIVE);
+            payMember, "홍길동", StatusType.INACTIVE);
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
@@ -106,7 +106,7 @@ class BankAccountServiceTest {
             1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
-            payMember);
+            payMember, "홍길동");
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
         doReturn(3L).when(payMember).getId();
@@ -134,7 +134,7 @@ class BankAccountServiceTest {
         OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(1L, 1L,
             1L, amountReq);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", balance,
-            payMember);
+            payMember, "홍길동");
 
         doReturn(1L).when(payMember).getId();
         doReturn(bankAccount).when(bankAccountService).findById(any());
@@ -155,7 +155,7 @@ class BankAccountServiceTest {
         OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(1L, 1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
-            payMember, StatusType.INACTIVE);
+            payMember, "홍길동", StatusType.INACTIVE);
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
@@ -169,7 +169,7 @@ class BankAccountServiceTest {
         OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(2L, 1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
-            payMember);
+            payMember, "홍길동");
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
         doReturn(3L).when(payMember).getId();

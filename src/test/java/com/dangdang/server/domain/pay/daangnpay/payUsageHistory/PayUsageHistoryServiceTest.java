@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application;
+package com.dangdang.server.domain.pay.daangnpay.payUsageHistory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,6 +7,7 @@ import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayType;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
+import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application.PayUsageHistoryService;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.PayUsageHistoryRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.entity.PayUsageHistory;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.domain.BankType;

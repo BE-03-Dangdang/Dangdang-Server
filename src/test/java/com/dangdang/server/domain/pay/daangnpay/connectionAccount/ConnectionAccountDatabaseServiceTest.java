@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.daangnpay.connectionAccount.application;
+package com.dangdang.server.domain.pay.daangnpay.connectionAccount;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -56,9 +56,9 @@ class ConnectionAccountDatabaseServiceTest {
     payMember = new PayMember(password, member);
     payMemberRepository.save(payMember);
 
-    BankAccount bankAccount1 = new BankAccount("12383461723", "신한은행", 500000, payMember);
-    BankAccount bankAccount2 = new BankAccount("34511234235", "우리은행", 40000, payMember);
-    BankAccount bankAccount3 = new BankAccount("01290947732", "케이뱅크", 248200, payMember);
+    BankAccount bankAccount1 = new BankAccount("12383461723", "신한은행", 500000, payMember, "홍길동");
+    BankAccount bankAccount2 = new BankAccount("34511234235", "우리은행", 40000, payMember, "홍길동");
+    BankAccount bankAccount3 = new BankAccount("01290947732", "케이뱅크", 248200, payMember, "홍길동");
 
     bankAccounts = List.of(bankAccount1, bankAccount2, bankAccount3);
     bankAccountRepository.saveAll(bankAccounts);
@@ -89,7 +89,7 @@ class ConnectionAccountDatabaseServiceTest {
     @Test
     @DisplayName("사용 불가능 계좌일 경우 추가할 수 없다.")
     void failAdd() {
-      BankAccount bankAccount = new BankAccount("12383461723", "신한은행", 500000, payMember,
+      BankAccount bankAccount = new BankAccount("12383461723", "신한은행", 500000, payMember, "홍길동",
           StatusType.INACTIVE);
       bankAccountRepository.save(bankAccount);
 
@@ -140,7 +140,6 @@ class ConnectionAccountDatabaseServiceTest {
           assertThat(allConnectionAccount).hasSize(allBankAccountSize);
         }
       }
-
 
       @Nested
       @DisplayName("고객의 당근페이 연결계좌가 존재하지 않을 경우")

@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.banks.bankAccount.application;
+package com.dangdang.server.domain.pay.banks.bankAccount;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -54,11 +54,11 @@ class BankAccountServiceIntegrationTest {
     payMember = new PayMember("password", member);
     payMemberRepository.save(payMember);
 
-    bankAccountInactive = new BankAccount("11239847", "신한은행", 1000, payMember,
+    bankAccountInactive = new BankAccount("11239847", "신한은행", 1000, payMember, "홍길동",
         StatusType.INACTIVE);
     bankAccountRepository.save(bankAccountInactive);
 
-    bankAccount = new BankAccount("11239847", "신한은행", 1000, payMember);
+    bankAccount = new BankAccount("11239847", "신한은행", 1000, payMember, "홍길동");
     bankAccountRepository.save(bankAccount);
   }
 

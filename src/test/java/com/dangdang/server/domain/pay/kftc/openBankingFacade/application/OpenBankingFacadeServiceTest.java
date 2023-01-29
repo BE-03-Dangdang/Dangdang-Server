@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
-import com.dangdang.server.domain.pay.banks.bankAccount.application.BankAccountService;
+import com.dangdang.server.domain.pay.banks.bankAccount.BankAccountService;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.BankAccountRepository;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccount;
 import com.dangdang.server.domain.pay.banks.bankAccount.exception.BankAccountAuthenticationException;
@@ -65,8 +65,7 @@ class OpenBankingFacadeServiceTest {
     payMemberRepository.save(payMember);
 
     trustAccount = new TrustAccount("23947182", 100000, "당근페이_신탁");
-    trustAccountInactive = new TrustAccount("23947182", 100000, "당근페이_신탁",
-        StatusType.INACTIVE);
+    trustAccountInactive = new TrustAccount("23947182", 100000, "당근페이_신탁", StatusType.INACTIVE);
     trustAccountRepository.save(trustAccountInactive);
     trustAccountRepository.save(trustAccount);
   }
@@ -82,7 +81,7 @@ class OpenBankingFacadeServiceTest {
     @DisplayName("출금 계좌 정보를 확인하고")
     @BeforeEach
     void setUpFromBankAccount() {
-      bankAccount = new BankAccount("238471234", "우리은행", 25000, payMember);
+      bankAccount = new BankAccount("238471234", "우리은행", 25000, payMember, "홍길동");
       bankAccountRepository.save(bankAccount);
     }
 
@@ -101,8 +100,7 @@ class OpenBankingFacadeServiceTest {
         int resultTrust = beforeTrustBalance + amountReq;
 
         OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-            payMember.getId(), trustAccount.getId(), bankAccount.getId(),
-            amountReq);
+            payMember.getId(), trustAccount.getId(), bankAccount.getId(), amountReq);
 
         openBankingFacadeService.withdraw(openBankingWithdrawRequest);
 
@@ -125,7 +123,7 @@ class OpenBankingFacadeServiceTest {
 
         @BeforeEach
         void setUpZeroBankAccount() {
-          zeroBankAccount = new BankAccount("11374623", "신한은행", 0, payMember);
+          zeroBankAccount = new BankAccount("11374623", "신한은행", 0, payMember, "홍길동");
           bankAccountRepository.save(zeroBankAccount);
         }
 
@@ -161,7 +159,7 @@ class OpenBankingFacadeServiceTest {
 
         @BeforeEach
         void setUpZeroBankAccount() {
-          inactiveBankAccount = new BankAccount("11239847", "신한은행", 1000, payMember,
+          inactiveBankAccount = new BankAccount("11239847", "신한은행", 1000, payMember, "홍길동",
               StatusType.INACTIVE);
           bankAccountRepository.save(inactiveBankAccount);
         }

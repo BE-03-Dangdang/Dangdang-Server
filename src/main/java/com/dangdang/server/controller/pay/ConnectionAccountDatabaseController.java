@@ -1,4 +1,4 @@
-package com.dangdang.server.controller;
+package com.dangdang.server.controller.pay;
 
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application.ConnectionAccountDatabaseService;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 외부 API 연동 제외
  */
 @RestController
-@RequestMapping("/connection-account")
+@RequestMapping("/connection-accounts")
 public class ConnectionAccountDatabaseController {
 
   private final ConnectionAccountDatabaseService connectionAccountDataBaseService;

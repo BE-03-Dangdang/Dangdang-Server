@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.banks.bankAccount.application;
+package com.dangdang.server.domain.pay.banks.bankAccount;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -6,13 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import com.dangdang.server.domain.common.StatusType;
-import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.BankAccountRepository;
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccount;
 import com.dangdang.server.domain.pay.banks.bankAccount.exception.BankAccountAuthenticationException;
 import com.dangdang.server.domain.pay.banks.bankAccount.exception.InactiveBankAccountException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.InsufficientBankAccountException;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,21 +25,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BankAccountService 단위 테스트")
-class BankAccountServiceTest {
+class BankAccountServiceUnitTest {
 
   @Mock
   BankAccountRepository bankAccountRepository;
   @Spy
   @InjectMocks
-  BankAccountService bankAccountService = new BankAccountService(bankAccountRepository);
+  BankAccountService bankAccountService;
+  @Mock
+  PayMember payMember;
 
   @Nested
   @DisplayName("은행 계좌에 출금 요청이 들어왔을 때")
-  class withdrawTest {
+  class WithdrawTest {
 
     @Nested
     @DisplayName("성공")
-    class whenSuccess {
+    class WhenSuccess {
 
       @Test
       @DisplayName("정상계좌이면 요청 금액만큼 요청 계좌에서 돈이 출금된다.")
@@ -51,9 +53,9 @@ class BankAccountServiceTest {
             1L,
             1L, amountReq);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", balance,
-            new PayMember("password", new Member("닉네임", "핸드폰")));
+            payMember);
 
-        doReturn(1L).when(bankAccountService).getPayMemberIdFromAccount(any());
+        doReturn(1L).when(payMember).getId();
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
         bankAccountService.withdraw(openBankingWithdrawRequest);
@@ -64,7 +66,7 @@ class BankAccountServiceTest {
 
     @Nested
     @DisplayName("실패")
-    class whenFail {
+    class WhenFail {
 
       @Test
       @DisplayName("출금계좌에 잔액이 없다면 InsufficientBankAccountException이 발생한다.")
@@ -73,10 +75,10 @@ class BankAccountServiceTest {
             1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 0,
-            new PayMember("password", new Member("닉네임", "핸드폰")));
+            payMember);
 
-        doReturn(1L).when(bankAccountService).getPayMemberIdFromAccount(any());
         doReturn(bankAccount).when(bankAccountService).findById(any());
+        doReturn(1L).when(payMember).getId();
 
         assertThrows(InsufficientBankAccountException.class,
             () -> bankAccountService.withdraw(openBankingWithdrawRequest));
@@ -89,7 +91,7 @@ class BankAccountServiceTest {
             1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
-            new PayMember("password", new Member("닉네임", "핸드폰")), StatusType.INACTIVE);
+            payMember, StatusType.INACTIVE);
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
@@ -104,13 +106,75 @@ class BankAccountServiceTest {
             1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
-            new PayMember("password", new Member("닉네임", "핸드폰")));
+            payMember);
 
-        doReturn(1L).when(bankAccountService).getPayMemberIdFromAccount(any());
         doReturn(bankAccount).when(bankAccountService).findById(any());
+        doReturn(3L).when(payMember).getId();
 
         assertThrows(BankAccountAuthenticationException.class,
             () -> bankAccountService.withdraw(openBankingWithdrawRequest));
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("은행 계좌에 입금 요청이 들어왔을 때")
+  class DepositTest {
+
+    @Nested
+    @DisplayName("성공")
+    class WhenSuccess {
+
+      @Test
+      @DisplayName("정상계좌이면 요청 금액만큼 요청 계좌에 돈이 입금된다.")
+      void successWithdraw() {
+        int amountReq = 600;
+        int balance = 1000;
+        int result = 1600;
+        OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(1L, 1L,
+            1L, amountReq);
+        BankAccount bankAccount = new BankAccount("11239847", "신한은행", balance,
+            payMember);
+
+        doReturn(1L).when(payMember).getId();
+        doReturn(bankAccount).when(bankAccountService).findById(any());
+
+        bankAccountService.deposit(openBankingDepositRequest);
+
+        assertThat(bankAccount.getBalance()).isEqualTo(result);
+      }
+    }
+
+    @Nested
+    @DisplayName("실패")
+    class WhenFail {
+
+      @Test
+      @DisplayName("입금계좌 상태가 inactive인 경우 InactiveBankAccountExceptionException이 발생한다.")
+      void inactiveAccount() {
+        OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(1L, 1L,
+            1L, 10000);
+        BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
+            payMember, StatusType.INACTIVE);
+
+        doReturn(bankAccount).when(bankAccountService).findById(any());
+
+        assertThrows(InactiveBankAccountException.class,
+            () -> bankAccountService.deposit(openBankingDepositRequest));
+      }
+
+      @Test
+      @DisplayName("입금계좌의 payMemberId와 요청값인 payMemberId가 일치하지 않는다면 BankAccountAuthenticationException이 발생한다.")
+      void failAuth() {
+        OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(2L, 1L,
+            1L, 10000);
+        BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
+            payMember);
+
+        doReturn(bankAccount).when(bankAccountService).findById(any());
+        doReturn(3L).when(payMember).getId();
+        assertThrows(BankAccountAuthenticationException.class,
+            () -> bankAccountService.deposit(openBankingDepositRequest));
       }
     }
   }

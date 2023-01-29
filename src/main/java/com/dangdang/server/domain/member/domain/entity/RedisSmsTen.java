@@ -6,8 +6,8 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
 @Getter
-@RedisHash(value = "redisSendSms")
-public class RedisSendSms {
+@RedisHash(value = "redisSmsTen")
+public class RedisSmsTen {
 
   public static final Long SEND_SMS_TTL = 10L;
 
@@ -16,7 +16,7 @@ public class RedisSendSms {
   @TimeToLive
   private Long expiration;
 
-  public RedisSendSms(String id) {
+  public RedisSmsTen(String id) {
     this.id = id;
     this.expiration = SEND_SMS_TTL;
   }

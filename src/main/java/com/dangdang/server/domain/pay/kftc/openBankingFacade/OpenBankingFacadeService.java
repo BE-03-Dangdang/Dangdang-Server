@@ -4,6 +4,8 @@ import com.dangdang.server.domain.pay.banks.bankAccount.BankAccountService;
 import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiResponse;
 import com.dangdang.server.domain.pay.banks.trustAccount.application.TrustAccountService;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveRequest;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import java.time.LocalDateTime;
@@ -45,11 +47,23 @@ public class OpenBankingFacadeService {
   public OpenBankingResponse withdraw(OpenBankingWithdrawRequest openBankingWithdrawRequest) {
     BankOpenBankingApiResponse bankOpenBankingApiResponse = bankAccountService.withdraw(
         openBankingWithdrawRequest);
-    log.info("오픈뱅킹 출금이체 : 출금 완료");
     trustAccountService.deposit(openBankingWithdrawRequest);
 
     return OpenBankingResponse.of(openBankingWithdrawRequest.payMemberId(),
         bankOpenBankingApiResponse, LocalDateTime.now());
   }
 
+  /**
+   * 수취 조회
+   */
+  public OpenBankingInquiryReceiveResponse inquiryReceive(
+      OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest) {
+    BankOpenBankingApiResponse bankOpenBankingApiREsponse = bankAccountService.inquiryReceive(
+        openBankingInquiryReceiveRequest);
+
+    return new OpenBankingInquiryReceiveResponse(openBankingInquiryReceiveRequest.payMemberId(),
+        openBankingInquiryReceiveRequest.bankCode(), bankOpenBankingApiREsponse.bankName(),
+        bankOpenBankingApiREsponse.clientName(), bankOpenBankingApiREsponse.accountNumber(),
+        LocalDateTime.now());
+  }
 }

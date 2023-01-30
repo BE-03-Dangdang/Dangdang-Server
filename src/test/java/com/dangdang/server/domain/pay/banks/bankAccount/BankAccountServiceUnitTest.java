@@ -53,7 +53,7 @@ class BankAccountServiceUnitTest {
             1L,
             1L, amountReq);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", balance,
-            payMember);
+            payMember, "홍길동");
 
         doReturn(1L).when(payMember).getId();
         doReturn(bankAccount).when(bankAccountService).findById(any());
@@ -75,7 +75,7 @@ class BankAccountServiceUnitTest {
             1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 0,
-            payMember);
+            payMember, "홍길동");
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
         doReturn(1L).when(payMember).getId();
@@ -91,7 +91,7 @@ class BankAccountServiceUnitTest {
             1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
-            payMember, StatusType.INACTIVE);
+            payMember, "홍길동", StatusType.INACTIVE);
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
@@ -106,7 +106,7 @@ class BankAccountServiceUnitTest {
             1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
-            payMember);
+            payMember, "홍길동");
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
         doReturn(3L).when(payMember).getId();
@@ -134,7 +134,7 @@ class BankAccountServiceUnitTest {
         OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(1L, 1L,
             1L, amountReq);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", balance,
-            payMember);
+            payMember, "홍길동");
 
         doReturn(1L).when(payMember).getId();
         doReturn(bankAccount).when(bankAccountService).findById(any());
@@ -155,7 +155,7 @@ class BankAccountServiceUnitTest {
         OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(1L, 1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
-            payMember, StatusType.INACTIVE);
+            payMember, "홍길동", StatusType.INACTIVE);
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
 
@@ -169,7 +169,7 @@ class BankAccountServiceUnitTest {
         OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(2L, 1L,
             1L, 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000,
-            payMember);
+            payMember, "홍길동");
 
         doReturn(bankAccount).when(bankAccountService).findById(any());
         doReturn(3L).when(payMember).getId();

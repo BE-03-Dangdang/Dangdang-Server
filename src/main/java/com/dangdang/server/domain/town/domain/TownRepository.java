@@ -10,9 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface TownRepository extends JpaRepository<Town, Long> {
-
   Optional<Town> findByName(String townName);
-
+  
   @Query(value =
       """
           SELECT t.town_id as townId, t.name, 

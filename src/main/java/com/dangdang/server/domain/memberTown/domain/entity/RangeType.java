@@ -1,6 +1,6 @@
 package com.dangdang.server.domain.memberTown.domain.entity;
 
-import com.dangdang.server.global.exception.BusinessException;
+import com.dangdang.server.domain.memberTown.exception.NotAppropriateRangeException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.Arrays;
 
@@ -20,6 +20,6 @@ public enum RangeType {
     return Arrays.stream(RangeType.values())
         .filter(rangeType -> rangeType.rangeLevel == rangeLevel)
         .findFirst()
-        .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_EXIST_LEVEL));
+        .orElseThrow(() -> new NotAppropriateRangeException(ExceptionCode.NOT_EXIST_LEVEL));
   }
 }

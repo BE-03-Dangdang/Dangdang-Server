@@ -2,8 +2,10 @@ package com.dangdang.server.controller.memberTown;
 
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.memberTown.application.MemberTownService;
+import com.dangdang.server.domain.memberTown.dto.request.MemberTownCertifyRequest;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRangeRequest;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRequest;
+import com.dangdang.server.domain.memberTown.dto.response.MemberTownCertifyResponse;
 import com.dangdang.server.domain.memberTown.dto.response.MemberTownRangeResponse;
 import com.dangdang.server.domain.memberTown.dto.response.MemberTownResponse;
 import javax.validation.Valid;
@@ -61,4 +63,12 @@ public class MemberTownController {
 
     return ResponseEntity.ok(memberTownRangeResponse);
   }
-}
+
+  @PostMapping("/certification")
+  public ResponseEntity<MemberTownCertifyResponse> certifyMyPosition(@RequestBody
+  MemberTownCertifyRequest memberTownCertifyRequest, Authentication authentication) {
+    MemberTownCertifyResponse memberTownCertifyResponse = memberTownService
+        .certifyMyPosition(memberTownCertifyRequest, (Member) authentication.getPrincipal());
+    return ResponseEntity.ok(memberTownCertifyResponse);
+  }
+ }

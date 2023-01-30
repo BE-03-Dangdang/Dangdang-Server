@@ -1,15 +1,20 @@
 package com.dangdang.server.domain.post.application;
 
+import static com.dangdang.server.global.exception.ExceptionCode.MEMBER_NOT_FOUND;
 import static com.dangdang.server.global.exception.ExceptionCode.POST_NOT_FOUND;
 import static com.dangdang.server.global.exception.ExceptionCode.TOWN_NOT_FOUND;
 
+import com.dangdang.server.domain.likes.domain.LikesRepository;
+import com.dangdang.server.domain.likes.domain.entity.Likes;
+import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
+import com.dangdang.server.domain.member.exception.MemberNotFoundException;
 import com.dangdang.server.domain.post.domain.PostRepository;
 import com.dangdang.server.domain.post.domain.entity.Post;
+import com.dangdang.server.domain.post.dto.request.PostLikeRequest;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
-import com.dangdang.server.domain.post.dto.response.PostResponse;
 import com.dangdang.server.domain.post.dto.response.PostsSliceResponse;
 import com.dangdang.server.domain.post.exception.PostNotFoundException;
 import com.dangdang.server.domain.postImage.application.PostImageService;
@@ -18,6 +23,7 @@ import com.dangdang.server.domain.town.domain.entity.Town;
 import com.dangdang.server.domain.town.exception.TownNotFoundException;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -27,12 +33,17 @@ public class PostService {
   private final PostRepository postRepository;
   private final PostImageService postImageService;
   private final TownRepository townRepository;
+  private final LikesRepository likesRepository;
+  private final MemberRepository memberRepository;
 
   public PostService(PostRepository postRepository, PostImageService postImageService,
-      TownRepository townRepository) {
+      TownRepository townRepository, LikesRepository likesRepository,
+      MemberRepository memberRepository) {
     this.postRepository = postRepository;
     this.postImageService = postImageService;
     this.townRepository = townRepository;
+    this.likesRepository = likesRepository;
+    this.memberRepository = memberRepository;
   }
 
   public PostsSliceResponse findPostsForSlice(PostSliceRequest postSliceRequest,
@@ -56,13 +67,13 @@ public class PostService {
   }
 
   @Transactional
-  public PostResponse savePost(PostSaveRequest postSaveRequest, Member loginMember) {
+  public PostDetailResponse savePost(PostSaveRequest postSaveRequest, Member loginMember) {
     Town foundTown = townRepository.findByName(postSaveRequest.getTownName())
         .orElseThrow(() -> new TownNotFoundException(TOWN_NOT_FOUND));
     Post post = PostSaveRequest.toPost(postSaveRequest, loginMember, foundTown);
     Post savedPost = postRepository.save(post);
     postImageService.savePostImage(savedPost, postSaveRequest.getPostImageRequest());
-    return PostResponse.from(savedPost);
+    return PostDetailResponse.from(savedPost, postSaveRequest.getPostImageRequest().getUrl());
   }
 
   public PostDetailResponse findPostDetailById(Long postId) {
@@ -74,11 +85,28 @@ public class PostService {
     return PostDetailResponse.from(foundPost, postImageUrls);
   }
 
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void viewUpdate(Long postId) {
     Post foundPost = postRepository.findByIdForUpdate(postId)
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 
     foundPost.upView();
+  }
+
+  @Transactional
+  public void clickLikes(PostLikeRequest postLikeRequest) {
+    Post foundPost = postRepository.findById(postLikeRequest.postId())
+        .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
+
+    Member foundMember = memberRepository.findById(postLikeRequest.memberId())
+        .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
+
+    likesRepository.findByPostIdAndMemberId(
+            postLikeRequest.postId(), postLikeRequest.memberId())
+        .ifPresentOrElse(likes -> likesRepository.delete(likes),
+            () -> {
+              Likes saveLikes = likesRepository.save(new Likes(foundPost, foundMember));
+              saveLikes.addLikes();
+            });
   }
 }

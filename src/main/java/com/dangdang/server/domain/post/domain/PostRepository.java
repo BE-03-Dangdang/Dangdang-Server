@@ -17,7 +17,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   Slice<Post> findPostsByTownIdFetchJoinSortByCreatedAt(
       @Param("adjacency") List<Long> adjacency, Pageable pageable);
 
-  @Query(value = "select p from Post p join fetch p.member where p.id = :postId")
+  @Query(value = "select p from Post p join fetch p.member left join p.likes where p.id = :postId")
   Optional<Post> findPostDetailById(@Param("postId") Long postId);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)

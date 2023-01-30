@@ -2,10 +2,13 @@ package com.dangdang.server.domain.post.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
+import com.dangdang.server.domain.likes.domain.entity.Likes;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -71,6 +75,9 @@ public class Post extends BaseEntity {
   @Lob
   private String imageUrl;
 
+  @OneToMany(mappedBy = "post")
+  private List<Likes> likes = new ArrayList<>();
+
   protected Post() {
   }
 
@@ -99,5 +106,13 @@ public class Post extends BaseEntity {
 
   public String getTownName() {
     return town.getName();
+  }
+
+  public int getLikeCount() {
+    return likes.size();
+  }
+
+  public void addLikes(Likes likes) {
+    this.likes.add(likes);
   }
 }

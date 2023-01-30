@@ -13,18 +13,18 @@ public class PostSliceResponse {
   private String townName;
   private String imageUrl;
   private LocalDateTime createdAt;
+  private int likeCount;
 
-  private PostSliceResponse(Long id, String title, String townName, String imageUrl,
-      LocalDateTime createdAt) {
-    this.id = id;
-    this.title = title;
-    this.townName = townName;
-    this.imageUrl = imageUrl;
-    this.createdAt = createdAt;
+  private PostSliceResponse(Post post) {
+    this.id = post.getId();
+    this.title = post.getTitle();
+    this.townName = post.getTownName();
+    this.imageUrl = S3ImageUtil.makeImageLink(post.getImageUrl());
+    this.createdAt = post.getCreatedAt();
+    this.likeCount = post.getLikeCount();
   }
 
   public static PostSliceResponse from(Post post) {
-    return new PostSliceResponse(post.getId(), post.getTitle(), post.getTown().getName(),
-        S3ImageUtil.makeImageLink(post.getImageUrl()), post.getCreatedAt());
+    return new PostSliceResponse(post);
   }
 }

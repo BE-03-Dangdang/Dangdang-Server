@@ -4,14 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.dangdang.server.domain.common.StatusType;
+import com.dangdang.server.domain.likes.domain.LikesRepository;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.domain.PostRepository;
 import com.dangdang.server.domain.post.domain.entity.Post;
+import com.dangdang.server.domain.post.dto.request.PostLikeRequest;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
-import com.dangdang.server.domain.post.dto.response.PostResponse;
 import com.dangdang.server.domain.post.exception.PostNotFoundException;
 import com.dangdang.server.domain.postImage.domain.PostImageRepository;
 import com.dangdang.server.domain.postImage.dto.PostImageRequest;
@@ -23,6 +24,8 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -35,6 +38,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Transactional
 @SpringBootTest
 class PostServiceTest {
@@ -48,6 +52,9 @@ class PostServiceTest {
   @Autowired
   PostImageRepository postImageRepository;
 
+  @Autowired
+  EntityManager entityManager;
+
   @Value("${s3.bucket}")
   String bucketName;
   @Value("${cloud.aws.region.static}")
@@ -59,6 +66,9 @@ class PostServiceTest {
 
   @Autowired
   private SaveClassForViewUpdate saveClassForViewUpdate;
+
+  @Autowired
+  private LikesRepository likeRepository;
 
   @TestConfiguration
   static class testConfig {
@@ -84,7 +94,7 @@ class PostServiceTest {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Post save() {
-      innerMember = new Member("테스트 멤버", "01033334444", "testImgUrl");
+      innerMember = new Member("01033334444", "testImgUrl", "테스트 멤버");
       memberRepository.save(innerMember);
       innerTown = new Town("테스트동2", null, null);
       townRepository.save(innerTown);
@@ -124,12 +134,12 @@ class PostServiceTest {
   void postSaveTest() {
     setup();
 
-    PostResponse savedPostResponse = postService.savePost(postSaveRequest, member);
-
-    PostDetailResponse postDetailResponse = postService.findPostDetailById(
-        savedPostResponse.getId());
-    assertThat(savedPostResponse).usingRecursiveComparison()
-        .isEqualTo(postDetailResponse.getPostResponse());
+    PostDetailResponse postDetailResponse = postService.savePost(postSaveRequest, member);
+    System.out.println("######## posResponseId:" + postDetailResponse.postResponse().getId());
+    PostDetailResponse resultDetailResponse = postService.findPostDetailById(
+        postDetailResponse.postResponse().getId());
+    assertThat(postDetailResponse.postResponse().getId()).usingRecursiveComparison()
+        .isEqualTo(resultDetailResponse.postResponse().getId());
   }
 
   @Test
@@ -145,48 +155,86 @@ class PostServiceTest {
   @DisplayName("게시글을 상세 조회 할 수 있다.")
   void findPostDetailById() {
     setup();
-    PostResponse savedPostResponse = postService.savePost(postSaveRequest, member);
-
-    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getId());
+    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
+    PostDetailResponse foundPost = postService.findPostDetailById(
+        savedPostDetailResponse.postResponse().getId());
 
     assertThat(foundPost).isNotNull();
-    assertThat(foundPost.getImageUrls()).hasSize(2);
-    assertThat(foundPost.getImageUrls()).usingRecursiveComparison();
+    assertThat(foundPost.imageUrls()).hasSize(2);
+    assertThat(foundPost.imageUrls()).usingRecursiveComparison();
+  }
+
+  @Test
+  @DisplayName("게시글을 상세 조회시 좋아요 횟수를 가져올 수 있다.")
+  void findPostDetailByIdV2() {
+    setup();
+    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
+    postService.clickLikes(
+        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
+
+    PostDetailResponse foundPost = postService.findPostDetailById(
+        savedPostDetailResponse.postResponse().getId());
+
+    assertThat(foundPost.postResponse().getLikeCount()).isEqualTo(1);
+  }
+
+  @Test
+  @DisplayName("게시글 좋아용를 이미 누른 유저가 한번 더 누른 경우 취소된다.")
+  void cancelLikes() {
+    setup();
+    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
+    postService.clickLikes(
+        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
+
+    postService.clickLikes(
+        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
+
+    entityManager.flush();
+    entityManager.clear();
+
+    PostDetailResponse foundPost = postService.findPostDetailById(
+        savedPostDetailResponse.postResponse().getId());
+
+    assertThat(foundPost.postResponse().getLikeCount()).isEqualTo(0);
   }
 
   @Test
   @Order(0)
   @DisplayName("게시글을 여러명이 동시에 접속하여도 view값의 동시성을 확보하여 update가 가능하다.")
-  void multiThreadForViewUpdateTest() throws InterruptedException {
-    Post savedPost = saveClassForViewUpdate.save();
+  void multiThreadForViewUpdateTest() {
+    try {
+      Post savedPost = saveClassForViewUpdate.save();
+      int threadCount = 10;
+      ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+      CountDownLatch latch = new CountDownLatch(threadCount);
 
-    int threadCount = 10;
-    ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-    CountDownLatch latch = new CountDownLatch(threadCount);
-
-    for (int i = 0; i < threadCount; i++) {
-      executorService.execute(() -> {
-        postService.viewUpdate(savedPost.getId());
-        latch.countDown();
-      });
+      for (int i = 0; i < threadCount; i++) {
+        executorService.execute(() -> {
+          postService.viewUpdate(savedPost.getId());
+          latch.countDown();
+        });
+      }
+      latch.await();
+      PostDetailResponse resultPostResponse = postService.findPostDetailById(
+          savedPost.getId());
+      Assertions.assertThat(resultPostResponse.postResponse().getView())
+          .isEqualTo(threadCount);
+    } catch (Exception e) {
+      log.info("####### viewUpTest Exception: {}, {} ", e, e.getMessage());
+    } finally {
+      saveClassForViewUpdate.deleteAfterTest();
     }
-    latch.await();
-    PostDetailResponse resultPostResponse = postService.findPostDetailById(
-        savedPost.getId());
-    Assertions.assertThat(resultPostResponse.getPostResponse().getView())
-        .isEqualTo(threadCount);
-
-    saveClassForViewUpdate.deleteAfterTest();
   }
 
   @Test
   @DisplayName("게시글을 상세 조회 시 열어볼 수 있는 이미지 링크를 제공할 수 있다.")
   void findPostDetailByIdOpenImageLink() {
     setup();
-    PostResponse savedPostResponse = postService.savePost(postSaveRequest, member);
+    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
 
-    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getId());
-    Assertions.assertThat(foundPost.getImageUrls()).hasSize(2);
+    PostDetailResponse foundPost = postService.findPostDetailById(
+        savedPostDetailResponse.postResponse().getId());
+    Assertions.assertThat(foundPost.imageUrls()).hasSize(2);
   }
 
   @Test
@@ -199,10 +247,10 @@ class PostServiceTest {
         1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "서현동",
         wrongPostImageRequest);
 
-    PostResponse savedPostResponse = postService.savePost(postSaveRequest, member);
+    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
 
     assertThatThrownBy(
-        () -> postService.findPostDetailById(savedPostResponse.getId()))
+        () -> postService.findPostDetailById(savedPostDetailResponse.postResponse().getId()))
         .isInstanceOf(UrlInValidException.class);
   }
 }

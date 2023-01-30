@@ -102,7 +102,7 @@ public class PostService {
     Post post = postRepository.findPostDetailById(postId)
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 
-    if (!Objects.equals(post.getMemberId(), authorId)) {
+    if (!post.getMemberId().equals(authorId)) {
       throw new MemberUnmatchedAuthorException(MEMBER_UNMATCH_AUTHOR);
     }
 

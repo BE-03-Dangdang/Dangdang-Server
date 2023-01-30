@@ -7,18 +7,14 @@ import com.dangdang.server.domain.member.exception.MemberNotFoundException;
 import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.memberTown.domain.entity.RangeType;
-import com.dangdang.server.domain.memberTown.domain.entity.TownAuthStatus;
-import com.dangdang.server.domain.memberTown.dto.request.MemberTownCertifyRequest;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRangeRequest;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRequest;
-import com.dangdang.server.domain.memberTown.dto.response.MemberTownCertifyResponse;
 import com.dangdang.server.domain.memberTown.dto.response.MemberTownRangeResponse;
 import com.dangdang.server.domain.memberTown.dto.response.MemberTownResponse;
 import com.dangdang.server.domain.memberTown.exception.MemberTownNotFoundException;
 import com.dangdang.server.domain.memberTown.exception.NotAppropriateCountException;
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
-import com.dangdang.server.domain.town.dto.AdjacentTownResponse;
 import com.dangdang.server.domain.town.exception.TownNotFoundException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.List;
@@ -29,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberTownService {
 
-  private final int MY_TOWN_CERTIFY_DISTANCE = 10;
   private final MemberTownRepository memberTownRepository;
   private final TownRepository townRepository;
   private final MemberRepository memberRepository;
@@ -130,31 +125,6 @@ public class MemberTownService {
         memberTownRangeRequest.level());
   }
 
-  @Transactional
-  public MemberTownCertifyResponse certifyMyPosition(
-      MemberTownCertifyRequest memberTownCertifyRequest, Member member) {
-    boolean isCertified = false;
-    // 1. 현재 위도, 경도를 기준으로 Town list 조회
-    List<AdjacentTownResponse> towns = townRepository.findAdjacentTownsByPoint(
-        memberTownCertifyRequest.longitude(),
-        memberTownCertifyRequest.latitude(), MY_TOWN_CERTIFY_DISTANCE);
-    // 2. Active 로 설정한 동네가 list 안에 있는지 확인
-    MemberTown activeMemberTown = memberTownRepository.findByMemberId(member.getId())
-        .stream()
-        .filter(memberTown -> memberTown.getStatus() == StatusType.ACTIVE)
-        .findFirst()
-        .orElseThrow(() -> new MemberTownNotFoundException(ExceptionCode.MEMBER_TOWN_NOT_FOUND));
-
-    for (AdjacentTownResponse adjacentTown : towns) {
-      if (activeMemberTown.getMemberTownName().equals(adjacentTown.getName())) {
-        isCertified = true;
-        activeMemberTown.updateMemberTownAuthStatus(TownAuthStatus.TOWN_CERTIFIED);
-        break;
-      }
-    }
-    return new MemberTownCertifyResponse(isCertified);
-  }
-
   private Member getMemberByMemberId(Long memberId) {
     return memberRepository.findById(memberId)
         .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
@@ -164,6 +134,4 @@ public class MemberTownService {
     return townRepository.findByName(townName)
         .orElseThrow(() -> new TownNotFoundException(ExceptionCode.TOWN_NOT_FOUND));
   }
-
-
 }

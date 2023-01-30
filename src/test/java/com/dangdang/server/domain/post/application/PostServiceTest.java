@@ -61,7 +61,7 @@ class PostServiceTest {
 
   @BeforeEach
   void setUp() {
-    loginMember = new Member("테스트 멤버", "01012341234", "yb");
+    loginMember = new Member("01064083487", "yb");
     memberRepository.save(loginMember);
 
     Town town = townRepository.findByName("천호동")

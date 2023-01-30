@@ -3,6 +3,7 @@ package com.dangdang.server.domain.town.application;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.dangdang.server.domain.town.domain.AdjacentTownRepository;
+import com.dangdang.server.domain.town.domain.RangeRepository;
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.AdjacentTown;
 import com.dangdang.server.domain.town.domain.entity.Town;
@@ -14,8 +15,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@Transactional
 public class TownServiceTest {
 
   @Autowired
@@ -23,12 +27,17 @@ public class TownServiceTest {
   @Autowired
   private TownRepository townRepository;
   @Autowired
+  private RangeRepository rangeRepository;
+  @Autowired
   private AdjacentTownRepository adjacentTownRepository;
 
   @Test
   @DisplayName("Town 테이블에서 거리 레벨에 따른 인접 동들을 mongoDB로 저장할 수 있다.")
   public void makeAdjacentTowns() throws Exception {
     //given
+    adjacentTownRepository.deleteAll();
+    rangeRepository.deleteAll();
+
     townService.analyzeAdjacentTowns();
     List<Town> towns = townRepository.findAll();
     // when

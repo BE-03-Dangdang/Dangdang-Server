@@ -68,6 +68,6 @@ jobs:
           key: ${{ secrets.AWS_EC2_KEY }}
           script: |
             docker rm -f $(docker ps -aq)
-            docker rmi ${{ secrets.DOCKER_HUB_USERNAME }}/server
+            docker rmi $(docker images -q)
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/server
             docker-compose up -d

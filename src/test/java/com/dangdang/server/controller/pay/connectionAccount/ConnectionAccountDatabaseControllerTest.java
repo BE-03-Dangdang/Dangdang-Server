@@ -66,7 +66,7 @@ class ConnectionAccountDatabaseControllerTest {
     redisAuthCodeRepository.save(new RedisAuthCode(phoneNumber));
 
     MemberCertifyResponse signup = memberService.signup(memberSignUpRequest);
-    accessToken = "Bearer " + signup.getAccessToken();
+    accessToken = "Bearer " + signup.accessToken();
   }
 
   @Test

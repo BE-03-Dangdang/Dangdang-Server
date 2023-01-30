@@ -6,7 +6,7 @@ on:
       - main
       - develop/v1.0.0
   pull_request:
-    branches:
+    branches:\
       - main
       - develop/v1.0.0
 
@@ -67,7 +67,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.AWS_EC2_KEY }}
           script: |
-            docker rm -f web
+            docker rm -f $(docker ps -aq)
             docker rmi ${{ secrets.DOCKER_HUB_USERNAME }}/server
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/server
             docker-compose up -d

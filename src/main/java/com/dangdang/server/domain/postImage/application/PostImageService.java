@@ -22,10 +22,13 @@ public class PostImageService {
   }
 
   @Transactional(propagation = Propagation.MANDATORY)
-  public void savePostImage(Post post, PostImageRequest postImageRequest) {
+  public List<String> savePostImage(Post post, PostImageRequest postImageRequest) {
     List<String> urls = postImageRequest.getUrl();
     urls.stream().map(url -> PostImageRequest.toPostImage(post, url))
         .forEach(postImageRepository::save);
+    return postImageRepository.findPostImagesByPostId(post.getId()).stream()
+        .map(PostImage::getUrl)
+        .collect(Collectors.toList());
   }
 
   public List<String> findPostImagesByPostId(Long postId) {

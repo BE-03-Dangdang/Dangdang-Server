@@ -10,7 +10,6 @@ import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.application.PayMemberService;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
-import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayType;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
@@ -36,6 +35,7 @@ class PayMemberServiceIntegrationTest {
   static Member member;
   static List<BankAccount> bankAccounts;
   static PayMember payMember;
+  final int payMemberMoney = 100000;
   @Autowired
   MemberRepository memberRepository;
   @Autowired
@@ -49,10 +49,9 @@ class PayMemberServiceIntegrationTest {
 
   @BeforeEach
   void createPayMemberAndBankAccounts() {
-    member = new Member("예지 테스트 유저", "01012341234");
+    member = new Member("010", "예지 테스트 유저");
     memberRepository.save(member);
 
-    int payMemberMoney = 100000;
     String password = "password123";
     payMember = new PayMember(password, payMemberMoney, member);
     payMemberRepository.save(payMember);
@@ -74,6 +73,7 @@ class PayMemberServiceIntegrationTest {
     @Test
     @DisplayName("출금 금액만큼 줄어든 당근머니 잔액, 고객이 요청한 입금계좌 정보와 동일한 값이 리턴되어야 한다.")
     void withdraw() {
+      final int amountRequest = 1000;
       int bankAccountSize = bankAccounts.size();
       PayResponse payResponse = null;
 
@@ -81,7 +81,7 @@ class PayMemberServiceIntegrationTest {
         Long bankAccountId = bankAccount.getId();
         PayRequest payRequest = new PayRequest(bankAccountId, 1000);
 
-        payResponse = payMemberService.withdraw(PayType.WITHDRAW, member.getId(),
+        payResponse = payMemberService.withdraw(member.getId(),
             payRequest);
 
         assertThat(payResponse.bank()).isEqualTo(bankAccount.getBankName());
@@ -89,7 +89,7 @@ class PayMemberServiceIntegrationTest {
       }
 
       assert payResponse != null;
-      assertThat(payResponse.money()).isEqualTo(10000 - (1000 * bankAccountSize));
+      assertThat(payResponse.money()).isEqualTo(payMemberMoney - (amountRequest * bankAccountSize));
     }
   }
 
@@ -101,14 +101,16 @@ class PayMemberServiceIntegrationTest {
     @Test
     @DisplayName("충전 완료된 당근머니 잔액, 고객이 요청한 출금계좌 정보와 동일한 값이 리턴되어야 한다.")
     void charge() {
+      final int amountRequest = 10000;
+      BankAccount bankAccount = bankAccounts.get(0);
       Long bankAccountId = bankAccounts.get(0).getId();
-      PayRequest payRequest = new PayRequest(bankAccountId, 1000);
+      PayRequest payRequest = new PayRequest(bankAccountId, amountRequest);
 
-      PayResponse payResponse = payMemberService.charge(PayType.CHARGE, member.getId(), payRequest);
+      PayResponse payResponse = payMemberService.charge(member.getId(), payRequest);
 
-      assertThat(payResponse.money()).isEqualTo(10000 + 1000);
-      assertThat(payResponse.bank()).isEqualTo(bankAccounts.get(0).getBankName());
-      assertThat(payResponse.accountNumber()).isEqualTo(bankAccounts.get(0).getAccountNumber());
+      assertThat(payResponse.money()).isEqualTo(payMemberMoney + amountRequest);
+      assertThat(payResponse.bank()).isEqualTo(bankAccount.getBankName());
+      assertThat(payResponse.accountNumber()).isEqualTo(bankAccount.getAccountNumber());
     }
   }
 

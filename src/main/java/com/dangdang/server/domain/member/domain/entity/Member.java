@@ -2,21 +2,14 @@ package com.dangdang.server.domain.member.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
-import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
-import com.dangdang.server.global.exception.BusinessException;
-import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,15 +23,16 @@ public class Member extends BaseEntity implements UserDetails {
   @Column(name = "member_id")
   private Long id;
 
+
   @Column(nullable = false, unique = true, length = 30)
   private String phoneNumber;
-
-  @Column(nullable = false, length = 30)
-  private String nickname;
 
   @Column
   @Lob
   private String profileImgUrl;
+
+  @Column(nullable = false, length = 30)
+  private String nickname;
 
   protected Member() {
 
@@ -51,7 +45,6 @@ public class Member extends BaseEntity implements UserDetails {
   }
 
   public Member(String phoneNumber, String profileImgUrl, String nickname) {
-
     this.phoneNumber = phoneNumber;
     this.profileImgUrl = profileImgUrl;
     this.nickname = nickname;
@@ -65,6 +58,7 @@ public class Member extends BaseEntity implements UserDetails {
   public static MemberSignUpResponse from(Member member) {
     return new MemberSignUpResponse(member.getPhoneNumber());
   }
+
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -101,9 +95,4 @@ public class Member extends BaseEntity implements UserDetails {
     return true;
   }
 
-  public void isId(Long memberId) {
-    if (!Objects.equals(this.id, memberId)) {
-      throw new BusinessException(ExceptionCode.NOT_PERMISSION);
-    }
-  }
 }

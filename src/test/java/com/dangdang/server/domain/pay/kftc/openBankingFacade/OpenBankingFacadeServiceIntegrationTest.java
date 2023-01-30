@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.kftc.openBankingFacade.application;
+package com.dangdang.server.domain.pay.kftc.openBankingFacade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @DisplayName("오픈뱅킹 API 통합테스트")
-class OpenBankingFacadeServiceTest {
+class OpenBankingFacadeServiceIntegrationTest {
 
   @Autowired
   MemberRepository memberRepository;

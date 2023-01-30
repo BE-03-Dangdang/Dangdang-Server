@@ -13,16 +13,16 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.en
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.domain.BankType;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
 import java.time.LocalDateTime;
-import javax.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @SpringBootTest
-class PayUsageHistoryServiceTest {
+class PayUsageHistoryServiceIntegrationTest {
 
   static Member member;
   static PayMember payMember;

@@ -23,7 +23,7 @@ public class TestHelper {
     redisAuthCodeRepository.save(new RedisAuthCode(phoneNumber));
 
     MemberCertifyResponse signup = memberService.signup(memberSignUpRequest);
-    return "Bearer " + signup.getAccessToken();
+    return "Bearer " + signup.accessToken();
   }
 
 }

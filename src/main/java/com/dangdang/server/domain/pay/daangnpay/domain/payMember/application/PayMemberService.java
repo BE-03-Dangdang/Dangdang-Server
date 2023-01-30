@@ -1,7 +1,9 @@
 package com.dangdang.server.domain.pay.daangnpay.domain.payMember.application;
 
 import static com.dangdang.server.domain.pay.daangnpay.global.vo.TrustAccount.OPEN_BANKING_CONTRACT_ACCOUNT;
+import static com.dangdang.server.global.exception.ExceptionCode.CHARGE_LESS_THAN_MIN_AMOUNT;
 import static com.dangdang.server.global.exception.ExceptionCode.PAY_MEMBER_NOT_FOUND;
+import static com.dangdang.server.global.exception.ExceptionCode.WITHDRAW_LESS_THAN_MIN_AMOUNT;
 
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application.ConnectionAccountDatabaseService;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetConnectionAccountReceiveResponse;
@@ -14,8 +16,9 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.MinAmountException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application.PayUsageHistoryService;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.application.OpenBankingFacadeService;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.OpenBankingFacadeService;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
@@ -43,30 +46,15 @@ public class PayMemberService {
     this.payMemberRepository = payMemberRepository;
   }
 
-  // TODO : 비밀번호 입력 로직 추가
-
-  private PayMember getPayMember(Long memberId) {
-    return payMemberRepository.findByMemberId(memberId)
-        .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
-  }
-
-  private OpenBankingWithdrawRequest createOpenBankingWithdrawRequest(Long payMemberId,
-      PayRequest payRequest) {
-    return new OpenBankingWithdrawRequest(payMemberId, OPEN_BANKING_CONTRACT_ACCOUNT.getAccountId(),
-        payRequest.bankAccountId(), payRequest.amount());
-  }
-
-  private OpenBankingDepositRequest createOpenBankingDepositRequest(Long payMemberId,
-      PayRequest payRequest) {
-    return new OpenBankingDepositRequest(payMemberId, payRequest.bankAccountId(),
-        OPEN_BANKING_CONTRACT_ACCOUNT.getAccountId(), payRequest.amount());
-  }
-
   /**
    * 당근머니 충전
    */
   @Transactional
-  public PayResponse charge(PayType payType, Long memberId, PayRequest payRequest) {
+  public PayResponse charge(Long memberId, PayRequest payRequest) {
+    if (!PayType.CHARGE.checkMinAmount(payRequest.amount())) {
+      throw new MinAmountException(CHARGE_LESS_THAN_MIN_AMOUNT);
+    }
+
     PayMember payMember = getPayMember(memberId);
     OpenBankingWithdrawRequest openBankingWithdrawRequest = createOpenBankingWithdrawRequest(
         payMember.getId(), payRequest);
@@ -75,7 +63,8 @@ public class PayMemberService {
 
     int balanceMoney = addPayMemberMoney(payMember, payRequest);
 
-    payUsageHistoryService.addUsageHistory(payType, openBankingResponse, balanceMoney, payMember);
+    payUsageHistoryService.addUsageHistory(PayType.CHARGE, openBankingResponse, balanceMoney,
+        payMember);
 
     return PayResponse.from(openBankingResponse, balanceMoney);
   }
@@ -89,7 +78,11 @@ public class PayMemberService {
    * 당근머니 출금
    */
   @Transactional
-  public PayResponse withdraw(PayType payType, Long memberId, PayRequest payRequest) {
+  public PayResponse withdraw(Long memberId, PayRequest payRequest) {
+    if (!PayType.WITHDRAW.checkMinAmount(payRequest.amount())) {
+      throw new MinAmountException(WITHDRAW_LESS_THAN_MIN_AMOUNT);
+    }
+
     PayMember payMember = getPayMember(memberId);
     OpenBankingDepositRequest openBankingDepositRequestFromWithdraw = createOpenBankingDepositRequest(
         payMember.getId(), payRequest);
@@ -99,7 +92,8 @@ public class PayMemberService {
 
     int balanceMoney = minusPayMemberMoney(payMember, payRequest);
 
-    payUsageHistoryService.addUsageHistory(payType, openBankingResponse, balanceMoney, payMember);
+    payUsageHistoryService.addUsageHistory(PayType.WITHDRAW, openBankingResponse, balanceMoney,
+        payMember);
 
     return PayResponse.from(openBankingResponse, balanceMoney);
   }
@@ -108,6 +102,8 @@ public class PayMemberService {
     int amount = payRequest.amount();
     return payMember.minusMoney(amount);
   }
+
+  // TODO : 비밀번호 입력 로직 추가
 
   /**
    * 수취 조회
@@ -128,6 +124,23 @@ public class PayMemberService {
     FeeInfo feeInfo = payMember.getFeeInfo();
     return ReceiveResponse.of(openBankingInquiryReceiveResponse,
         getConnectionAccountReceiveResponse, autoChargeAmount, feeInfo);
+  }
+
+  private PayMember getPayMember(Long memberId) {
+    return payMemberRepository.findByMemberId(memberId)
+        .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
+  }
+
+  private OpenBankingWithdrawRequest createOpenBankingWithdrawRequest(Long payMemberId,
+      PayRequest payRequest) {
+    return new OpenBankingWithdrawRequest(payMemberId, OPEN_BANKING_CONTRACT_ACCOUNT.getAccountId(),
+        payRequest.bankAccountId(), payRequest.amount());
+  }
+
+  private OpenBankingDepositRequest createOpenBankingDepositRequest(Long payMemberId,
+      PayRequest payRequest) {
+    return new OpenBankingDepositRequest(payMemberId, payRequest.bankAccountId(),
+        OPEN_BANKING_CONTRACT_ACCOUNT.getAccountId(), payRequest.amount());
   }
 
   private OpenBankingInquiryReceiveRequest createOpenBankingInquiryReceiveRequest(Long payMemberId,

@@ -101,7 +101,8 @@ public class PostRepositorySupport extends QuerydslRepositorySupport {
 
   private Slice<Post> toSlice(List<Post> contents, Pageable pageable) {
     boolean hasNext = isContentSizeGreaterThanPageSize(contents, pageable);
-    return new SliceImpl<>(contents, pageable, hasNext);
+    return new SliceImpl<>(hasNext ? subtractLastContent(contents, pageable) : contents, pageable,
+        hasNext);
   }
 
   private boolean isContentSizeGreaterThanPageSize(List<Post> contents, Pageable pageable) {

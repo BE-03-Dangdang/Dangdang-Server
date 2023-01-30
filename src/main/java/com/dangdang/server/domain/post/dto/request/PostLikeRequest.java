@@ -1,17 +1,12 @@
 package com.dangdang.server.domain.post.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.validation.constraints.NotNull;
 
-@Getter
-public class PostLikeRequest {
+public record PostLikeRequest(
+    @NotNull @JsonProperty("postId")
+    Long postId,
+    @NotNull @JsonProperty("memberId") Long memberId
+) {
 
-  private Long postId;
-  private Long memberId;
-
-  @JsonCreator
-  public PostLikeRequest(Long postId, Long memberId) {
-    this.postId = postId;
-    this.memberId = memberId;
-  }
 }

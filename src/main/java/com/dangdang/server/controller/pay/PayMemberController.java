@@ -8,7 +8,6 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequ
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,25 +30,23 @@ public class PayMemberController {
   /**
    * 당근머니 충전 API
    */
+  @ResponseStatus(HttpStatus.OK)
   @PatchMapping("/money/charge")
-  public ResponseEntity<PayResponse> charge(Authentication authentication,
+  public PayResponse charge(Authentication authentication,
       @RequestBody @Valid PayRequest payRequest) {
     Long memberId = ((Member) authentication.getPrincipal()).getId();
-    PayResponse payResponse = payMemberService.charge(memberId, payRequest);
-
-    return ResponseEntity.ok(payResponse);
+    return payMemberService.charge(memberId, payRequest);
   }
 
   /**
    * 당근머니 출금 API
    */
+  @ResponseStatus(HttpStatus.OK)
   @PatchMapping("/money/withdraw")
-  public ResponseEntity<PayResponse> withdraw(Authentication authentication,
+  public PayResponse withdraw(Authentication authentication,
       @RequestBody @Valid PayRequest payRequest) {
     Long memberId = ((Member) authentication.getPrincipal()).getId();
-    PayResponse payResponse = payMemberService.withdraw(memberId, payRequest);
-
-    return ResponseEntity.ok(payResponse);
+    return payMemberService.withdraw(memberId, payRequest);
   }
 
   /**

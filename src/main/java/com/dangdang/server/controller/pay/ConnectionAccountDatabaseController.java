@@ -1,14 +1,13 @@
 package com.dangdang.server.controller.pay;
 
-import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application.ConnectionAccountDatabaseService;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AllConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetAllConnectionAccountResponse;
+import com.dangdang.server.global.aop.CurrentUserId;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,12 +32,11 @@ public class ConnectionAccountDatabaseController {
   /**
    * 연결계좌 추가 API
    */
+  @CurrentUserId
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("")
-  public void addConnectionAccount(Authentication authentication,
+  public void addConnectionAccount(Long memberId,
       @RequestBody @Valid AddConnectionAccountRequest addConnectionAccountRequest) {
-    Long memberId = ((Member) authentication.getPrincipal()).getId();
-
     connectionAccountDataBaseService.addConnectionAccount(memberId,
         addConnectionAccountRequest);
   }
@@ -46,11 +44,9 @@ public class ConnectionAccountDatabaseController {
   /**
    * 내 연결 계좌 리스트 제공 API
    */
+  @CurrentUserId
   @GetMapping("")
-  public GetAllConnectionAccountResponse getAllConnectionAccountResponse(
-      Authentication authentication) {
-    Long memberId = ((Member) authentication.getPrincipal()).getId();
-
+  public GetAllConnectionAccountResponse getAllConnectionAccountResponse(Long memberId) {
     List<AllConnectionAccount> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
         memberId);
     return GetAllConnectionAccountResponse.from(allConnectionAccount);

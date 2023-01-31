@@ -77,4 +77,7 @@ public class MemberTown extends BaseEntity {
     this.rangeType = rangeType;
   }
 
+  public void updateMemberTownAuthStatus(TownAuthStatus authStatus) {
+    this.townAuthStatus = authStatus;
+  }
 }

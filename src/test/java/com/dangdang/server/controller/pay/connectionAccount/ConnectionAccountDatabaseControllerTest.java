@@ -15,11 +15,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.dangdang.server.domain.member.application.MemberService;
-import com.dangdang.server.domain.member.domain.RedisAuthCodeRepository;
-import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
-import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
-import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
+import com.dangdang.server.controller.pay.TestHelper;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application.ConnectionAccountDatabaseService;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetAllConnectionAccountResponse;
@@ -42,14 +38,10 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
 @Transactional
-class ConnectionAccountDatabaseControllerTest {
+class ConnectionAccountDatabaseControllerTest extends TestHelper {
 
   @MockBean
   ConnectionAccountDatabaseService connectionAccountDataBaseService;
-  @Autowired
-  RedisAuthCodeRepository redisAuthCodeRepository;
-  @Autowired
-  MemberService memberService;
   @Autowired
   MockMvc mockMvc;
   @Autowired
@@ -59,14 +51,7 @@ class ConnectionAccountDatabaseControllerTest {
 
   @BeforeEach
   void setUp() {
-    // token
-    String phoneNumber = "1";
-    MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("천호동", phoneNumber, "url",
-        "닉네임");
-    redisAuthCodeRepository.save(new RedisAuthCode(phoneNumber));
-
-    MemberCertifyResponse signup = memberService.signup(memberSignUpRequest);
-    accessToken = "Bearer " + signup.accessToken();
+    accessToken = jwtSetUp();
   }
 
   @Test

@@ -19,8 +19,12 @@ public class PostDetailResponse {
     this.imageUrls = imageUrls;
   }
 
-  public static PostDetailResponse from(Post post, List<String> imageUrls) {
-    return new PostDetailResponse(PostResponse.from(post), post.getMember(), imageUrls);
+  public static PostDetailResponse from(Post post, Member member, List<String> imageUrls) {
+    return new PostDetailResponse(PostResponse.from(post), member, imageUrls);
+  }
+
+  public Long getPostId() {
+    return postResponse.getId();
   }
 
 }

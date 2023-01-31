@@ -14,6 +14,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtTokenProvider jwtTokenProvider;
 
   public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+    logger.error("스프링 시큐리티 작동함");
     this.jwtTokenProvider = jwtTokenProvider;
   }
 

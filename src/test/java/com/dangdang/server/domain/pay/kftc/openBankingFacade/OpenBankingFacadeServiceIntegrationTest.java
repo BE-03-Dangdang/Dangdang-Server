@@ -65,8 +65,7 @@ class OpenBankingFacadeServiceIntegrationTest {
     payMemberRepository.save(payMember);
 
     trustAccount = new TrustAccount("23947182", 100000, "당근페이_신탁");
-    trustAccountInactive = new TrustAccount("23947182", 100000, "당근페이_신탁",
-        StatusType.INACTIVE);
+    trustAccountInactive = new TrustAccount("23947182", 100000, "당근페이_신탁", StatusType.INACTIVE);
     trustAccountRepository.save(trustAccountInactive);
     trustAccountRepository.save(trustAccount);
   }
@@ -82,7 +81,7 @@ class OpenBankingFacadeServiceIntegrationTest {
     @DisplayName("출금 계좌 정보를 확인하고")
     @BeforeEach
     void setUpFromBankAccount() {
-      bankAccount = new BankAccount("238471234", "우리은행", 25000, payMember);
+      bankAccount = new BankAccount("238471234", "우리은행", 25000, payMember, "홍길동");
       bankAccountRepository.save(bankAccount);
     }
 
@@ -101,8 +100,7 @@ class OpenBankingFacadeServiceIntegrationTest {
         int resultTrust = beforeTrustBalance + amountReq;
 
         OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-            payMember.getId(), trustAccount.getId(), bankAccount.getId(),
-            amountReq);
+            payMember.getId(), trustAccount.getId(), bankAccount.getId(), amountReq);
 
         openBankingFacadeService.withdraw(openBankingWithdrawRequest);
 
@@ -125,7 +123,7 @@ class OpenBankingFacadeServiceIntegrationTest {
 
         @BeforeEach
         void setUpZeroBankAccount() {
-          zeroBankAccount = new BankAccount("11374623", "신한은행", 0, payMember);
+          zeroBankAccount = new BankAccount("11374623", "신한은행", 0, payMember, "홍길동");
           bankAccountRepository.save(zeroBankAccount);
         }
 
@@ -161,7 +159,7 @@ class OpenBankingFacadeServiceIntegrationTest {
 
         @BeforeEach
         void setUpZeroBankAccount() {
-          inactiveBankAccount = new BankAccount("11239847", "신한은행", 1000, payMember,
+          inactiveBankAccount = new BankAccount("11239847", "신한은행", 1000, payMember, "홍길동",
               StatusType.INACTIVE);
           bankAccountRepository.save(inactiveBankAccount);
         }

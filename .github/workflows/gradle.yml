@@ -64,10 +64,10 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AWS_EC2_HOST }}
-          username: ubuntu
+          username: ec2-user
           key: ${{ secrets.AWS_EC2_KEY }}
           script: |
-            docker rm -f spring
-            docker rmi ${{ secrets.DOCKER_HUB_USERNAME }}/server
+            docker rm -f $(docker ps -aq)
+            docker rmi $(docker images -q)
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/server
             docker-compose up -d

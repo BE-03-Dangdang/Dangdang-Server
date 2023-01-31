@@ -7,6 +7,7 @@ import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccoun
 import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -48,4 +49,12 @@ public class BankAccountService {
     return BankOpenBankingApiResponse.from(bankAccount);
   }
 
+  public BankOpenBankingApiResponse inquiryReceive(
+      OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest) {
+    BankAccount bankAccount = bankAccountRepository.findByPayMemberIdAndAccountNumber(
+            openBankingInquiryReceiveRequest.payMemberId(),
+            openBankingInquiryReceiveRequest.bankAccountNumber())
+        .orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
+    return BankOpenBankingApiResponse.from(bankAccount);
+  }
 }

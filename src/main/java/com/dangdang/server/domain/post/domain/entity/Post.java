@@ -80,7 +80,8 @@ public class Post extends BaseEntity {
 
   public Post(String title, String content, Category category, Integer price,
       String desiredPlaceName, BigDecimal desiredPlaceLongitude, BigDecimal desiredPlaceLatitude,
-      Integer view, Boolean sharing, Member member, Town town, String imageUrl, StatusType statusType) {
+      Integer view, Boolean sharing, Member member, Town town, String imageUrl,
+      StatusType statusType) {
     this.title = title;
     this.content = content;
     this.category = category;
@@ -96,7 +97,15 @@ public class Post extends BaseEntity {
     super.status = statusType;
   }
 
+  public Long getMemberId() {
+    return member.getId();
+  }
+
   public String getTownName() {
     return town.getName();
+  }
+
+  public void changeStatus(StatusType statusType) {
+    this.status = statusType;
   }
 }

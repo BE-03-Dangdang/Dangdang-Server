@@ -12,9 +12,11 @@ import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetAllConnectionAccountResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetConnectionAccountReceiveResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +42,7 @@ public class ConnectionAccountDatabaseService {
   @Transactional
   public ConnectionAccount addConnectionAccount(Long memberId,
       AddConnectionAccountRequest addConnectionAccountRequest) {
-    PayMember payMember = payMemberRepository.findByMemberId(memberId)
-        .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
+    PayMember payMember = getPayMemberByMemberId(memberId);
 
     BankAccount bankAccount = bankAccountRepository.findById(
             addConnectionAccountRequest.bankAccountId())
@@ -59,8 +60,7 @@ public class ConnectionAccountDatabaseService {
    * 내 연결 계좌 리스트 제공
    */
   public List<GetAllConnectionAccountResponse> getAllConnectionAccount(Long memberId) {
-    PayMember payMember = payMemberRepository.findByMemberId(memberId)
-        .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
+    PayMember payMember = getPayMemberByMemberId(memberId);
 
     List<ConnectionAccount> connectionAccountList = connectionAccountRepository.findByPayMemberId(
         payMember.getId());
@@ -70,4 +70,25 @@ public class ConnectionAccountDatabaseService {
         .toList();
   }
 
+  public GetConnectionAccountReceiveResponse findIsMyAccountAndChargeAccountByReceiveRequest(
+      Long payMemberId, ReceiveRequest receiveRequest) {
+    List<ConnectionAccount> byPayMemberId = connectionAccountRepository.findByPayMemberId(
+        payMemberId);
+
+    boolean isMyAccount = byPayMemberId.stream()
+        .anyMatch(connectionAccount -> connectionAccount.getBankAccountNumber()
+            .equals(receiveRequest.bankAccountNumber()));
+
+    ConnectionAccount findChargeAccount = byPayMemberId.stream()
+        .filter(connectionAccount -> connectionAccount.getStatus().equals(StatusType.ACTIVE))
+        .findFirst().orElseThrow();
+
+    return new GetConnectionAccountReceiveResponse(isMyAccount, findChargeAccount.getBank(),
+        findChargeAccount.getBankAccountNumber());
+  }
+
+  private PayMember getPayMemberByMemberId(Long memberId) {
+    return payMemberRepository.findByMemberId(memberId)
+        .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
+  }
 }

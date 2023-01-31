@@ -38,6 +38,9 @@ public class BankAccount extends BaseEntity {
   @Column(length = 20, nullable = false)
   private String bankName;
 
+  @Column(length = 10, nullable = false)
+  private String clientName;
+
   @Column(columnDefinition = "INT UNSIGNED", nullable = false)
   @ColumnDefault("0")
   private Integer balance = 0;
@@ -49,20 +52,23 @@ public class BankAccount extends BaseEntity {
   protected BankAccount() {
   }
 
-  public BankAccount(String accountNumber, String bankName, Integer balance, PayMember payMember) {
+  public BankAccount(String accountNumber, String bankName, Integer balance, PayMember payMember,
+      String clientName) {
     this.accountNumber = accountNumber;
     this.bankName = bankName;
     this.balance = balance;
     this.payMember = payMember;
+    this.clientName = clientName;
   }
 
   public BankAccount(String accountNumber, String bankName, Integer balance, PayMember payMember,
-      StatusType statusType) {
+      String clientName, StatusType statusType) {
     this.accountNumber = accountNumber;
     this.bankName = bankName;
     this.balance = balance;
     this.payMember = payMember;
     this.status = statusType;
+    this.clientName = clientName;
   }
 
   private void verifyStatus() {

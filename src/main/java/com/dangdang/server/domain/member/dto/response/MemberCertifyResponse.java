@@ -9,4 +9,7 @@ public record MemberCertifyResponse (
   public static MemberCertifyResponse from(String accessToken, String refreshToken ,Boolean isCertified) {
     return new MemberCertifyResponse(accessToken, refreshToken, isCertified);
   }
+    Boolean isCertified
+) {
+
 }

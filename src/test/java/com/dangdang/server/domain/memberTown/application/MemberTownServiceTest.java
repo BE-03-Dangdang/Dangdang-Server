@@ -14,8 +14,13 @@ import com.dangdang.server.domain.memberTown.dto.request.MemberTownRequest;
 import com.dangdang.server.domain.memberTown.exception.MemberTownNotFoundException;
 import com.dangdang.server.domain.memberTown.exception.NotAppropriateCountException;
 import com.dangdang.server.domain.memberTown.exception.NotAppropriateRangeException;
+
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
+
+import com.dangdang.server.domain.town.domain.entity.Town;
+import com.dangdang.server.domain.town.domain.TownRepository;
+
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

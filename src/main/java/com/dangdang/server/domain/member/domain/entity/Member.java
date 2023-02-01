@@ -6,7 +6,6 @@ import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -36,10 +35,9 @@ public class Member extends BaseEntity implements UserDetails {
 
   @Column(nullable = false, length = 30)
   private String nickname;
-
+  
   @Column(nullable = true)
   private String refreshToken;
-
   protected Member() {
 
   }
@@ -64,6 +62,7 @@ public class Member extends BaseEntity implements UserDetails {
   public static MemberSignUpResponse from(Member member) {
     return new MemberSignUpResponse(member.getPhoneNumber());
   }
+
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -99,7 +98,7 @@ public class Member extends BaseEntity implements UserDetails {
   public boolean isEnabled() {
     return true;
   }
-
+  
   public void isId(Long memberId) {
     if (!Objects.equals(this.id, memberId)) {
       throw new BusinessException(ExceptionCode.NOT_PERMISSION);

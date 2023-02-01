@@ -61,13 +61,19 @@ class MemberRestDocsTest {
     redisSendSmsRepository.deleteAll();
   }
 
+  RedisSmsTenRepository redisSmsTenRepository;
+
+
   @Test
   @DisplayName("회원 가입 시 핸드폰 번호와 인증 번호로 요청함, 회원 가입이 되어 있지 않다면 Http 200 상태코드가 응답됨")
+  @Transactional
   void signupCertifyTest() throws Exception {
     //given
     //인증 문자 발송
     String phoneNumber = "01012345678";
     SmsRequest smsRequest = new SmsRequest(phoneNumber);
+    redisSmsTenRepository.deleteAll();
+
     String authCode = smsMessageService.sendMessage(smsRequest);
 
     //인증 요청
@@ -108,6 +114,7 @@ class MemberRestDocsTest {
 
   @Test
   @DisplayName("로그인 시 핸드폰 번호와 인증 코드로 요청해야 하며, 성공 시 http 200 status code와 accessToken 이 발급됨")
+  @Transactional
   void loginCertifyTest() throws Exception {
     //회원 가입된 정보 생성
     long id = 1L;
@@ -154,6 +161,7 @@ class MemberRestDocsTest {
 
   @Test
   @DisplayName("/api/v1/signup -> 닉네임과 프로필 이미지 핸드폰 번호 지역 이름으로 요청, 성공 시 http 200 status code와 accessToken으로 응답")
+  @Transactional
   void signUpTest() throws Exception {
     //회원 가입된 정보 생성
     long id = 1L;

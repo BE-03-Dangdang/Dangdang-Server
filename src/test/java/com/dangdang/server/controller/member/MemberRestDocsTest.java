@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.dangdang.server.domain.member.application.SmsMessageService;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.RedisAuthCodeRepository;
-import com.dangdang.server.domain.member.domain.RedisSendSmsRepository;
+import com.dangdang.server.domain.member.domain.RedisSmsTenRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
 import com.dangdang.server.domain.member.dto.request.MemberRefreshRequest;
@@ -27,6 +27,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
 @SpringBootTest
-@Transactional
 class MemberRestDocsTest {
 
   @Autowired

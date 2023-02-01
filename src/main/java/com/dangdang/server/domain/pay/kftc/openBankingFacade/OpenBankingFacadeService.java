@@ -1,9 +1,11 @@
-package com.dangdang.server.domain.pay.kftc.openBankingFacade.application;
+package com.dangdang.server.domain.pay.kftc.openBankingFacade;
 
-import com.dangdang.server.domain.pay.banks.bankAccount.application.BankAccountService;
+import com.dangdang.server.domain.pay.banks.bankAccount.BankAccountService;
 import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiResponse;
 import com.dangdang.server.domain.pay.banks.trustAccount.application.TrustAccountService;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveRequest;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import java.time.LocalDateTime;
@@ -26,12 +28,16 @@ public class OpenBankingFacadeService {
   }
 
   /**
-   * 입금 이체 미완성
+   * 입금 이체
    */
   @Transactional
-  public void deposit(OpenBankingDepositRequest openBankingDepositRequest) {
+  public OpenBankingResponse deposit(OpenBankingDepositRequest openBankingDepositRequest) {
     trustAccountService.withdraw(openBankingDepositRequest);
-    bankAccountService.deposit(openBankingDepositRequest);
+    BankOpenBankingApiResponse bankOpenBankingApiResponse = bankAccountService.deposit(
+        openBankingDepositRequest);
+
+    return OpenBankingResponse.of(openBankingDepositRequest.payMemberId(),
+        bankOpenBankingApiResponse, LocalDateTime.now());
   }
 
   /**
@@ -41,11 +47,23 @@ public class OpenBankingFacadeService {
   public OpenBankingResponse withdraw(OpenBankingWithdrawRequest openBankingWithdrawRequest) {
     BankOpenBankingApiResponse bankOpenBankingApiResponse = bankAccountService.withdraw(
         openBankingWithdrawRequest);
-    log.info("오픈뱅킹 출금 완료");
     trustAccountService.deposit(openBankingWithdrawRequest);
 
     return OpenBankingResponse.of(openBankingWithdrawRequest.payMemberId(),
         bankOpenBankingApiResponse, LocalDateTime.now());
   }
 
+  /**
+   * 수취 조회
+   */
+  public OpenBankingInquiryReceiveResponse inquiryReceive(
+      OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest) {
+    BankOpenBankingApiResponse bankOpenBankingApiREsponse = bankAccountService.inquiryReceive(
+        openBankingInquiryReceiveRequest);
+
+    return new OpenBankingInquiryReceiveResponse(openBankingInquiryReceiveRequest.payMemberId(),
+        openBankingInquiryReceiveRequest.bankCode(), bankOpenBankingApiREsponse.bankName(),
+        bankOpenBankingApiREsponse.clientName(), bankOpenBankingApiREsponse.accountNumber(),
+        LocalDateTime.now());
+  }
 }

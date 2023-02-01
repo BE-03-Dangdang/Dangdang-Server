@@ -3,9 +3,9 @@ package com.dangdang.server.domain.member.exception;
 import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 
-public class TownNotFoundException extends BusinessException {
+public class MemberUnmatchedAuthorException extends BusinessException {
 
-  public TownNotFoundException(ExceptionCode exceptionCode) {
+  public MemberUnmatchedAuthorException(ExceptionCode exceptionCode) {
     super(exceptionCode);
   }
 }

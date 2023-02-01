@@ -2,7 +2,6 @@ package com.dangdang.server.domain.member.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
-import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.Collection;
@@ -10,13 +9,10 @@ import java.util.Collections;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,15 +26,16 @@ public class Member extends BaseEntity implements UserDetails {
   @Column(name = "member_id")
   private Long id;
 
+
   @Column(nullable = false, unique = true, length = 30)
   private String phoneNumber;
-
-  @Column(nullable = false, length = 30)
-  private String nickname;
 
   @Column
   @Lob
   private String profileImgUrl;
+
+  @Column(nullable = false, length = 30)
+  private String nickname;
 
   @Column(nullable = true)
   private String refreshToken;
@@ -54,7 +51,6 @@ public class Member extends BaseEntity implements UserDetails {
   }
 
   public Member(String phoneNumber, String profileImgUrl, String nickname) {
-
     this.phoneNumber = phoneNumber;
     this.profileImgUrl = profileImgUrl;
     this.nickname = nickname;

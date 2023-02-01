@@ -1,7 +1,6 @@
 package com.dangdang.server.domain.member.domain.entity;
 
 import com.dangdang.server.domain.member.exception.MemberCertifiedFailException;
-import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import javax.persistence.Id;
 import lombok.Getter;
@@ -28,7 +27,7 @@ public class RedisSms {
     this.expiration = SMS_TTL;
   }
 
-  public void isAuthCode(String authCode) {
+  public void validateAuthCode(String authCode) {
     if (!this.authCode.equals(authCode)) {
       throw new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL);
     }

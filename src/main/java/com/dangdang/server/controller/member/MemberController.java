@@ -5,6 +5,7 @@ import com.dangdang.server.domain.member.dto.request.MemberRefreshRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
+import com.dangdang.server.domain.member.exception.MemberBadRequestException;
 import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import javax.validation.Valid;
@@ -28,7 +29,10 @@ public class MemberController {
   // 완료 버튼 후 회원가입할  모든 정보 보냄
   @PostMapping("/signup")
   public ResponseEntity<MemberCertifyResponse> signUp(
-      @RequestBody @Valid MemberSignUpRequest memberSignupRequest) {
+      @RequestBody @Valid MemberSignUpRequest memberSignupRequest, BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+      throw new MemberBadRequestException(ExceptionCode.BAD_REQUEST);
+    }
     MemberCertifyResponse memberCertifyResponse = memberService.signup(memberSignupRequest);
     return ResponseEntity.ok(memberCertifyResponse);
   }
@@ -38,9 +42,8 @@ public class MemberController {
       @RequestBody @Valid PhoneNumberCertifyRequest phoneNumberCertifyRequest,
       BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
-      throw new BusinessException(ExceptionCode.BAD_REQUEST);
+      throw new MemberBadRequestException(ExceptionCode.BAD_REQUEST);
     }
-
     MemberCertifyResponse memberCertifyResponse = memberService.signupCertify(
         phoneNumberCertifyRequest);
 
@@ -52,7 +55,7 @@ public class MemberController {
       @RequestBody @Valid PhoneNumberCertifyRequest phoneNumberCertifyRequest,
       BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
-      throw new BusinessException(ExceptionCode.BAD_REQUEST);
+      throw new MemberBadRequestException(ExceptionCode.BAD_REQUEST);
     }
 
     MemberCertifyResponse memberCertifyResponse = memberService.loginCertify(
@@ -72,4 +75,3 @@ public class MemberController {
     return ResponseEntity.ok(memberCertifyResponse);
   }
 }
-

@@ -1,0 +1,55 @@
+:hardbreaks:
+ifndef::snippets[]
+:snippets: ../ ../ ../build/generated-snippets
+endif::[]
+
+
+== 멤버타운
+=== 멤버타운 생성
+=== /api/v1/member-town
+
+.Request
+
+include::{snippets}/api/v1/post/member-town/http-request.adoc[]
+include::{snippets}/api/v1/post/member-town/request-headers.adoc[]
+include::{snippets}/api/v1/post/member-town/request-fields.adoc[]
+
+.Response
+include::{snippets}/api/v1/post/member-town/http-response.adoc[]
+
+== 멤버타운
+=== 멤버타운 삭제
+=== api/v1/member-town
+
+.Request
+include::{snippets}/api/v1/delete/member-town/http-request.adoc[]
+include::{snippets}/api/v1/delete/member-town/request-headers.adoc[]
+include::{snippets}/api/v1/delete/member-town/request-fields.adoc[]
+
+.Response
+include::{snippets}/api/v1/delete/member-town/http-response.adoc[]
+
+== 멤버타운
+=== 멤버타운 활성화 변경
+=== api/v1/member-town/active
+
+.Request
+include::{snippets}/api/v1/put/member-town/active/http-request.adoc[]
+include::{snippets}/api/v1/put/member-town/active/request-headers.adoc[]
+include::{snippets}/api/v1/put/member-town/active/request-fields.adoc[]
+
+.Response
+include::{snippets}/api/v1/put/member-town/active/http-response.adoc[]
+
+
+== 멤버타운
+=== 멤버타운 범위 변경
+=== api/v1/member-town/range
+
+.Request
+include::{snippets}/api/v1/put/member-town/range/http-request.adoc[]
+include::{snippets}/api/v1/put/member-town/range/request-headers.adoc[]
+include::{snippets}/api/v1/put/member-town/range/request-fields.adoc[]
+
+.Response
+include::{snippets}/api/v1/put/member-town/range/http-response.adoc[]

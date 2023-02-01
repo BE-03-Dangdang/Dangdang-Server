@@ -37,6 +37,7 @@ public enum ExceptionCode {
   STATUS_TYPE_MISMATCH(HttpStatus.BAD_REQUEST.value(), "일치하는 상태값이 없습니다."),
   INVALID_POST_STATUS(HttpStatus.BAD_REQUEST.value(), "글 상태값에 적절한 값이 아닙니다."),
   SEARCH_KEYWORD_MUST_EXIST(HttpStatus.BAD_REQUEST.value(), "검색어는 필수 입력 항목입니다."),
+  UPDATABLE_POST_NOT_EXIST(HttpStatus.NO_CONTENT.value(), "변경할 데이터가 없습니다."),
 
 
   // membertown

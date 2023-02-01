@@ -10,7 +10,10 @@ import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.memberTown.exception.MemberTownNotFoundException;
 import com.dangdang.server.domain.post.domain.PostRepository;
+import com.dangdang.server.domain.post.domain.UpdatedPostRepository;
 import com.dangdang.server.domain.post.domain.entity.Post;
+import com.dangdang.server.domain.post.domain.entity.PostSearch;
+import com.dangdang.server.domain.post.domain.entity.UpdatedPost;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
 import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
@@ -19,16 +22,16 @@ import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
 import com.dangdang.server.domain.post.dto.response.PostSliceResponse;
 import com.dangdang.server.domain.post.dto.response.PostsSliceResponse;
 import com.dangdang.server.domain.post.exception.PostNotFoundException;
-import com.dangdang.server.domain.post.infrastructure.PostRepositorySupport;
+import com.dangdang.server.domain.post.infrastructure.PostSearchRepositoryImpl;
 import com.dangdang.server.domain.postImage.application.PostImageService;
 import com.dangdang.server.domain.town.application.TownService;
-import com.dangdang.server.domain.town.domain.AdjacentTownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
+import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,20 +41,20 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final PostImageService postImageService;
-  private final PostRepositorySupport postRepositorySupport;
   private final MemberTownRepository memberTownRepository;
-  private final AdjacentTownRepository adjacentTownRepository;
   private final TownService townService;
+  private final UpdatedPostRepository updatedPostRepository;
+  private final PostSearchRepositoryImpl postSearchRepositoryImpl;
 
   public PostService(PostRepository postRepository, PostImageService postImageService,
-      PostRepositorySupport postRepositorySupport, MemberTownRepository memberTownRepository,
-      AdjacentTownRepository adjacentTownRepository, TownService townService) {
+      MemberTownRepository memberTownRepository, TownService townService,
+      UpdatedPostRepository updatedPostRepository, PostSearchRepositoryImpl postSearchRepositoryImpl) {
     this.postRepository = postRepository;
     this.postImageService = postImageService;
-    this.postRepositorySupport = postRepositorySupport;
     this.memberTownRepository = memberTownRepository;
-    this.adjacentTownRepository = adjacentTownRepository;
     this.townService = townService;
+    this.updatedPostRepository = updatedPostRepository;
+    this.postSearchRepositoryImpl = postSearchRepositoryImpl;
   }
 
   public PostsSliceResponse findPostsForSlice(PostSliceRequest postSliceRequest,
@@ -82,6 +85,10 @@ public class PostService {
     Town town = memberTown.getTown();
     Post post = PostSaveRequest.toPost(postSaveRequest, member, town);
     Post savedPost = postRepository.save(post);
+
+    UpdatedPost updatedPost = UpdatedPost.from(savedPost);
+    updatedPostRepository.save(updatedPost);
+
     List<String> imageUrls = postImageService.savePostImage(savedPost,
         postSaveRequest.getPostImageRequest());
 
@@ -119,10 +126,22 @@ public class PostService {
     List<Long> adjacentTownIds = townService.findAdjacentTownWithRangeLevel(
         memberTown.getTownName(), String.valueOf(postSearchOption.rangeLevel()));
 
-    Slice<Post> postSlice = postRepositorySupport.searchBySearchOptionSlice(query, postSearchOption,
-        adjacentTownIds, PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize()));
+    Slice<PostSearch> postSlice = postSearchRepositoryImpl.searchBySearchOptionSlice(query, postSearchOption,
+        adjacentTownIds, PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize() + 1, Sort.by("createdAt").descending()));
     return PostsSliceResponse.of(
         postSlice.getContent().stream().map(PostSliceResponse::from).collect(Collectors.toList()),
         postSlice.hasNext());
+  }
+
+  @Transactional
+  public void uploadToES() {
+    List<UpdatedPost> updatedPosts = updatedPostRepository.findAll();
+    if (updatedPosts.isEmpty()) {
+      throw new PostNotFoundException(ExceptionCode.UPDATABLE_POST_NOT_EXIST);
+    }
+
+    List<PostSearch> postSearches = updatedPosts.stream().map(PostSearch::from).toList();
+    postSearchRepositoryImpl.bulkInsertOrUpdate(postSearches);
+    updatedPostRepository.deleteAll();
   }
 }

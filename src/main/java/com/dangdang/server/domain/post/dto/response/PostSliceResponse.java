@@ -1,6 +1,7 @@
 package com.dangdang.server.domain.post.dto.response;
 
 import com.dangdang.server.domain.post.domain.entity.Post;
+import com.dangdang.server.domain.post.domain.entity.PostSearch;
 import com.dangdang.server.global.util.S3ImageUtil;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -28,5 +29,12 @@ public class PostSliceResponse {
   public static PostSliceResponse from(Post post) {
     return new PostSliceResponse(post.getId(), post.getTitle(), post.getTownName(),
         S3ImageUtil.makeImageLink(post.getImageUrl()), post.getPrice(), post.getCreatedAt());
+  }
+
+  public static PostSliceResponse from(PostSearch postSearch) {
+    assert postSearch.getId() != null;
+    return new PostSliceResponse(Long.parseLong(postSearch.getId()), postSearch.getTitle(),
+        postSearch.getTownName(), postSearch.getImageUrl(), postSearch.getPrice(),
+        postSearch.getCreatedAt());
   }
 }

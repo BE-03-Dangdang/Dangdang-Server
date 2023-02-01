@@ -5,6 +5,7 @@ import static com.dangdang.server.global.exception.ExceptionCode.CHARGE_LESS_THA
 import static com.dangdang.server.global.exception.ExceptionCode.PAY_MEMBER_NOT_FOUND;
 import static com.dangdang.server.global.exception.ExceptionCode.WITHDRAW_LESS_THAN_MIN_AMOUNT;
 
+import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application.ConnectionAccountDatabaseService;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetConnectionAccountReceiveResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
@@ -14,6 +15,7 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayType;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberSignupResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.MinAmountException;
@@ -44,6 +46,15 @@ public class PayMemberService {
     this.payUsageHistoryService = payUsageHistoryService;
     this.connectionAccountDatabaseService = connectionAccountDatabaseService;
     this.payMemberRepository = payMemberRepository;
+  }
+
+  /**
+   * 당근페이 가입
+   */
+  public PostPayMemberSignupResponse signup(String password, Member member) {
+    PayMember payMember = new PayMember(password, member);
+    payMember = payMemberRepository.save(payMember);
+    return PostPayMemberSignupResponse.from(payMember.getId());
   }
 
   /**

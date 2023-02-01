@@ -10,6 +10,10 @@ backtony.github.io(Rest Docs)
 [[PayMember-API]]
 == PayMember API
 
+[[PayMember-당근페이-가입]]
+=== PayMember 당근페이 가입
+operation::PayMemberController/signup[snippets='http-request,request-headers,http-response,response-fields']
+
 [[PayMember-당근머니-충전]]
 === PayMember 당근머니 충전
 

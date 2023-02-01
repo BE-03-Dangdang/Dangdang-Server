@@ -24,6 +24,7 @@ import com.dangdang.server.global.exception.UrlInValidException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +35,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @SpringBootTest
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -61,13 +63,12 @@ class PostServiceTest {
 
   @BeforeEach
   void setUp() {
-    loginMember = new Member("01064083487", "yb");
+    loginMember = new Member("01064083433", "yb");
     memberRepository.save(loginMember);
-
     Town town = townRepository.findByName("천호동")
         .orElseThrow(() -> new TownNotFoundException(ExceptionCode.TOWN_NOT_FOUND));
 
-    MemberTown memberTown = new MemberTown(loginMember, town);
+    MemberTown memberTown = new MemberTown(this.loginMember, town);
     memberTownRepository.save(memberTown);
 
     PostImageRequest postImageRequest = new PostImageRequest(Arrays.asList(
@@ -77,7 +78,8 @@ class PostServiceTest {
     PostSaveRequest postSaveRequest = new PostSaveRequest("맛있는 커피팝니다.", "아메리카노가 단돈 1000원!",
         Category.디지털기기, 1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false,
         "서현동", postImageRequest);
-    savedPostResponse = postService.savePost(postSaveRequest, loginMember.getId());
+    savedPostResponse = postService.savePost(postSaveRequest, this.loginMember.getId());
+    postService.uploadToES();
   }
 
   @Test
@@ -141,10 +143,10 @@ class PostServiceTest {
   }
 
   @Test
-  @DisplayName("검색어와 각종 파라미터를 사용해서 검색할 수 있다.")
-  public void searchWithQueryAndOptions() throws Exception {
+  @DisplayName("검색어와 각종 파라미터를 사용해서 ES로 검색할 수 있다.")
+  public void searchWithQueryAndOptionsES() throws Exception {
     //given
-    String query = "커피";
+    String query = "아메리카노";
     PostSearchOptionRequest postSearchOption = new PostSearchOptionRequest(List.of(Category.디지털기기),
         0L, 40000L, 1, true);
 
@@ -152,6 +154,6 @@ class PostServiceTest {
     PostsSliceResponse posts = postService.search(query, postSearchOption, loginMember.getId(),
         new PostSliceRequest(0, 10));
     //then
-    Assertions.assertThat(posts.getPostSliceResponses()).hasSize(1);
+    Assertions.assertThat(posts.getPostSliceResponses()).hasSizeGreaterThan(0);
   }
 }

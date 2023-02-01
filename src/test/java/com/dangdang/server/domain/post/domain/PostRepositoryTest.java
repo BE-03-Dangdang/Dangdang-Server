@@ -6,17 +6,22 @@ import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.entity.Post;
+import com.dangdang.server.domain.post.domain.entity.PostSearch;
+import com.dangdang.server.domain.post.domain.entity.UpdatedPost;
 import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
-import com.dangdang.server.domain.post.infrastructure.PostRepositorySupport;
+import com.dangdang.server.domain.post.infrastructure.PostSearchRepositoryImpl;
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,21 +33,24 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestInstance(Lifecycle.PER_CLASS)
 class PostRepositoryTest {
 
   @Autowired
   PostRepository postRepository;
   @Autowired
-  PostRepositorySupport postRepositorySupport;
+  PostSearchRepositoryImpl postSearchRepositoryImpl;
+  @Autowired
+  PostSearchRepository postSearchRepository;
   @Autowired
   MemberRepository memberRepository;
   @Autowired
   TownRepository townRepository;
 
 
-  @BeforeEach
+  @BeforeAll
   void setUp() throws Exception {
-    Member member = new Member("01064083487", "yb");
+    Member member = new Member("01064083433", "yb");
     memberRepository.save(member);
     Post post;
     for (int i = 1; i <= 40; i++) {
@@ -73,6 +81,7 @@ class PostRepositoryTest {
       // "image_url"은 기존 테스트 코드의 동작을 보장하기 위한 임의의 image link String 값입니다.
       // when
       postRepository.save(post);
+      postSearchRepository.save(PostSearch.from(UpdatedPost.from(post)));
     }
     //then
   }
@@ -113,9 +122,10 @@ class PostRepositoryTest {
             20000L, 1, false);
         List<Long> ids = Arrays.asList(1L, 2L, 3L, 6L, 15L);
         // when
-        List<Post> posts = postRepositorySupport.searchBySearchOption(query, postSearchOption, ids);
+        Slice<PostSearch> posts = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+            postSearchOption, ids, PageRequest.of(0, 50));
         //then
-        assertThat(posts).hasSize(20);
+        assertThat(posts.getContent()).hasSize(20);
       }
 
       @Test
@@ -128,9 +138,10 @@ class PostRepositoryTest {
             null, 1, false);
         List<Long> ids = Arrays.asList(1L, 2L, 3L, 6L, 15L);
         // when
-        List<Post> posts = postRepositorySupport.searchBySearchOption(query, postSearchOption, ids);
+        Slice<PostSearch> posts = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+            postSearchOption, ids, PageRequest.of(0, 50));
         //then
-        assertThat(posts).hasSize(10);
+        assertThat(posts.getContent()).hasSize(10);
       }
 
       @Test
@@ -143,9 +154,10 @@ class PostRepositoryTest {
             null, 1, false);
         List<Long> ids = Arrays.asList(1L, 2L, 3L, 6L, 15L);
         // when
-        List<Post> posts = postRepositorySupport.searchBySearchOption(query, postSearchOption, ids);
+        Slice<PostSearch> posts = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+            postSearchOption, ids, PageRequest.of(0, 50));
         //then
-        assertThat(posts).hasSize(40);
+        assertThat(posts.getContent()).hasSize(40);
       }
     }
 
@@ -163,9 +175,10 @@ class PostRepositoryTest {
             null, 1, false);
         List<Long> ids = Arrays.asList(1L, 2L, 3L, 6L, 15L);
         // when
-        List<Post> posts = postRepositorySupport.searchBySearchOption(query, postSearchOption, ids);
+        Slice<PostSearch> posts = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+            postSearchOption, ids, PageRequest.of(0, 50));
         //then
-        assertThat(posts).hasSize(40);
+        assertThat(posts.getContent()).hasSize(40);
       }
 
       @Test
@@ -178,9 +191,10 @@ class PostRepositoryTest {
             null, 1, false);
         List<Long> ids = Arrays.asList(1L, 2L, 3L, 6L, 15L);
         // when
-        List<Post> posts = postRepositorySupport.searchBySearchOption(query, postSearchOption, ids);
+        Slice<PostSearch> posts = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+            postSearchOption, ids, PageRequest.of(0, 50));
         //then
-        assertThat(posts).hasSize(20);
+        assertThat(posts.getContent()).hasSize(20);
       }
     }
 
@@ -198,10 +212,10 @@ class PostRepositoryTest {
             null, 1, true);
         List<Long> ids = Arrays.asList(1L, 2L, 3L, 6L, 15L);
         // when
-        List<Post> posts = postRepositorySupport.searchBySearchOption(query, postSearchOption, ids);
-        System.out.println(posts.get(0).getStatus().name());
+        Slice<PostSearch> posts = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+            postSearchOption, ids, PageRequest.of(0, 50));
         //then
-        assertThat(posts).hasSize(30);
+        assertThat(posts.getContent()).hasSize(30);
       }
 
       @Test
@@ -214,10 +228,10 @@ class PostRepositoryTest {
             null, 1, false);
         List<Long> ids = Arrays.asList(1L, 2L, 3L, 6L, 15L);
         // when
-        List<Post> posts = postRepositorySupport.searchBySearchOption(query, postSearchOption, ids);
-        System.out.println(posts.get(0).getStatus().name());
+        Slice<PostSearch> posts = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+            postSearchOption, ids, PageRequest.of(0, 50));
         //then
-        assertThat(posts).hasSize(40);
+        assertThat(posts.getContent()).hasSize(40);
       }
     }
 
@@ -235,9 +249,10 @@ class PostRepositoryTest {
             null, 1, false);
         List<Long> ids = Arrays.asList(1L, 2L, 3L, 6L, 15L);
         // when
-        List<Post> posts = postRepositorySupport.searchBySearchOption(query, postSearchOption, ids);
+        Slice<PostSearch> posts = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+            postSearchOption, ids, PageRequest.of(0, 50));
         //then
-        assertThat(posts).hasSize(40);
+        assertThat(posts.getContent()).hasSize(40);
       }
 
       @Test
@@ -250,9 +265,10 @@ class PostRepositoryTest {
             null, 1, false);
         List<Long> ids = Arrays.asList(1L, 2L, 3L, 6L, 15L);
         // when
-        List<Post> posts = postRepositorySupport.searchBySearchOption(query, postSearchOption, ids);
+        Slice<PostSearch> posts = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+            postSearchOption, ids, PageRequest.of(0, 50));
         //then
-        assertThat(posts).hasSize(40);
+        assertThat(posts.getContent()).hasSize(40);
       }
 
     }

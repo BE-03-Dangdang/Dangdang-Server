@@ -2,21 +2,21 @@ package com.dangdang.server.domain.postImage.dto;
 
 import com.dangdang.server.domain.post.domain.entity.Post;
 import com.dangdang.server.domain.postImage.domain.entity.PostImage;
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import lombok.Getter;
 
-@Getter
-public class PostImageRequest {
+public record PostImageRequest(
+    @JsonProperty List<String> urls
+) {
 
-  private List<String> url;
-
-  @JsonCreator
-  public PostImageRequest(List<String> url) {
-    this.url = url;
-  }
+  private static final int REPRESENTATIVE_IMAGE_INDEX = 0;
 
   public static PostImage toPostImage(Post post, String url) {
     return new PostImage(post, url);
   }
+
+  public String representativeImage() {
+    return urls.get(REPRESENTATIVE_IMAGE_INDEX);
+  }
+
 }

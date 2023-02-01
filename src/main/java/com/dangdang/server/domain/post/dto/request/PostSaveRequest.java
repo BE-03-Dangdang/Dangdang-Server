@@ -74,7 +74,7 @@ public class PostSaveRequest {
         postSaveRequest.price, postSaveRequest.desiredPlaceName,
         postSaveRequest.getDesiredPlaceLongitude(), postSaveRequest.desiredPlaceLatitude,
         VIEW_INIT_VALUE, postSaveRequest.sharing, loginMember, town,
-        postSaveRequest.postImageRequest.getUrl().size() == 0 ? DEFAULT_IMAGE_LINK
-            : postSaveRequest.postImageRequest.getUrl().get(0), StatusType.SELLING);
+        postSaveRequest.postImageRequest.urls().size() == 0 ? DEFAULT_IMAGE_LINK
+            : postSaveRequest.postImageRequest.urls().get(0), StatusType.SELLING);
   }
 }

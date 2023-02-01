@@ -1,0 +1,19 @@
+:hardbreaks:
+ifndef::snippets[]
+:snippets: ../ ../ ../build/generated-snippets
+endif::[]
+
+
+== 게시글
+
+=== 게시글 수정
+
+=== /api/put/update
+
+.Request
+include::{snippets}/post/api/put/update/http-request.adoc[]
+include::{snippets}/post/api/put/update/request-fields.adoc[]
+
+.Response
+include::{snippets}/post/api/put/update/http-response.adoc[]
+include::{snippets}/post/api/put/update/response-fields.adoc[]

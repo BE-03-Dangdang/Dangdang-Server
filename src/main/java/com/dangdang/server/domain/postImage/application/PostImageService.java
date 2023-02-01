@@ -23,7 +23,7 @@ public class PostImageService {
 
   @Transactional(propagation = Propagation.MANDATORY)
   public List<String> savePostImage(Post post, PostImageRequest postImageRequest) {
-    List<String> urls = postImageRequest.getUrl();
+    List<String> urls = postImageRequest.urls();
     urls.stream().map(url -> PostImageRequest.toPostImage(post, url))
         .forEach(postImageRepository::save);
     return postImageRepository.findPostImagesByPostId(post.getId()).stream()
@@ -36,5 +36,10 @@ public class PostImageService {
     return postImages.stream().map(PostImage::getUrl)
         .map(S3ImageUtil::makeImageLink)
         .collect(Collectors.toList());
+  }
+
+  @Transactional //(propagation = Propagation.REQUIRES_NEW)
+  public void deletePostImagesByPostId(Long postId) {
+    postImageRepository.deletePostImageByPostId(postId);
   }
 }

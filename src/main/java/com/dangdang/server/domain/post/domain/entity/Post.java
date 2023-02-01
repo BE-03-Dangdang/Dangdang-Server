@@ -4,10 +4,8 @@ import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.Category;
-import com.dangdang.server.domain.postImage.domain.entity.PostImage;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import java.math.BigDecimal;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -19,8 +17,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -97,6 +93,21 @@ public class Post extends BaseEntity {
     super.status = statusType;
   }
 
+  public Post(String title, String content, Category category, Integer price,
+      String desiredPlaceName,
+      BigDecimal desiredPlaceLongitude, BigDecimal desiredPlaceLatitude, Boolean sharing,
+      String imageUrl) {
+    this.title = title;
+    this.content = content;
+    this.category = category;
+    this.price = price;
+    this.desiredPlaceName = desiredPlaceName;
+    this.desiredPlaceLongitude = desiredPlaceLongitude;
+    this.desiredPlaceLatitude = desiredPlaceLatitude;
+    this.sharing = sharing;
+    this.imageUrl = imageUrl;
+  }
+
   public Long getMemberId() {
     return member.getId();
   }
@@ -108,4 +119,17 @@ public class Post extends BaseEntity {
   public void changeStatus(StatusType statusType) {
     this.status = statusType;
   }
+
+  public void changePost(Post post) {
+    this.title = post.getTitle();
+    this.content = post.getContent();
+    this.category = post.getCategory();
+    this.price = post.getPrice();
+    this.desiredPlaceName = post.getDesiredPlaceName();
+    this.desiredPlaceLongitude = post.getDesiredPlaceLongitude();
+    this.desiredPlaceLatitude = post.getDesiredPlaceLatitude();
+    this.sharing = post.getSharing();
+    this.imageUrl = imageUrl;
+  }
+
 }

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link crossorigin="anonymous"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+        rel="stylesheet">
+  <style>
+    .btn-warning {
+      background-color: darkorange;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+<div class="px-4 py-5 my-5 text-center">
+  <div class="col-lg-6 mx-auto">
+    <img src="logo.png">
+    <p style="color: gray">dangdangserver 로그인 API, pay 가입 API를 사용하여 회원 등록이 완료됐다고<br>가정한 상태에서 진행되는
+      계좌등록 및 인증 페이지입니다.</p>
+    <br><br><br>
+    <div class="input-group flex-nowrap">
+      <input aria-describedby="addon-wrapping" aria-label="PhoneNumber" class="form-control"
+             id="PhoneNumber" placeholder="PhoneNumber"
+             type="text">
+    </div>
+    <br><br>
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+      <button class="btn btn-warning px-4 gap-3" id="signup" type="button">계좌등록 및 인증</button>
+    </div>
+  </div>
+  <br>
+</div>
+<script>
+  let memberId;
+  let signupButton = document.getElementById("signup");
+
+  let inputPhoneNumber;
+  signupButton.addEventListener('click', () => {
+    inputPhoneNumber = document.getElementById("PhoneNumber").value;
+
+    fetch("http://localhost:8080/api/v1/members/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        phoneNumber: inputPhoneNumber,
+      })
+    })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        alert('dangdangserver 회원가입 및 로그인을 먼저 진행해주세요.');
+        return response.text;
+      }
+    }).then((data) => {
+      memberId = data.memberId;
+      openAPIWindowOpen();
+      saveState();
+    })
+    .catch(err => {
+      console.log('Fetch Error', err);
+    });
+  })
+
+  function saveState() {
+    fetch("http://localhost:8080/api/v1/open-banking", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        memberId: memberId,
+        state: randomString,
+      })
+    })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        return response.text;
+      }
+    })
+    .catch(err => {
+      console.log('Fetch Error', err);
+    });
+  }
+
+  const generateRandomString = (num) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < num; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+  }
+
+  let randomString;
+
+  function openAPIWindowOpen() {
+    randomString = generateRandomString(32);
+    let windowProxy = window.open('about:blank');
+    windowProxy.location = "https://testapi.openbanking.or.kr/oauth/2.0/authorize?"
+        + "response_type=code&"
+        + "client_id=b1cc2cf1-9aa8-4912-abb4-205dbfac0bbe&"
+        + "redirect_uri=http://localhost:8080/api/v1/open-banking/auth-result&"
+        + "scope=login inquiry transfer&"
+        + "client_info=test&"
+        + "state=" + randomString + "&"
+        + "auth_type=0";
+  }
+</script>
+</body>
+</html>

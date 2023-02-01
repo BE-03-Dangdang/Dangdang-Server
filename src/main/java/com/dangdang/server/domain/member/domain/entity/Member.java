@@ -2,6 +2,8 @@ package com.dangdang.server.domain.member.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
 import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
+import com.dangdang.server.global.exception.BusinessException;
+import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.Collection;
 import java.util.Collections;
 import javax.persistence.Column;
@@ -33,7 +35,9 @@ public class Member extends BaseEntity implements UserDetails {
 
   @Column(nullable = false, length = 30)
   private String nickname;
-
+  
+  @Column(nullable = true)
+  private String refreshToken;
   protected Member() {
 
   }
@@ -94,5 +98,14 @@ public class Member extends BaseEntity implements UserDetails {
   public boolean isEnabled() {
     return true;
   }
+  
+  public void isId(Long memberId) {
+    if (!Objects.equals(this.id, memberId)) {
+      throw new BusinessException(ExceptionCode.NOT_PERMISSION);
+    }
+  }
 
+  public void setRefreshToken(String refreshToken) {
+    this.refreshToken = refreshToken;
+  }
 }

@@ -1,10 +1,12 @@
 package com.dangdang.server.controller.member;
 
 import com.dangdang.server.domain.member.application.MemberService;
+import com.dangdang.server.domain.member.dto.request.MemberRefreshRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import com.dangdang.server.domain.member.exception.MemberBadRequestException;
+import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +61,17 @@ public class MemberController {
     MemberCertifyResponse memberCertifyResponse = memberService.loginCertify(
         phoneNumberCertifyRequest);
 
+    return ResponseEntity.ok(memberCertifyResponse);
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<MemberCertifyResponse> refresh(
+      @RequestBody @Valid MemberRefreshRequest memberRefreshRequest, BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+      throw new BusinessException(ExceptionCode.BAD_REQUEST);
+    }
+
+    MemberCertifyResponse memberCertifyResponse = memberService.refresh(memberRefreshRequest);
     return ResponseEntity.ok(memberCertifyResponse);
   }
 }

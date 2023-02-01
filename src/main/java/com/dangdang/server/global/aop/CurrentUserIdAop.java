@@ -35,7 +35,7 @@ public class CurrentUserIdAop {
 
     String token = jwtTokenProvider.resolveAccessToken(request);
     token = jwtTokenProvider.bearerRemove(token);
-    Authentication authentication = jwtTokenProvider.getAuthentication(token);
+    Authentication authentication = jwtTokenProvider.getAccessTokenAuthentication(token);
     Long memberId = ((Member) authentication.getPrincipal()).getId();
 
     Object[] modifiedArgs = modifyArgsWithMemberId(memberId, proceedingJoinPoint);

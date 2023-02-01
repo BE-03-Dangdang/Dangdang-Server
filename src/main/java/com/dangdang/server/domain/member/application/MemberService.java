@@ -11,6 +11,7 @@ import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
 import com.dangdang.server.domain.member.domain.entity.RedisSms;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
+import com.dangdang.server.domain.member.dto.request.PhoneNumberVerifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import com.dangdang.server.domain.member.exception.MemberCertifiedFailException;
 import com.dangdang.server.domain.member.exception.MemberNotFoundException;
@@ -62,7 +63,7 @@ public class MemberService {
     RedisAuthCode redisAuthCode = toRedisAuthCode(phoneNumberCertifyRequest);
     redisAuthCodeRepository.save(redisAuthCode);
 
-    return new MemberCertifyResponse(null,true);
+    return new MemberCertifyResponse(null, true);
   }
 
   @Transactional
@@ -109,5 +110,11 @@ public class MemberService {
   private MemberCertifyResponse getMemberCertifyResponse(Long memberId) {
     String accessToken = jwtTokenProvider.createAccessToken(memberId);
     return new MemberCertifyResponse(accessToken, true);
+  }
+
+  public Long phoneNumberVerify(PhoneNumberVerifyRequest phoneNumberVerifyRequest) {
+    Member member = memberRepository.findByPhoneNumber(phoneNumberVerifyRequest.phoneNumber())
+        .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
+    return member.getId();
   }
 }

@@ -21,12 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/pay-members")
 public class PayMemberController {
 
-
   private final PayMemberService payMemberService;
 
   public PayMemberController(PayMemberService payMemberService) {
     this.payMemberService = payMemberService;
   }
+
+  /**
+   * TODO 회원가입
+   */
 
   /**
    * 당근머니 충전 API

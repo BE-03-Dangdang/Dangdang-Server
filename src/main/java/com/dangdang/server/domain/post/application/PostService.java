@@ -77,7 +77,7 @@ public class PostService {
     Post foundPost = postRepository.findPostDetailById(postId)
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 
-    List<String> imageUrls = postImageService.findPostImagesByPostId(postId);
+    List<String> imageUrls = postImageService.findImageUrlsByPostId(postId);
     return PostDetailResponse.from(foundPost, foundPost.getMember(), imageUrls);
   }
 
@@ -92,7 +92,7 @@ public class PostService {
     }
 
     post.changeStatus(postUpdateStatusRequest.status());
-    List<String> imageUrls = postImageService.findPostImagesByPostId(postId);
+    List<String> imageUrls = postImageService.findImageUrlsByPostId(postId);
     return PostDetailResponse.from(post, post.getMember(), imageUrls);
   }
 
@@ -105,10 +105,8 @@ public class PostService {
       throw new MemberUnmatchedAuthorException(MEMBER_UNMATCH_AUTHOR);
     }
 
-    postImageService.deletePostImagesByPostId(foundPost.getId());
-    List<String> imageUrls = postImageService.savePostImage(foundPost,
-        postUpdateRequest.postImageRequest());
-
+    List<String> imageUrls = postUpdateRequest.postImageRequest().urls();
+    postImageService.renewPostImage(foundPost, imageUrls);
     foundPost.changePost(PostUpdateRequest.to(postUpdateRequest));
 
     return PostDetailResponse.from(foundPost, foundPost.getMember(), imageUrls);

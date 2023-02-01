@@ -1,11 +1,14 @@
 package com.dangdang.server.domain.postImage.application;
 
+import com.dangdang.server.domain.post.domain.PostRepository;
 import com.dangdang.server.domain.post.domain.entity.Post;
 import com.dangdang.server.domain.postImage.domain.PostImageRepository;
 import com.dangdang.server.domain.postImage.domain.entity.PostImage;
 import com.dangdang.server.domain.postImage.dto.PostImageRequest;
 import com.dangdang.server.global.util.S3ImageUtil;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -16,9 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostImageService {
 
   private final PostImageRepository postImageRepository;
+  private final PostRepository postRepository;
 
-  public PostImageService(PostImageRepository postImageRepository) {
+  public PostImageService(PostImageRepository postImageRepository,
+      PostRepository postRepository) {
     this.postImageRepository = postImageRepository;
+    this.postRepository = postRepository;
   }
 
   @Transactional(propagation = Propagation.MANDATORY)
@@ -31,15 +37,31 @@ public class PostImageService {
         .collect(Collectors.toList());
   }
 
-  public List<String> findPostImagesByPostId(Long postId) {
+  public List<String> findImageUrlsByPostId(Long postId) {
     List<PostImage> postImages = postImageRepository.findPostImagesByPostId(postId);
     return postImages.stream().map(PostImage::getUrl)
         .map(S3ImageUtil::makeImageLink)
         .collect(Collectors.toList());
   }
 
-  @Transactional //(propagation = Propagation.REQUIRES_NEW)
-  public void deletePostImagesByPostId(Long postId) {
-    postImageRepository.deletePostImageByPostId(postId);
+  @Transactional
+  public void renewPostImage(Post post, List<String> newUrls) {
+    Set<String> checkPreviousUrl = new HashSet<>();
+    List<PostImage> postImages = postImageRepository.findPostImagesByPostId(post.getId());
+
+    for (PostImage postImage : postImages) {
+      if (newUrls.contains(postImage.getUrl())) {
+        checkPreviousUrl.add(postImage.getUrl());
+        continue;
+      }
+      postImageRepository.deleteById(postImage.getId());
+    }
+
+    for (String url : newUrls) {
+      if (checkPreviousUrl.contains(url)) {
+        continue;
+      }
+      postImageRepository.save(new PostImage(post, url));
+    }
   }
 }

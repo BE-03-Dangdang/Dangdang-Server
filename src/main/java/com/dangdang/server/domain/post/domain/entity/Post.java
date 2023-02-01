@@ -129,7 +129,7 @@ public class Post extends BaseEntity {
     this.desiredPlaceLongitude = post.getDesiredPlaceLongitude();
     this.desiredPlaceLatitude = post.getDesiredPlaceLatitude();
     this.sharing = post.getSharing();
-    this.imageUrl = imageUrl;
+    this.imageUrl = post.getImageUrl();
   }
 
 }

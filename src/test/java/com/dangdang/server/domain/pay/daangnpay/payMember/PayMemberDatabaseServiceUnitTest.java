@@ -14,7 +14,7 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.P
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application.PayUsageHistoryService;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.OpenBankingFacadeService;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.application.OpenBankingFacadeService;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -29,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PayMemberService 단위테스트")
-public class PayMemberServiceUnitTest {
+public class PayMemberDatabaseServiceUnitTest {
 
   @Spy
   @InjectMocks

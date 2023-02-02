@@ -55,7 +55,7 @@ class PayMemberServiceIntegrationTest {
     memberRepository.save(member);
 
     String password = "password123";
-    payMember = new PayMember(password, payMemberMoney, member);
+    payMember = new PayMember(password, payMemberMoney, member.getId());
     payMemberRepository.save(payMember);
 
     BankAccount bankAccount1 = new BankAccount("12383461723", "신한은행", 500000, payMember, "홍길동");

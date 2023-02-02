@@ -42,7 +42,7 @@ class PayUsageHistoryServiceIntegrationTest {
     memberRepository.save(member);
 
     String password = "password123";
-    payMember = new PayMember(password, member);
+    payMember = new PayMember(password, member.getId());
     payMemberRepository.save(payMember);
   }
 

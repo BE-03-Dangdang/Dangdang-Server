@@ -27,11 +27,11 @@ class PayMemberRepositoryTest {
     memberRepository.save(member);
 
     String password = "password123";
-    PayMember payMember = new PayMember(password, member);
+    PayMember payMember = new PayMember(password, member.getId());
     payMemberRepository.save(payMember);
 
     PayMember findPayMember = payMemberRepository.findByMemberId(member.getId()).get();
 
-    Assertions.assertThat(findPayMember.getMember().getId()).isEqualTo(member.getId());
+    Assertions.assertThat(findPayMember.getMemberId()).isEqualTo(member.getId());
   }
 }

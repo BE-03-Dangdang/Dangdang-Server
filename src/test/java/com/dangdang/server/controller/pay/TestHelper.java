@@ -17,7 +17,7 @@ public class TestHelper {
   RedisAuthCodeRepository redisAuthCodeRepository;
 
   protected String jwtSetUp() {
-    String phoneNumber = "1";
+    String phoneNumber = "01000000003";
     MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("천호동", phoneNumber, "url",
         "닉네임");
     redisAuthCodeRepository.save(new RedisAuthCode(phoneNumber));

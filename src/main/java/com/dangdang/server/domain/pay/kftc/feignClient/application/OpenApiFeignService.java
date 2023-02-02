@@ -100,7 +100,8 @@ public class OpenApiFeignService implements OpenBankingService {
     PostWithdrawRequest postWithdrawRequest = new PostWithdrawRequest(
         openBankingWithdrawRequest.toTrustAccountNumber(), "당근페이",
         openBankingWithdrawRequest.fintechUseNum(), openBankingWithdrawRequest.fintechUseNum(),
-        "10000", "20201001150133", "김오픈", "KIMOPEN1234", "당당페이", "088", "34");
+        openBankingWithdrawRequest.amount().toString(), "20201001150133", "김오픈", "KIMOPEN1234",
+        "당당페이", "088", "34");
 
     PostWithdrawResponse postWithdrawResponse = openApiFeignClient.withdraw(
         openBankingWithdrawRequest.openBankingToken(), postWithdrawRequest);

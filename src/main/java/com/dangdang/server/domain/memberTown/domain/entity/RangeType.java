@@ -5,15 +5,17 @@ import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.Arrays;
 
 public enum RangeType {
-  LEVEL1(1),
-  LEVEL2(2),
-  LEVEL3(3),
-  LEVEL4(4);
+  LEVEL1(1,1),
+  LEVEL2(2,2),
+  LEVEL3(3,4),
+  LEVEL4(4,6);
 
   private final int rangeLevel;
+  private final int distance;
 
-  RangeType(int rangeLevel) {
+  RangeType(int rangeLevel, int distance) {
     this.rangeLevel = rangeLevel;
+    this.distance = distance;
   }
 
   public static RangeType getRangeType(int rangeLevel) {

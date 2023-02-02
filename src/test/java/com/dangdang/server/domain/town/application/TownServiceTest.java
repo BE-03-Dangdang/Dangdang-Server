@@ -57,7 +57,7 @@ public class TownServiceTest {
     Town town = townRepository.findByName(townName).orElseThrow();
 
     List<AdjacentTownResponse> adjacentTowns = townRepository.findAdjacentTownsByPoint(
-        town.getLatitude(), town.getLongitude(), distance);
+        town.getLongitude(), town.getLatitude(), distance);
 
     //then
     List<Long> townIdsFromTable = adjacentTowns.stream().map(AdjacentTownResponse::getTownId)

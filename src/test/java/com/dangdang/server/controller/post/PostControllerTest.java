@@ -127,9 +127,12 @@ class PostControllerTest {
   @DisplayName("사용자는 게시글 메인 페이지에서 페이지네이션을 적용한 전체 게시글을 조회할 수 있다.")
   public void findAll() throws Exception {
     // given
-    PostSliceRequest postSliceRequest = new PostSliceRequest(0, 10);
+    LinkedMultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+    map.add("page", "0");
+    map.add("size", "10");
     // when
-    mockMvc.perform((MockMvcRequestBuilders.get("/posts?size=1&page=0")
+    mockMvc.perform((MockMvcRequestBuilders.get("/posts")
+            .params(map)
             .contentType(MediaType.APPLICATION_JSON)
             .header("AccessToken", accessToken)
             .characterEncoding(StandardCharsets.UTF_8)
@@ -140,11 +143,9 @@ class PostControllerTest {
         .andDo(document("PostController/findAll",
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
-//            requestFields(
-//                fieldWithPath("size").type(JsonFieldType.NUMBER).description("한 페이지에 보여줄 사이즈"),
-//                fieldWithPath("page").type(JsonFieldType.NUMBER).description("페이지 번호")
-//            ),
             responseFields(
+                fieldWithPath("postSliceResponses[]").type(JsonFieldType.ARRAY)
+                    .description("게시글 반환 리스트"),
                 fieldWithPath("postSliceResponses[].id").type(JsonFieldType.NUMBER)
                     .description("글 번호"),
                 fieldWithPath("postSliceResponses[].title").type(JsonFieldType.STRING)
@@ -157,6 +158,8 @@ class PostControllerTest {
                     .description("상품 가격"),
                 fieldWithPath("postSliceResponses[].createdAt").type(JsonFieldType.STRING)
                     .description("글 생성일시"),
+                fieldWithPath("postSliceResponses[].likeCount").type(JsonFieldType.NUMBER)
+                    .description("좋아요 개수"),
                 fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 글 존재 여부")
             )
         ));

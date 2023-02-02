@@ -1,6 +1,7 @@
 package com.dangdang.server.controller.post;
 
 import static com.dangdang.server.global.exception.ExceptionCode.POST_STATUS_IS_NULL;
+import static com.dangdang.server.global.exception.ExceptionCode.SLICE_PARAMETER_UNDER_ZERO;
 
 import com.dangdang.server.domain.post.application.PostService;
 import com.dangdang.server.domain.post.dto.request.PostLikeRequest;
@@ -9,15 +10,19 @@ import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
 import com.dangdang.server.domain.post.dto.request.PostUpdateStatusRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
 import com.dangdang.server.domain.post.dto.response.PostsSliceResponse;
+import com.dangdang.server.domain.post.exception.MinParameterException;
 import com.dangdang.server.domain.post.exception.NullParameterException;
 import com.dangdang.server.global.aop.CurrentUserId;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

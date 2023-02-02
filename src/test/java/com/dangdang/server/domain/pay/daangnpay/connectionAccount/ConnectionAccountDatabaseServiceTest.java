@@ -13,7 +13,7 @@ import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.applica
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.ConnectionAccountRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
-import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetAllConnectionAccountResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AllConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import java.util.List;
@@ -56,9 +56,9 @@ class ConnectionAccountDatabaseServiceTest {
     payMember = new PayMember(password, member);
     payMemberRepository.save(payMember);
 
-    BankAccount bankAccount1 = new BankAccount("12383461723", "신한은행", 500000, payMember);
-    BankAccount bankAccount2 = new BankAccount("34511234235", "우리은행", 40000, payMember);
-    BankAccount bankAccount3 = new BankAccount("01290947732", "케이뱅크", 248200, payMember);
+    BankAccount bankAccount1 = new BankAccount("12383461723", "신한은행", 500000, payMember, "홍길동");
+    BankAccount bankAccount2 = new BankAccount("34511234235", "우리은행", 40000, payMember, "홍길동");
+    BankAccount bankAccount3 = new BankAccount("01290947732", "케이뱅크", 248200, payMember, "홍길동");
 
     bankAccounts = List.of(bankAccount1, bankAccount2, bankAccount3);
     bankAccountRepository.saveAll(bankAccounts);
@@ -89,7 +89,7 @@ class ConnectionAccountDatabaseServiceTest {
     @Test
     @DisplayName("사용 불가능 계좌일 경우 추가할 수 없다.")
     void failAdd() {
-      BankAccount bankAccount = new BankAccount("12383461723", "신한은행", 500000, payMember,
+      BankAccount bankAccount = new BankAccount("12383461723", "신한은행", 500000, payMember, "홍길동",
           StatusType.INACTIVE);
       bankAccountRepository.save(bankAccount);
 
@@ -134,7 +134,7 @@ class ConnectionAccountDatabaseServiceTest {
 
           Long memberId = member.getId();
 
-          List<GetAllConnectionAccountResponse> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
+          List<AllConnectionAccount> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
               memberId);
 
           assertThat(allConnectionAccount).hasSize(allBankAccountSize);
@@ -150,7 +150,7 @@ class ConnectionAccountDatabaseServiceTest {
         void getZeroList() {
           Long memberId = member.getId();
 
-          List<GetAllConnectionAccountResponse> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
+          List<AllConnectionAccount> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
               memberId);
 
           assertThat(allConnectionAccount).isEmpty();

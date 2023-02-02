@@ -1,15 +1,22 @@
 package com.dangdang.server.domain.member.domain.entity;
 
 import com.dangdang.server.domain.common.BaseEntity;
+import com.dangdang.server.domain.likes.domain.entity.Likes;
 import com.dangdang.server.domain.member.dto.response.MemberSignUpResponse;
+import com.dangdang.server.global.exception.BusinessException;
+import com.dangdang.server.global.exception.ExceptionCode;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,9 +38,15 @@ public class Member extends BaseEntity implements UserDetails {
   @Lob
   private String profileImgUrl;
 
+  @OneToMany(mappedBy = "member")
+  private List<Likes> likes = new ArrayList<>();
+
   @Column(nullable = false, length = 30)
   private String nickname;
-
+  
+  @Column(nullable = true)
+  private String refreshToken;
+  
   protected Member() {
 
   }
@@ -94,5 +107,22 @@ public class Member extends BaseEntity implements UserDetails {
   public boolean isEnabled() {
     return true;
   }
+  
+  public void isId(Long memberId) {
+    if (!Objects.equals(this.id, memberId)) {
+      throw new BusinessException(ExceptionCode.NOT_PERMISSION);
+    }
+  }
 
+  public void addLikes(Likes likes) {
+    this.likes.add(likes);
+  }
+    
+  public void logout() {
+    this.refreshToken = "";
+  }
+
+  public void refresh(String refreshToken) {
+    this.refreshToken = refreshToken;
+  }
 }

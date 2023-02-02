@@ -22,8 +22,8 @@ public interface TownRepository extends JpaRepository<Town, Long> {
           HAVING distance <= :distanceLevel 
           ORDER BY name 
           """, nativeQuery = true)
-  List<AdjacentTownResponse> findAdjacentTownsByPoint(@Param("latitude") BigDecimal latitude,
-      @Param("longitude") BigDecimal longitude,
+  List<AdjacentTownResponse> findAdjacentTownsByPoint(@Param("longitude") BigDecimal longitude,
+      @Param("latitude") BigDecimal latitude,
       @Param("distanceLevel") int distanceLevel);
 
   @Query(value =

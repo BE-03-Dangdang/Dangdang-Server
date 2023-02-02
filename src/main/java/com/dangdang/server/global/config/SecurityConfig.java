@@ -1,6 +1,6 @@
 package com.dangdang.server.global.config;
 
-import com.dangdang.server.global.security.JwtAuthenticationFilter;
+import com.dangdang.server.global.security.JwtAccessTokenFilter;
 import com.dangdang.server.global.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +28,8 @@ public class SecurityConfig {
   public WebSecurityCustomizer webSecurityCustomizer() {
     return web -> web.ignoring()
         .antMatchers("/**");
+        .antMatchers("/docs/**")
+        .antMatchers("/dangdang-chat/**");
   }
 
   @Bean
@@ -42,9 +44,10 @@ public class SecurityConfig {
         .antMatchers(HttpMethod.POST, "/sms-message/**").permitAll()
         .antMatchers(HttpMethod.POST, "/members/**").permitAll()
         .antMatchers(HttpMethod.GET, "/open-banking/**").permitAll()
+        .antMatchers(HttpMethod.POST, "/chat-room").permitAll()
         .anyRequest().authenticated()
         .and()
-        .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+        .addFilterBefore(new JwtAccessTokenFilter(jwtTokenProvider),
             UsernamePasswordAuthenticationFilter.class);
 
     return http.build();

@@ -9,6 +9,7 @@ import com.dangdang.server.domain.member.domain.RedisSmsRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
 import com.dangdang.server.domain.member.domain.entity.RedisSms;
+import com.dangdang.server.domain.member.dto.request.MemberRefreshRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberVerifyRequest;
@@ -57,13 +58,13 @@ public class MemberService {
         phoneNumberCertifyRequest.phoneNumber());
 
     if (member.isPresent()) {
-      return getMemberCertifyResponse(member.get().getId());
+      return getMemberCertifyResponse(member.get());
     }
 
     RedisAuthCode redisAuthCode = toRedisAuthCode(phoneNumberCertifyRequest);
     redisAuthCodeRepository.save(redisAuthCode);
 
-    return new MemberCertifyResponse(null, true);
+    return MemberCertifyResponse.from(null, null, true);
   }
 
   @Transactional
@@ -73,7 +74,7 @@ public class MemberService {
     Member member = memberRepository.findByPhoneNumber(phoneNumberCertifyRequest.phoneNumber())
         .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
 
-    return getMemberCertifyResponse(member.getId());
+    return getMemberCertifyResponse(member);
   }
 
   @Transactional
@@ -93,7 +94,7 @@ public class MemberService {
     MemberTown memberTown = new MemberTown(member, town);
     memberTownRepository.save(memberTown);
 
-    return getMemberCertifyResponse(member.getId());
+    return getMemberCertifyResponse(member);
   }
 
   private void phoneNumberCertify(PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
@@ -107,9 +108,42 @@ public class MemberService {
     redisSmsRepository.deleteById(phoneNumberCertifyRequest.phoneNumber());
   }
 
-  private MemberCertifyResponse getMemberCertifyResponse(Long memberId) {
-    String accessToken = jwtTokenProvider.createAccessToken(memberId);
-    return new MemberCertifyResponse(accessToken, true);
+  private MemberCertifyResponse getMemberCertifyResponse(Member member) {
+    String accessToken = jwtTokenProvider.createAccessToken(member.getId());
+    String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
+
+    member.refresh(refreshToken);
+
+    return MemberCertifyResponse.from(accessToken, refreshToken, true);
+  }
+
+  @Transactional
+  public MemberCertifyResponse refresh(MemberRefreshRequest memberRefreshRequest) {
+    String refreshToken = memberRefreshRequest.refreshToken();
+
+    if (jwtTokenProvider.validateRefreshToken(refreshToken)) {
+      throw new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL);
+    }
+
+    Member principal = ((Member) jwtTokenProvider.getRefreshTokenAuthentication(refreshToken)
+        .getPrincipal());
+
+    Member member = memberRepository.findById(principal.getId())
+        .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
+
+    if (!member.getRefreshToken().equals(refreshToken)) {
+      throw new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL);
+    }
+
+    return getMemberCertifyResponse(principal);
+  }
+
+  @Transactional
+  public void logout(long memberId) {
+    Member member = memberRepository.findById(memberId)
+        .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
+
+    member.logout();
   }
 
   public Long phoneNumberVerify(PhoneNumberVerifyRequest phoneNumberVerifyRequest) {

@@ -6,11 +6,13 @@ import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import com.dangdang.server.domain.member.exception.MemberBadRequestException;
+import com.dangdang.server.global.aop.CurrentUserId;
 import com.dangdang.server.global.exception.BusinessException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,5 +75,12 @@ public class MemberController {
 
     MemberCertifyResponse memberCertifyResponse = memberService.refresh(memberRefreshRequest);
     return ResponseEntity.ok(memberCertifyResponse);
+  }
+
+  @DeleteMapping
+  @CurrentUserId
+  public ResponseEntity logout(long memberId) {
+    memberService.logout(memberId);
+    return ResponseEntity.ok().build();
   }
 }

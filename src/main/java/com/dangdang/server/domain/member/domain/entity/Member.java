@@ -106,7 +106,11 @@ public class Member extends BaseEntity implements UserDetails {
     }
   }
 
-  public void setRefreshToken(String refreshToken) {
+  public void logout() {
+    this.refreshToken = "";
+  }
+
+  public void refresh(String refreshToken) {
     this.refreshToken = refreshToken;
   }
 }

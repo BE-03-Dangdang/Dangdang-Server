@@ -15,15 +15,16 @@ public class PostSliceResponse {
   private final String imageUrl;
   private final Integer price;
   private final LocalDateTime createdAt;
+  private int likeCount;
 
-  private PostSliceResponse(Long id, String title, String townName, String imageUrl, Integer price,
-      LocalDateTime createdAt) {
-    this.id = id;
-    this.title = title;
-    this.townName = townName;
-    this.imageUrl = imageUrl;
-    this.price = price;
-    this.createdAt = createdAt;
+  private PostSliceResponse(Post post) {
+    this.id = post.getId();
+    this.title = post.getTitle();
+    this.townName = post.getTownName();
+    this.imageUrl = S3ImageUtil.makeImageLink(post.getImageUrl());
+    this.createdAt = post.getCreatedAt();
+    this.price = post.getPrice();
+    this.likeCount = post.getLikeCount();
   }
 
   public static PostSliceResponse from(Post post) {

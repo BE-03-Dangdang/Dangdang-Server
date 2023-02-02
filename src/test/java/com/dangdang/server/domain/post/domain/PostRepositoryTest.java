@@ -1,11 +1,16 @@
 package com.dangdang.server.domain.post.domain;
 
+import static com.dangdang.server.global.exception.ExceptionCode.POST_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.dangdang.server.domain.common.StatusType;
+import com.dangdang.server.domain.likes.domain.LikesRepository;
+import com.dangdang.server.domain.likes.domain.entity.Likes;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.entity.Post;
+import com.dangdang.server.domain.post.exception.PostNotFoundException;
+import java.math.BigDecimal;
 import com.dangdang.server.domain.post.domain.entity.PostSearch;
 import com.dangdang.server.domain.post.domain.entity.UpdatedPost;
 import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
@@ -46,10 +51,27 @@ class PostRepositoryTest {
   MemberRepository memberRepository;
   @Autowired
   TownRepository townRepository;
+  @Autowired
+  LikesRepository likesRepository;
 
+  Member member;
+  Town town;
+  Post post;
 
-  @BeforeAll
-  void setUp() throws Exception {
+  void savePost() {
+    Member newMember = new Member("테스트 멤버", "01012341234", "testImgUrl");
+    member = memberRepository.save(newMember);
+    Town newTown = new Town("서현동", null, null);
+    town = townRepository.save(newTown);
+
+    post = new Post("title1", "content1", Category.디지털기기, 10000, "desiredName1",
+        new BigDecimal("126.1111"), new BigDecimal("36.111111"), 0, false, member, town,
+        "http://s3.amazonaws.com/test1.png", StatusType.SELLING);
+
+    postRepository.save(post);
+  }
+
+  void setUpForSearch() throws Exception {
     Member member = new Member("01064083433", "yb");
     memberRepository.save(member);
     Post post;
@@ -83,12 +105,7 @@ class PostRepositoryTest {
       postRepository.save(post);
       postSearchRepository.save(PostSearch.from(UpdatedPost.from(post)));
     }
-    //then
-  }
 
-  @Test
-  @DisplayName("게시글을 페이징 처리 할 수 있다.")
-  public void getAllPosts() throws Exception {
     //given
     List<Post> posts = postRepository.findAll();
     List<Long> adjacency = posts.stream().map(post -> post.getTown().getId())
@@ -104,9 +121,26 @@ class PostRepositoryTest {
         .isAfter(findPosts.getContent().get(1).getCreatedAt());
   }
 
+  @Test
+  @DisplayName("게시글 상세 조회시 좋아요를 함께 가져올 수 있다.")
+  public void getPostDetailForLikesTest() {
+    savePost();
+    //given
+    Likes likes = new Likes(post, member);
+    likesRepository.save(likes);
+    likes.addLikes();
+
+    //then
+    Post foundPost = postRepository.findPostDetailById(post.getId())
+        .orElseThrow(() -> new PostNotFoundException(
+            POST_NOT_FOUND));
+    Assertions.assertThat(foundPost.getLikes().size()).isEqualTo(1);
+
+  }
   @Nested
   @DisplayName("게시글 검색 테스트")
   class PostSearchTest {
+    setUpForSearch();
 
     @Nested
     @DisplayName("최소, 최대 가격 입력 여부에 따라")
@@ -273,6 +307,4 @@ class PostRepositoryTest {
 
     }
   }
-
-
 }

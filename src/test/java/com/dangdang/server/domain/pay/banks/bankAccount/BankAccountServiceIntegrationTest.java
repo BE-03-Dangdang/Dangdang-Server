@@ -45,6 +45,7 @@ class BankAccountServiceIntegrationTest {
   BankAccount bankAccount;
   BankAccount bankAccountInactive;
   int beforeBankBalance = 1000;
+  String fintechUseNum = "128947";
 
   @BeforeEach
   void setUp() {
@@ -78,7 +79,8 @@ class BankAccountServiceIntegrationTest {
         int result = balance - amountReq;
 
         OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-            payMember.getId(), null, "1111", bankAccount.getAccountNumber(), amountReq);
+            payMember.getId(), null, fintechUseNum, "1111", bankAccount.getAccountNumber(),
+            amountReq);
 
         bankAccountService.withdraw(openBankingWithdrawRequest);
 
@@ -101,7 +103,8 @@ class BankAccountServiceIntegrationTest {
         @DisplayName("InactiveBankAccountException이 발생하고")
         void inactiveBankAccountException() {
           OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-              payMember.getId(), null, "1111", bankAccountInactive.getAccountNumber(), 10000);
+              payMember.getId(), null, fintechUseNum, "1111",
+              bankAccountInactive.getAccountNumber(), 10000);
 
           assertThrows(InactiveBankAccountException.class,
               () -> bankAccountService.withdraw(openBankingWithdrawRequest));
@@ -127,7 +130,7 @@ class BankAccountServiceIntegrationTest {
         void bankAccountAuthenticationException() {
           Long payMemberIdReq = Long.MAX_VALUE;
           OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-              payMemberIdReq, null, "11231", bankAccount.getAccountNumber(), 10000);
+              payMemberIdReq, null, fintechUseNum, "11231", bankAccount.getAccountNumber(), 10000);
 
           assertThrows(BankAccountAuthenticationException.class,
               () -> bankAccountService.withdraw(openBankingWithdrawRequest));
@@ -153,7 +156,8 @@ class BankAccountServiceIntegrationTest {
         void insufficientBankAccountException() {
           int amountReq = beforeBankBalance + 1000;
           OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-              payMember.getId(), null, "1111", bankAccount.getAccountNumber(), amountReq);
+              payMember.getId(), null, fintechUseNum, "1111", bankAccount.getAccountNumber(),
+              amountReq);
 
           assertThrows(InsufficientBankAccountException.class,
               () -> bankAccountService.withdraw(openBankingWithdrawRequest));

@@ -1,15 +1,13 @@
 package com.dangdang.server.controller.pay;
 
-import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.application.PayMemberService;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
+import com.dangdang.server.global.aop.CurrentUserId;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,35 +29,31 @@ public class PayMemberController {
   /**
    * 당근머니 충전 API
    */
+  @CurrentUserId
+  @ResponseStatus(HttpStatus.OK)
   @PatchMapping("/money/charge")
-  public ResponseEntity<PayResponse> charge(Authentication authentication,
-      @RequestBody @Valid PayRequest payRequest) {
-    Long memberId = ((Member) authentication.getPrincipal()).getId();
-    PayResponse payResponse = payMemberService.charge(memberId, payRequest);
-
-    return ResponseEntity.ok(payResponse);
+  public PayResponse charge(Long memberId, @RequestBody @Valid PayRequest payRequest) {
+    return payMemberService.charge(memberId, payRequest);
   }
 
   /**
    * 당근머니 출금 API
    */
+  @CurrentUserId
+  @ResponseStatus(HttpStatus.OK)
   @PatchMapping("/money/withdraw")
-  public ResponseEntity<PayResponse> withdraw(Authentication authentication,
-      @RequestBody @Valid PayRequest payRequest) {
-    Long memberId = ((Member) authentication.getPrincipal()).getId();
-    PayResponse payResponse = payMemberService.withdraw(memberId, payRequest);
-
-    return ResponseEntity.ok(payResponse);
+  public PayResponse withdraw(Long memberId, @RequestBody @Valid PayRequest payRequest) {
+    return payMemberService.withdraw(memberId, payRequest);
   }
 
   /**
    * 수취 조회 API
    */
+  @CurrentUserId
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("/inquiry/receive")
-  public ReceiveResponse inquiryReceive(Authentication authentication,
+  public ReceiveResponse inquiryReceive(Long memberId,
       @Valid @RequestBody ReceiveRequest receiveRequest) {
-    Long memberId = ((Member) authentication.getPrincipal()).getId();
     return payMemberService.inquiryReceive(memberId, receiveRequest);
   }
 }

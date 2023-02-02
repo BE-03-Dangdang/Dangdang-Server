@@ -11,5 +11,4 @@ public record MemberResponse(
   public static MemberResponse from(Member member) {
     return new MemberResponse(member.getId(), member.getProfileImgUrl(), member.getNickname());
   }
-
 }

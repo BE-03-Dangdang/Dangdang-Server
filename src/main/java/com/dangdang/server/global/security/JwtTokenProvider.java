@@ -5,6 +5,7 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
@@ -17,42 +18,42 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider  {
 
-  private String secretKey;
+  private final String accessTokenSecretKey;
+  private final String refreshTokenSecretKey;
 
-  private final Long EXPIRED_TIME = 1000 * 60 * 30L;
+  private final long ACCESS_TOKEN_EXPIRED_TIME = Duration.ofMinutes(5).toMillis(); // 만료시간 5분
+  private final long REFRESH_TOKEN_EXPIRED_TIME = Duration.ofMinutes(60).toMillis();
 
   private final CustomUserDetailsService customUserDetailsService;
 
-  public JwtTokenProvider(@Value("${spring.jwt.secretKey}")
-  String secretKey, CustomUserDetailsService customUserDetailsService) {
-    this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+  public JwtTokenProvider(@Value("${spring.jwt.AccessTokenSecretKey}")
+  String accessTokenSecretKey,
+      @Value("${spring.jwt.RefreshTokenSecretKey}") String refreshTokenSecretKey,
+      CustomUserDetailsService customUserDetailsService) {
+    this.accessTokenSecretKey = getTokenSecretKey(accessTokenSecretKey);
+    this.refreshTokenSecretKey = getTokenSecretKey(refreshTokenSecretKey);
     this.customUserDetailsService = customUserDetailsService;
   }
 
-
   public String createAccessToken(long memberId) {
-    Claims claims = Jwts.claims().setSubject("Dangdang");
-    claims.put("memberId", memberId);
-
-    Date date = new Date();
-
-    return Jwts.builder()
-        .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-        .setClaims(claims)
-        .setIssuedAt(date)
-        .setIssuer("Dangdang-server")
-        .setExpiration(new Date(date.getTime() + EXPIRED_TIME))
-        .signWith(SignatureAlgorithm.HS256, secretKey)
-        .compact();
+    return getToken(memberId, ACCESS_TOKEN_EXPIRED_TIME, accessTokenSecretKey);
   }
 
-  //토큰에서 인증정보를 조회하는 메서드
-  public Authentication getAuthentication(String token) {
-    UserDetails userDetails = customUserDetailsService.loadUserByUsername(getMemberId(token));
+  public String createRefreshToken(long memberId) {
+    return getToken(memberId, REFRESH_TOKEN_EXPIRED_TIME, refreshTokenSecretKey);
+  }
+  
+  public Authentication getAccessTokenAuthentication(String token) {
+    UserDetails userDetails = customUserDetailsService.loadUserByUsername(getMemberId(token, accessTokenSecretKey));
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 
-  public String getMemberId(String token) {
+  public Authentication getRefreshTokenAuthentication(String token) {
+    UserDetails userDetails = customUserDetailsService.loadUserByUsername(getMemberId(token, refreshTokenSecretKey));
+    return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+  }
+
+  public String getMemberId(String token, String secretKey) {
     return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody()
         .get("memberId").toString();
   }
@@ -62,6 +63,33 @@ public class JwtTokenProvider  {
   }
 
   public boolean validateAccessToken(String token) {
+    return extracted(token, accessTokenSecretKey);
+  }
+
+  public boolean validateRefreshToken(String token) {
+    return extracted(token, refreshTokenSecretKey);
+  }
+
+  public String bearerRemove(String token) {
+    return token.substring("Bearer ".length());
+  }
+
+  private String getToken(long memberId, long ACCESS_TOKEN_EXPIRED_TIME, String secretKey) {
+    Claims claims = Jwts.claims().setSubject("Dangdang");
+    claims.put("memberId", memberId);
+    Date date = new Date();
+
+    return Jwts.builder()
+        .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+        .setClaims(claims)
+        .setIssuedAt(date)
+        .setIssuer("Dangdang-server")
+        .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_EXPIRED_TIME))
+        .signWith(SignatureAlgorithm.HS256, secretKey)
+        .compact();
+  }
+
+  private boolean extracted(String token, String secretKey) {
     token = bearerRemove(token);
     try {
       Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
@@ -71,8 +99,9 @@ public class JwtTokenProvider  {
     }
   }
 
-  public String bearerRemove(String token) {
-    return token.substring("Bearer ".length());
+  private static String getTokenSecretKey(String accessTokenSecretKey) {
+    return Base64
+        .getEncoder()
+        .encodeToString(accessTokenSecretKey.getBytes());
   }
-
 }

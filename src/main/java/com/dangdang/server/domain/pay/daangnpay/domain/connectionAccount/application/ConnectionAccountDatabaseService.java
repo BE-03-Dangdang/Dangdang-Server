@@ -11,7 +11,7 @@ import com.dangdang.server.domain.pay.banks.bankAccount.exception.InactiveBankAc
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.ConnectionAccountRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
-import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetAllConnectionAccountResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AllConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetConnectionAccountReceiveResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
@@ -59,14 +59,14 @@ public class ConnectionAccountDatabaseService {
   /**
    * 내 연결 계좌 리스트 제공
    */
-  public List<GetAllConnectionAccountResponse> getAllConnectionAccount(Long memberId) {
+  public List<AllConnectionAccount> getAllConnectionAccount(Long memberId) {
     PayMember payMember = getPayMemberByMemberId(memberId);
 
     List<ConnectionAccount> connectionAccountList = connectionAccountRepository.findByPayMemberId(
         payMember.getId());
 
     return connectionAccountList.stream()
-        .map(GetAllConnectionAccountResponse::from)
+        .map(AllConnectionAccount::from)
         .toList();
   }
 

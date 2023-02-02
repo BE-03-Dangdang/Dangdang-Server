@@ -7,6 +7,14 @@ backtony.github.io(Rest Docs)
 :toclevels: 2
 :sectlinks:
 
+[[PayExternal-API]]
+== PayExternal API
+
+[[PayExternal-당근머니-충전]]
+=== PayExternal 당근머니 충전
+
+operation::PayExternalController/charge[snippets='http-request,request-headers,http-response,response-fields']
+
 [[PayMember-API]]
 == PayMember API
 

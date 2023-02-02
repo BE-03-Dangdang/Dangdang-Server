@@ -24,6 +24,8 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberSignupResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.RemittanceRequest;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.RemittanceResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.PasswordSizeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
@@ -377,6 +379,71 @@ class PayMemberControllerTest extends TestHelper {
                         fieldWithPath("feeAmount").type(JsonFieldType.NUMBER).description("수수료 금액"),
                         fieldWithPath("freeMonthlyFeeCount").type(JsonFieldType.NUMBER)
                             .description("남은 무료 수수료 횟수")
+                    )
+                ));
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("송금 API는")
+  class Remittance {
+
+    @Nested
+    @DisplayName("유효한 요청값이 들어오면")
+    class Success {
+
+      @Test
+      @DisplayName("당근머니 송금을 진행한다.")
+      void successRemittanceTest() throws Exception {
+        RemittanceRequest remittanceRequest = new RemittanceRequest(null, 10000, "홍길동",
+            bankAccountNumber, "097");
+        String json = objectMapper.writeValueAsString(remittanceRequest);
+        RemittanceResponse remittanceResponse = new RemittanceResponse("케이뱅크", "3274623",
+            1000, 0, 3, 0);
+
+        doReturn(remittanceResponse).when(payMemberService).remittance(any(), any());
+
+        mockMvc.perform(
+                post("/pay-members/money/remittance")
+                    .header("AccessToken", accessToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("UTF-8")
+                    .content(json)
+            )
+            .andExpect(status().isOk())
+            .andDo(
+                document("PayMemberController/remittance",
+                    preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint()),
+                    requestHeaders(
+                        headerWithName("AccessToken").description("jwt header")
+                    ),
+                    requestFields(
+                        fieldWithPath("openBankingToken").type(JsonFieldType.STRING)
+                            .description("openAPI 액세스 토큰").optional(),
+                        fieldWithPath("depositAmount").type(JsonFieldType.NUMBER)
+                            .description("입금 요청 금액"),
+                        fieldWithPath("receiveClientName").type(JsonFieldType.STRING)
+                            .description("입금 계좌 예금주명"),
+                        fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)
+                            .description("입금 계좌 번호"),
+                        fieldWithPath("bankCode").type(JsonFieldType.STRING)
+                            .description("입금 계좌 은행 코드")
+                    ),
+                    responseFields(
+                        fieldWithPath("chargeAccountBankName").type(JsonFieldType.STRING)
+                            .description("충전계좌 은행"),
+                        fieldWithPath("chargeAccountNumber").type(JsonFieldType.STRING)
+                            .description("충전계좌 번호"),
+                        fieldWithPath("autoChargeAmount").type(JsonFieldType.NUMBER)
+                            .description("자동충전 금액"),
+                        fieldWithPath("feeAmount").type(JsonFieldType.NUMBER).description("수수료 금액"),
+                        fieldWithPath("freeMonthlyFeeCount").type(JsonFieldType.NUMBER)
+                            .description("남은 무료 수수료 횟수"),
+                        fieldWithPath("feeAmount").type(JsonFieldType.NUMBER).description("수수료 금액"),
+                        fieldWithPath("balanceMoney").type(JsonFieldType.NUMBER)
+                            .description("당근머니 잔액")
                     )
                 ));
       }

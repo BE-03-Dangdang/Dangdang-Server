@@ -17,6 +17,9 @@ import com.dangdang.server.domain.pay.kftc.feignClient.dto.AuthTokenRequestPrope
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawRequest;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawResponse;
+import java.time.LocalDateTime;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +97,17 @@ public class OpenApiFeignService implements OpenBankingService {
    */
   @Override
   public OpenBankingResponse withdraw(OpenBankingWithdrawRequest openBankingWithdrawRequest) {
-    return null;
+    PostWithdrawRequest postWithdrawRequest = new PostWithdrawRequest(
+        openBankingWithdrawRequest.toTrustAccountNumber(), "당근페이",
+        openBankingWithdrawRequest.fintechUseNum(), openBankingWithdrawRequest.fintechUseNum(),
+        "10000", "20201001150133", "김오픈", "KIMOPEN1234", "당당페이", "088", "34");
+
+    PostWithdrawResponse postWithdrawResponse = openApiFeignClient.withdraw(
+        openBankingWithdrawRequest.openBankingToken(), postWithdrawRequest);
+
+    return OpenBankingResponse.ofExternal(openBankingWithdrawRequest.payMemberId(),
+        openBankingWithdrawRequest.fromBankAccountNumber(), postWithdrawResponse,
+        LocalDateTime.now());
   }
 
   /**

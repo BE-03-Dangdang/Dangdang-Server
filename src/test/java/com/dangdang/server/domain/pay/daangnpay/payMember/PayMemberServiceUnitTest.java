@@ -42,7 +42,6 @@ public class PayMemberServiceUnitTest {
   PayUsageHistoryService payUsageHistoryService;
   @Mock
   ConnectionAccountDatabaseService connectionAccountDatabaseService;
-
   int moneyBalance = 50000;
   int freeFeeCount = 0;
   PayMember payMember = new PayMember(moneyBalance, freeFeeCount);

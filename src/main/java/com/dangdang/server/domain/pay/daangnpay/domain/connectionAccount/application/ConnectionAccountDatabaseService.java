@@ -87,6 +87,15 @@ public class ConnectionAccountDatabaseService {
         findChargeAccount.getBankAccountNumber());
   }
 
+  /**
+   * 핀테크 이용 번호 찾기
+   */
+  public String getFintechUseNum(String accountNumber) {
+    ConnectionAccount connectionAccount = connectionAccountRepository.findByBankAccountNumber(
+        accountNumber).orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
+    return connectionAccount.getFintechUseNum();
+  }
+
   private PayMember getPayMemberByMemberId(Long memberId) {
     return payMemberRepository.findByMemberId(memberId)
         .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));

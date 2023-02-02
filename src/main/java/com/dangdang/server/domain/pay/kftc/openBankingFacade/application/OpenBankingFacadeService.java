@@ -46,7 +46,7 @@ public class OpenBankingFacadeService implements OpenBankingService {
     BankOpenBankingApiResponse bankOpenBankingApiResponse = bankAccountService.deposit(
         openBankingDepositRequest);
 
-    return OpenBankingResponse.of(openBankingDepositRequest.payMemberId(),
+    return OpenBankingResponse.ofInternal(openBankingDepositRequest.payMemberId(),
         bankOpenBankingApiResponse, LocalDateTime.now());
   }
 
@@ -59,7 +59,7 @@ public class OpenBankingFacadeService implements OpenBankingService {
         openBankingWithdrawRequest);
     trustAccountService.deposit(openBankingWithdrawRequest);
 
-    return OpenBankingResponse.of(openBankingWithdrawRequest.payMemberId(),
+    return OpenBankingResponse.ofInternal(openBankingWithdrawRequest.payMemberId(),
         bankOpenBankingApiResponse, LocalDateTime.now());
   }
 

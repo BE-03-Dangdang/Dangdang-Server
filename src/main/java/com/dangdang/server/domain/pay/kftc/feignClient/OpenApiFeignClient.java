@@ -2,10 +2,13 @@ package com.dangdang.server.domain.pay.kftc.feignClient;
 
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawRequest;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -29,4 +32,11 @@ public interface OpenApiFeignClient {
   @GetMapping(value = "/v2.0/user/me")
   GetUserMeResponse getUserInfo(@RequestHeader("Authorization") String token,
       @RequestParam String user_seq_no);
+
+  /**
+   * 출금 이체
+   */
+  @PostMapping(value = "/v2.0/transfer/withdraw/fin_num", produces = "application/json")
+  PostWithdrawResponse withdraw(@RequestHeader("Authorization") String token, @RequestBody
+  PostWithdrawRequest postWithdrawRequest);
 }

@@ -79,8 +79,10 @@ public class PayMemberService {
     }
 
     PayMember payMember = getPayMember(memberId);
+    String fintechUseNum = connectionAccountDatabaseService.getFintechUseNum(
+        payRequest.bankAccountNumber());
     OpenBankingWithdrawRequest openBankingWithdrawRequest = createOpenBankingWithdrawRequest(
-        payMember.getId(), payRequest);
+        payMember.getId(), payRequest, fintechUseNum);
     OpenBankingResponse openBankingResponse = openBankingService.withdraw(
         openBankingWithdrawRequest);
 
@@ -145,9 +147,9 @@ public class PayMemberService {
   }
 
   private OpenBankingWithdrawRequest createOpenBankingWithdrawRequest(Long payMemberId,
-      PayRequest payRequest) {
+      PayRequest payRequest, String fintechUseNum) {
     return new OpenBankingWithdrawRequest(payMemberId, payRequest.openBankingToken(),
-        OPEN_BANKING_CONTRACT_ACCOUNT.getAccountNumber(),
+        fintechUseNum, OPEN_BANKING_CONTRACT_ACCOUNT.getAccountNumber(),
         payRequest.bankAccountNumber(), payRequest.amount());
   }
 

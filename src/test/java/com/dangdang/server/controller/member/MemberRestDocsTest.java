@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
+@Transactional
 @SpringBootTest
 class MemberRestDocsTest {
 

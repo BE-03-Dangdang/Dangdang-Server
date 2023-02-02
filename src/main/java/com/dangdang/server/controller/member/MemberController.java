@@ -91,7 +91,7 @@ public class MemberController {
 
   @DeleteMapping
   @CurrentUserId
-  public ResponseEntity logout(long memberId) {
+  public ResponseEntity logout(Long memberId) {
     memberService.logout(memberId);
     return ResponseEntity.ok().build();
   }

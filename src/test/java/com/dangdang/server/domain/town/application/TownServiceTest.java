@@ -15,7 +15,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -57,12 +56,13 @@ public class TownServiceTest {
     Town town = townRepository.findByName(townName).orElseThrow();
 
     List<AdjacentTownResponse> adjacentTowns = townRepository.findAdjacentTownsByPoint(
-        town.getLongitude(), town.getLatitude(), distance);
+        town.getLatitude(), town.getLongitude(), distance);
 
     //then
     List<Long> townIdsFromTable = adjacentTowns.stream().map(AdjacentTownResponse::getTownId)
         .toList();
     assertThat(ids).hasSize(adjacentTowns.size());
+    assertThat(ids).hasSizeGreaterThan(1);
     assertThat(ids).usingRecursiveComparison().isEqualTo(townIdsFromTable);
   }
 }

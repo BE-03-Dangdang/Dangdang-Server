@@ -25,12 +25,14 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @SpringBootTest
 @DisplayName("연결계좌 DB 테스트")
-class ConnectionAccountDatabaseServiceTest {
+@ActiveProfiles("internal")
+class ConnectionAccountServiceTest {
 
   static Member member;
   static PayMember payMember;

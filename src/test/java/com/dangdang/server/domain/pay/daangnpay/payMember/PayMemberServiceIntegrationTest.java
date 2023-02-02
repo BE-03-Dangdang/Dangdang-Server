@@ -26,10 +26,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @Transactional
 @SpringBootTest
 @DisplayName("당근페이 멤버 Service 통합테스트")
+@ActiveProfiles("internal")
 class PayMemberServiceIntegrationTest {
 
   static Member member;
@@ -92,7 +94,6 @@ class PayMemberServiceIntegrationTest {
       assertThat(payResponse.money()).isEqualTo(payMemberMoney - (amountRequest * bankAccountSize));
     }
   }
-
 
   @Nested
   @DisplayName("당근머니를 충전하면")

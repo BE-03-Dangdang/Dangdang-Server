@@ -37,7 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-public class PayExternalControllerTest extends TestHelper {
+class PayExternalControllerTest extends TestHelper {
 
   @MockBean
   PayMemberService payMemberService;

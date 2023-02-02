@@ -1,10 +1,12 @@
 package com.dangdang.server.domain.pay.kftc.feignClient.dto;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
-public class BankTranIdMaker {
+public class RequestDtoHelper {
 
-  protected static String makeBankTranId() {
+  protected String makeBankTranId() {
     String tempPassword = "";
 
     for (int i = 0; i < 9; i++) {
@@ -19,5 +21,11 @@ public class BankTranIdMaker {
       }
     }
     return tempPassword;
+  }
+
+  protected String makeTranDtime() {
+    Date now = new Date();
+    SimpleDateFormat nowDate = new SimpleDateFormat("yyyyMMddHHmmss");
+    return nowDate.format(now);
   }
 }

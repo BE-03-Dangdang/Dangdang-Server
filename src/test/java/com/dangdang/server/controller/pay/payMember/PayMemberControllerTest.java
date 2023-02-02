@@ -8,7 +8,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -79,7 +78,7 @@ class PayMemberControllerTest extends TestHelper {
     doReturn(payResponse).when(payMemberService).charge(any(), any());
 
     mockMvc.perform(
-            patch("/pay-members/money/charge")
+            post("/pay-members/money/charge")
                 .header("AccessToken", accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
@@ -122,7 +121,7 @@ class PayMemberControllerTest extends TestHelper {
     doReturn(payResponse).when(payMemberService).withdraw(any(), any());
 
     mockMvc.perform(
-            patch("/pay-members/money/withdraw")
+            post("/pay-members/money/withdraw")
                 .header("AccessToken", accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")

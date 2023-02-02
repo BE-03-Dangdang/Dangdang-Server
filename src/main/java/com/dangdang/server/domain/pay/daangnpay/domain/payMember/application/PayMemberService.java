@@ -5,8 +5,8 @@ import static com.dangdang.server.global.exception.ExceptionCode.CHARGE_LESS_THA
 import static com.dangdang.server.global.exception.ExceptionCode.PAY_MEMBER_NOT_FOUND;
 import static com.dangdang.server.global.exception.ExceptionCode.WITHDRAW_LESS_THAN_MIN_AMOUNT;
 
-import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application.ConnectionAccountDatabaseService;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetConnectionAccountReceiveResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.FeeInfo;
@@ -15,8 +15,8 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayType;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
-import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberSignupResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberRequest;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberSignupResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.MinAmountException;
@@ -74,8 +74,8 @@ public class PayMemberService {
   /**
    * 당근페이 가입
    */
-  public PostPayMemberSignupResponse signup(String password, Member member) {
-    PayMember payMember = new PayMember(password, member);
+  public PostPayMemberSignupResponse signup(String password, Long memberId) {
+    PayMember payMember = new PayMember(password, memberId);
     payMember = payMemberRepository.save(payMember);
     return PostPayMemberSignupResponse.from(payMember.getId());
   }
@@ -90,10 +90,10 @@ public class PayMemberService {
     }
 
     PayMember payMember = getPayMember(memberId);
-    String fintechUseNum = connectionAccountDatabaseService.getFintechUseNum(
+    ConnectionAccount connectionAccount = connectionAccountDatabaseService.findByAccountNumber(
         payRequest.bankAccountNumber());
     OpenBankingWithdrawRequest openBankingWithdrawRequest = createOpenBankingWithdrawRequest(
-        payMember.getId(), payRequest, fintechUseNum);
+        payMember.getId(), payRequest, connectionAccount);
     OpenBankingResponse openBankingResponse = openBankingService.withdraw(
         openBankingWithdrawRequest);
 
@@ -138,13 +138,13 @@ public class PayMemberService {
     PayMember payMember = getPayMember(memberId);
     Long payMemberId = payMember.getId();
 
-    OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest = createOpenBankingInquiryReceiveRequest(
-        payMemberId, receiveRequest);
-    OpenBankingInquiryReceiveResponse openBankingInquiryReceiveResponse = openBankingService.inquiryReceive(
-        openBankingInquiryReceiveRequest);
-
     GetConnectionAccountReceiveResponse getConnectionAccountReceiveResponse = connectionAccountDatabaseService.findIsMyAccountAndChargeAccountByReceiveRequest(
         payMemberId, receiveRequest);
+
+    OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest = createOpenBankingInquiryReceiveRequest(
+        payMemberId, receiveRequest, getConnectionAccountReceiveResponse);
+    OpenBankingInquiryReceiveResponse openBankingInquiryReceiveResponse = openBankingService.inquiryReceive(
+        openBankingInquiryReceiveRequest);
 
     int autoChargeAmount = payMember.calculateAutoChargeAmount(receiveRequest.depositAmount());
     FeeInfo feeInfo = payMember.getFeeInfo();
@@ -158,10 +158,10 @@ public class PayMemberService {
   }
 
   private OpenBankingWithdrawRequest createOpenBankingWithdrawRequest(Long payMemberId,
-      PayRequest payRequest, String fintechUseNum) {
+      PayRequest payRequest, ConnectionAccount connectionAccount) {
     return new OpenBankingWithdrawRequest(payMemberId, payRequest.openBankingToken(),
-        fintechUseNum, OPEN_BANKING_CONTRACT_ACCOUNT.getAccountNumber(),
-        payRequest.bankAccountNumber(), payRequest.amount());
+        connectionAccount.getFintechUseNum(), OPEN_BANKING_CONTRACT_ACCOUNT.getAccountNumber(),
+        connectionAccount.getAccountHolder(), payRequest.bankAccountNumber(), payRequest.amount());
   }
 
   private OpenBankingDepositRequest createOpenBankingDepositRequest(Long payMemberId,
@@ -172,9 +172,12 @@ public class PayMemberService {
   }
 
   private OpenBankingInquiryReceiveRequest createOpenBankingInquiryReceiveRequest(Long payMemberId,
-      ReceiveRequest receiveRequest) {
+      ReceiveRequest receiveRequest,
+      GetConnectionAccountReceiveResponse getConnectionAccountReceiveResponse) {
     return new OpenBankingInquiryReceiveRequest(payMemberId, receiveRequest.openBankingToken(),
-        receiveRequest.bankAccountNumber(), receiveRequest.bankCode());
+        getConnectionAccountReceiveResponse.chargeAccountBankName(),
+        getConnectionAccountReceiveResponse.accountHolder(), receiveRequest.bankAccountNumber(),
+        receiveRequest.bankCode(), receiveRequest.depositAmount());
   }
 
   private int minusPayMemberMoney(PayMember payMember, PayRequest payRequest) {

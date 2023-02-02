@@ -4,6 +4,7 @@ import static com.dangdang.server.global.exception.ExceptionCode.OPEN_OAUTH_NOT_
 
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
+import com.dangdang.server.domain.pay.daangnpay.global.vo.TrustAccount;
 import com.dangdang.server.domain.pay.kftc.OpenBankingService;
 import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingDepositRequest;
 import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveRequest;
@@ -17,6 +18,8 @@ import com.dangdang.server.domain.pay.kftc.feignClient.dto.AuthTokenRequestPrope
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostReceiveReqeust;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostReceiveResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawResponse;
 import java.time.LocalDateTime;
@@ -68,8 +71,8 @@ public class OpenApiFeignService implements OpenBankingService {
 
     GetAuthTokenResponse getAuthTokenResponse = openApiFeignClient.getAuthorizeToken(
         getAuthTokenRequest.code(), authTokenRequestProperties.getId(),
-        authTokenRequestProperties.getSecret(),
-        authTokenRequestProperties.getUri(), authTokenRequestProperties.getGrantType());
+        authTokenRequestProperties.getSecret(), authTokenRequestProperties.getUri(),
+        authTokenRequestProperties.getGrantType());
     OpenBankingMember updateTokenAndUserSeqNo = GetAuthTokenResponse.to(getAuthTokenResponse);
     openBankingMember.updateTokenAndSeqNo(updateTokenAndUserSeqNo);
     openBankingMemberRepository.save(openBankingMember);
@@ -97,11 +100,7 @@ public class OpenApiFeignService implements OpenBankingService {
    */
   @Override
   public OpenBankingResponse withdraw(OpenBankingWithdrawRequest openBankingWithdrawRequest) {
-    PostWithdrawRequest postWithdrawRequest = new PostWithdrawRequest(
-        openBankingWithdrawRequest.toTrustAccountNumber(), "당근페이",
-        openBankingWithdrawRequest.fintechUseNum(), openBankingWithdrawRequest.fintechUseNum(),
-        openBankingWithdrawRequest.amount().toString(), "20201001150133", "김오픈", "KIMOPEN1234",
-        "당당페이", "088", "34");
+    PostWithdrawRequest postWithdrawRequest = new PostWithdrawRequest(openBankingWithdrawRequest);
 
     PostWithdrawResponse postWithdrawResponse = openApiFeignClient.withdraw(
         openBankingWithdrawRequest.openBankingToken(), postWithdrawRequest);
@@ -117,6 +116,14 @@ public class OpenApiFeignService implements OpenBankingService {
   @Override
   public OpenBankingInquiryReceiveResponse inquiryReceive(
       OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest) {
-    return null;
+    PostReceiveReqeust postReceiveReqeust = new PostReceiveReqeust(
+        TrustAccount.OPEN_BANKING_CONTRACT_ACCOUNT.getAccountNumber(),
+        openBankingInquiryReceiveRequest);
+
+    PostReceiveResponse postReceiveResponse = openApiFeignClient.inquiryReceive(
+        openBankingInquiryReceiveRequest.openBankingToken(), postReceiveReqeust);
+
+    return OpenBankingInquiryReceiveResponse.of(openBankingInquiryReceiveRequest.payMemberId(),
+        postReceiveResponse, openBankingInquiryReceiveRequest, LocalDateTime.now());
   }
 }

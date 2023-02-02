@@ -30,6 +30,8 @@ public enum ExceptionCode {
   INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST.value(), "계좌의 잔액이 부족합니다."),
   BANK_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "금융기관을 찾지 못했습니다."),
   MEMBER_UNMATCH_AUTHOR(HttpStatus.FORBIDDEN.value(), "글 작성자가 아닙니다."),
+  OPEN_OAUTH_NOT_COMPLETE(HttpStatus.BAD_REQUEST.value(), "계좌등록 및 인증 처리 여부를 확인해주세요."),
+  NOT_SUPPORTED(HttpStatus.BAD_REQUEST.value(), "현재 환경에서 지원하지 않는 기능입니다. 외부 연동 환경에서 요청해주세요."),
 
   // post
   POST_STATUS_IS_NULL(HttpStatus.BAD_REQUEST.value(), "글 상태값은 비어있을 수 없습니다."),

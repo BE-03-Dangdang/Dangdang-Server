@@ -30,7 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @Transactional
 @SpringBootTest
 @DisplayName("당근페이 멤버 Service 통합테스트")
-class PayMemberServiceIntegrationTest {
+class PayMemberDatabaseServiceIntegrationTest {
 
   static Member member;
   static List<BankAccount> bankAccounts;

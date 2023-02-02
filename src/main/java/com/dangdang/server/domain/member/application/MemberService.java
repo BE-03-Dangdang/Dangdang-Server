@@ -12,6 +12,7 @@ import com.dangdang.server.domain.member.domain.entity.RedisSms;
 import com.dangdang.server.domain.member.dto.request.MemberRefreshRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
+import com.dangdang.server.domain.member.dto.request.PhoneNumberVerifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import com.dangdang.server.domain.member.exception.MemberCertifiedFailException;
 import com.dangdang.server.domain.member.exception.MemberNotFoundException;
@@ -143,5 +144,11 @@ public class MemberService {
         .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
 
     member.logout();
+  }
+
+  public Long phoneNumberVerify(PhoneNumberVerifyRequest phoneNumberVerifyRequest) {
+    Member member = memberRepository.findByPhoneNumber(phoneNumberVerifyRequest.phoneNumber())
+        .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
+    return member.getId();
   }
 }

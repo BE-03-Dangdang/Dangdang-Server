@@ -67,7 +67,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.AWS_EC2_KEY }}
           script: |
-            docker rm -f $(docker ps -aq)
-            docker rmi $(docker images -q)
+            docker rm -f server
+            docker rmi cloudwi/server
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/server
-            docker-compose up -d
+            docker run -p 8080:8080 -d --net mybridge --name=server cloudwi/server

@@ -8,6 +8,8 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberSignupResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.RemittanceRequest;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.RemittanceResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.PasswordSizeException;
 import com.dangdang.server.global.aop.CurrentUserId;
 import javax.validation.Valid;
@@ -72,5 +74,16 @@ public class PayMemberController {
   public ReceiveResponse inquiryReceive(Long memberId,
       @Valid @RequestBody ReceiveRequest receiveRequest) {
     return payMemberService.inquiryReceive(memberId, receiveRequest);
+  }
+
+  /**
+   * 송금 API
+   */
+  @CurrentUserId
+  @ResponseStatus(HttpStatus.OK)
+  @PostMapping("/money/remittance")
+  public RemittanceResponse remittance(Long memberId,
+      @Valid @RequestBody RemittanceRequest remittanceRequest) {
+    return payMemberService.remittance(memberId, remittanceRequest);
   }
 }

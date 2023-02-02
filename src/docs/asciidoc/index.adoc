@@ -30,6 +30,11 @@ operation::PayMemberController/charge[snippets='http-request,request-headers,htt
 
 operation::PayMemberController/inquiryReceive[snippets='http-request,request-headers,request-body,http-response,response-fields']
 
+[[PayMember-당근머니-송금]]
+=== PayMember 당근머니 송금
+
+operation::PayMemberController/remittance[snippets='http-request,request-headers,request-body,http-response,response-fields']
+
 [[ConnectionAccount-API]]
 == ConnectionAccount API
 

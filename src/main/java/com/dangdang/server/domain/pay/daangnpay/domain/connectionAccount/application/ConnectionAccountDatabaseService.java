@@ -16,7 +16,6 @@ import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.Get
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
-import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,14 +69,14 @@ public class ConnectionAccountDatabaseService {
         .toList();
   }
 
-  public GetConnectionAccountReceiveResponse findIsMyAccountAndChargeAccountByReceiveRequest(
-      Long payMemberId, ReceiveRequest receiveRequest) {
+  public GetConnectionAccountReceiveResponse findIsMyAccountAndChargeAccount(
+      Long payMemberId, String AccountNumber) {
     List<ConnectionAccount> byPayMemberId = connectionAccountRepository.findByPayMemberId(
         payMemberId);
 
     boolean isMyAccount = byPayMemberId.stream()
         .anyMatch(connectionAccount -> connectionAccount.getBankAccountNumber()
-            .equals(receiveRequest.bankAccountNumber()));
+            .equals(AccountNumber));
 
     ConnectionAccount findChargeAccount = byPayMemberId.stream()
         .filter(connectionAccount -> connectionAccount.getStatus().equals(StatusType.ACTIVE))
@@ -89,9 +88,8 @@ public class ConnectionAccountDatabaseService {
   }
 
   public ConnectionAccount findByAccountNumber(String accountNumber) {
-    ConnectionAccount connectionAccount = connectionAccountRepository.findByBankAccountNumber(
+    return connectionAccountRepository.findByBankAccountNumber(
         accountNumber).orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
-    return connectionAccount;
   }
 
   private PayMember getPayMemberByMemberId(Long memberId) {

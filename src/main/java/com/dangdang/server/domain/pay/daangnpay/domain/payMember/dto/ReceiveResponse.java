@@ -6,7 +6,7 @@ import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveR
 
 public record ReceiveResponse(
     String receiveClientName,
-    boolean isMyAccount,
+    boolean isMyAccount,      // true일 경우 이후 프론트에서 출금 API를 호출해야 한다.
     String chargeAccountBankName,
     String chargeAccountNumber,
     int autoChargeAmount,

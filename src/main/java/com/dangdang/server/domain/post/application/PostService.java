@@ -26,6 +26,7 @@ import com.dangdang.server.domain.post.infrastructure.PostSearchRepositoryImpl;
 import com.dangdang.server.domain.postImage.application.PostImageService;
 import com.dangdang.server.domain.town.application.TownService;
 import com.dangdang.server.domain.town.domain.entity.Town;
+import com.dangdang.server.domain.town.dto.request.AdjacentTownRequest;
 import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,7 +49,8 @@ public class PostService {
 
   public PostService(PostRepository postRepository, PostImageService postImageService,
       MemberTownRepository memberTownRepository, TownService townService,
-      UpdatedPostRepository updatedPostRepository, PostSearchRepositoryImpl postSearchRepositoryImpl) {
+      UpdatedPostRepository updatedPostRepository,
+      PostSearchRepositoryImpl postSearchRepositoryImpl) {
     this.postRepository = postRepository;
     this.postImageService = postImageService;
     this.memberTownRepository = memberTownRepository;
@@ -58,23 +60,19 @@ public class PostService {
   }
 
   public PostsSliceResponse findPostsForSlice(PostSliceRequest postSliceRequest,
-      Member loginMember) {
-    /*
-    TODO : Member 정보(town Id 등) 가져오기 기능 완료되면 파라미터 수정
-     */
-//     long townIdSelectedByUser = 1L;
-//     int level = 1;
-//     List<Long> adjacency = townRepository.findAdjacencyTownIdByRangeTypeAndTownId(
-//         townIdSelectedByUser, level);
-//     Slice<Post> posts = postRepository.findPostsByTownIdFetchJoinSortByCreatedAt(
-//         adjacency,
-//         PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize(),
-//             Sort.by("createdAt")));
-//     return PostsSliceResponse.of(
-//         posts.getContent().stream().map(PostSliceResponse::from).collect(
-//             Collectors.toList()), posts.hasNext()
-//     );
-    return null;
+      Long loginMemberId) {
+    MemberTown memberTown = memberTownRepository.findActiveMemberTownByMember(loginMemberId)
+        .orElseThrow(() -> new MemberTownNotFoundException(NO_ACTIVE_TOWN));
+    Long townId = memberTown.getTown().getId();
+    AdjacentTownRequest adjacentTownRequest = new AdjacentTownRequest(townId,
+        memberTown.getRangeType());
+    List<Long> adjacency = townService.findAdjacentTownIds(adjacentTownRequest);
+    Slice<Post> posts = postRepository.findPostsByTownIdFetchJoinSortByCreatedAt(adjacency,
+        PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize(),
+            Sort.by("createdAt")));
+    return PostsSliceResponse.of(
+        posts.getContent().stream().map(PostSliceResponse::from).collect(Collectors.toList()),
+        posts.hasNext());
   }
 
   @Transactional
@@ -126,8 +124,10 @@ public class PostService {
     List<Long> adjacentTownIds = townService.findAdjacentTownWithRangeLevel(
         memberTown.getTownName(), String.valueOf(postSearchOption.rangeLevel()));
 
-    Slice<PostSearch> postSlice = postSearchRepositoryImpl.searchBySearchOptionSlice(query, postSearchOption,
-        adjacentTownIds, PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize() + 1, Sort.by("createdAt").descending()));
+    Slice<PostSearch> postSlice = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+        postSearchOption, adjacentTownIds,
+        PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize() + 1,
+            Sort.by("createdAt").descending()));
     return PostsSliceResponse.of(
         postSlice.getContent().stream().map(PostSliceResponse::from).collect(Collectors.toList()),
         postSlice.hasNext());

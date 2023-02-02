@@ -18,6 +18,14 @@ public enum RangeType {
     this.distance = distance;
   }
 
+  public int getRangeLevel() {
+    return rangeLevel;
+  }
+
+  public int getDistance() {
+    return distance;
+  }
+
   public static RangeType getRangeType(int rangeLevel) {
     return Arrays.stream(RangeType.values())
         .filter(rangeType -> rangeType.rangeLevel == rangeLevel)

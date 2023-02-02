@@ -9,9 +9,12 @@ import com.dangdang.server.domain.town.domain.entity.AdjacentTown;
 import com.dangdang.server.domain.town.domain.entity.Range;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import com.dangdang.server.domain.town.dto.AdjacentTownResponse;
+import com.dangdang.server.domain.town.dto.request.AdjacentTownRequest;
 import com.dangdang.server.domain.town.exception.TownNotFoundException;
+import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +56,14 @@ public class TownService {
       AdjacentTown adjacentTown = new AdjacentTown(town.getName(), ranges);
       adjacentTownRepository.save(adjacentTown);
     });
+  }
+
+  public List<Long> findAdjacentTownIds(AdjacentTownRequest adjacentTownRequest) {
+    Town town = townRepository.findById(adjacentTownRequest.townId())
+        .orElseThrow(() -> new TownNotFoundException(TOWN_NOT_FOUND));
+    List<AdjacentTownResponse> adjacentTowns = townRepository.findAdjacentTownsByPoint(
+        town.getLatitude(), town.getLongitude(), adjacentTownRequest.rangeType().getDistance());
+    return adjacentTowns.stream().map(AdjacentTownResponse::getTownId).toList();
   }
 
   public List<Long> findAdjacentTownWithRangeLevel(String name, String level) {

@@ -90,8 +90,10 @@ class PayMemberControllerTest extends TestHelper {
                     headerWithName("AccessToken").description("jwt header")
                 ),
                 requestFields(
-                    fieldWithPath("bankAccountId").type(JsonFieldType.NUMBER)
-                        .description("bankAccountId"),
+                    fieldWithPath("openBankingToken").type(JsonFieldType.STRING)
+                        .description("openAPI 액세스 토큰").optional(),
+                    fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)
+                        .description("충전 계좌 번호"),
                     fieldWithPath("amount").type(JsonFieldType.NUMBER).description("충전 금액")
                 ),
                 responseFields(
@@ -131,8 +133,10 @@ class PayMemberControllerTest extends TestHelper {
                     headerWithName("AccessToken").description("jwt header")
                 ),
                 requestFields(
-                    fieldWithPath("bankAccountId").type(JsonFieldType.NUMBER)
-                        .description("bankAccountId"),
+                    fieldWithPath("openBankingToken").type(JsonFieldType.STRING)
+                        .description("openAPI 액세스 토큰").optional(),
+                    fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)
+                        .description("출금 계좌 번호"),
                     fieldWithPath("amount").type(JsonFieldType.NUMBER).description("충전 금액")
                 ),
                 responseFields(
@@ -261,6 +265,8 @@ class PayMemberControllerTest extends TestHelper {
                         headerWithName("AccessToken").description("jwt header")
                     ),
                     requestFields(
+                        fieldWithPath("openBankingToken").type(JsonFieldType.STRING)
+                            .description("openAPI 액세스 토큰").optional(),
                         fieldWithPath("depositAmount").type(JsonFieldType.NUMBER)
                             .description("입금 요청 금액"),
                         fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)

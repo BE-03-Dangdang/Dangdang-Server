@@ -57,6 +57,7 @@ class PayMemberControllerTest extends TestHelper {
   ObjectMapper objectMapper;
 
   String accessToken;
+  String bankAccountNumber = "12354324534";
 
   @BeforeEach
   void setUp() {
@@ -66,7 +67,7 @@ class PayMemberControllerTest extends TestHelper {
   @Test
   @DisplayName("당근머니 충전 API 성공")
   void charge() throws Exception {
-    PayRequest payRequest = new PayRequest(1L, 10000);
+    PayRequest payRequest = new PayRequest(null, bankAccountNumber, 10000);
     String json = objectMapper.writeValueAsString(payRequest);
     PayResponse payResponse = new PayResponse("신한은행", "234716230423", 20000, LocalDateTime.now());
 
@@ -107,7 +108,7 @@ class PayMemberControllerTest extends TestHelper {
   @Test
   @DisplayName("당근머니 출금 API 성공")
   void withdraw() throws Exception {
-    PayRequest payRequest = new PayRequest(1L, 10000);
+    PayRequest payRequest = new PayRequest(null, bankAccountNumber, 10000);
     String json = objectMapper.writeValueAsString(payRequest);
     PayResponse payResponse = new PayResponse("신한은행", "234716230423", 20000, LocalDateTime.now());
 
@@ -156,7 +157,7 @@ class PayMemberControllerTest extends TestHelper {
       @Test
       @DisplayName("BadRequest를 응답한다")
       void failInquiryReceiveTest() throws Exception {
-        ReceiveRequest receiveRequest = new ReceiveRequest(0, "231321", "097");
+        ReceiveRequest receiveRequest = new ReceiveRequest(null, 0, bankAccountNumber, "097");
         String json = objectMapper.writeValueAsString(receiveRequest);
         String message = BINDING_WRONG.getMessage();
 
@@ -183,7 +184,7 @@ class PayMemberControllerTest extends TestHelper {
       @NullAndEmptySource
       @DisplayName("BadRequest를 응답한다")
       void failInquiryReceiveTest(String input) throws Exception {
-        ReceiveRequest receiveRequest = new ReceiveRequest(0, input, input);
+        ReceiveRequest receiveRequest = new ReceiveRequest(null, 0, input, input);
         String json = objectMapper.writeValueAsString(receiveRequest);
         String message = BINDING_WRONG.getMessage();
 
@@ -209,7 +210,7 @@ class PayMemberControllerTest extends TestHelper {
       @Test
       @DisplayName("BadRequest를 응답한다")
       void failInquiryReceiveTest() throws Exception {
-        ReceiveRequest receiveRequest = new ReceiveRequest(0, "34143234", "4");
+        ReceiveRequest receiveRequest = new ReceiveRequest(null, 0, bankAccountNumber, "4");
         String json = objectMapper.writeValueAsString(receiveRequest);
         String message = BINDING_WRONG.getMessage();
 
@@ -235,7 +236,7 @@ class PayMemberControllerTest extends TestHelper {
       @Test
       @DisplayName("수취 조회 정보를 반환한다.")
       void successInquiryReceiveTest() throws Exception {
-        ReceiveRequest receiveRequest = new ReceiveRequest(10000, "328427", "097");
+        ReceiveRequest receiveRequest = new ReceiveRequest(null, 10000, bankAccountNumber, "097");
         String json = objectMapper.writeValueAsString(receiveRequest);
         ReceiveResponse receiveResponse = new ReceiveResponse("홍길동", false, "케이뱅크", "3274623",
             10000,

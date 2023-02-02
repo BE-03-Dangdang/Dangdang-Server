@@ -26,10 +26,6 @@ public class PayMemberController {
   }
 
   /**
-   * TODO 회원가입
-   */
-
-  /**
    * 당근머니 충전 API
    */
   @CurrentUserId

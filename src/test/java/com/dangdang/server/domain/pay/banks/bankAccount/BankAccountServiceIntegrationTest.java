@@ -58,7 +58,7 @@ class BankAccountServiceIntegrationTest {
         StatusType.INACTIVE);
     bankAccountRepository.save(bankAccountInactive);
 
-    bankAccount = new BankAccount("11239847", "신한은행", 1000, payMember, "홍길동");
+    bankAccount = new BankAccount("1123967847", "신한은행", 1000, payMember, "홍길동");
     bankAccountRepository.save(bankAccount);
   }
 

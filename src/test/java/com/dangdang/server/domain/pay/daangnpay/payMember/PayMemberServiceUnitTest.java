@@ -29,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PayMemberService 단위테스트")
-public class PayMemberDatabaseServiceUnitTest {
+public class PayMemberServiceUnitTest {
 
   @Spy
   @InjectMocks

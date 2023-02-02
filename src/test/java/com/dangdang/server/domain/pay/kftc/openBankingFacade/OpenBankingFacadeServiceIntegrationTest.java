@@ -65,7 +65,7 @@ class OpenBankingFacadeServiceIntegrationTest {
     payMember = new PayMember("password", member);
     payMemberRepository.save(payMember);
 
-    trustAccount = new TrustAccount("23947182", 100000, "당근페이_신탁");
+    trustAccount = new TrustAccount("257182", 100000, "당근페이_신탁");
     trustAccountInactive = new TrustAccount("23947182", 100000, "당근페이_신탁", StatusType.INACTIVE);
     trustAccountRepository.save(trustAccountInactive);
     trustAccountRepository.save(trustAccount);

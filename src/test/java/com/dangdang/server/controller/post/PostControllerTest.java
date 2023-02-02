@@ -226,6 +226,37 @@ class PostControllerTest {
                 fieldWithPath("imageUrls").type(JsonFieldType.ARRAY)
                     .description("게시글 이미지 url 리스트").optional()))
         );
+
+ @DisplayName("사용자는 게시글 메인 페이지에서 페이지네이션을 적용한 전체 게시글을 조회할 수 있다.")
+  public void findAll() throws Exception {
+    // given
+    LinkedMultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+    map.add("page", "0");
+    map.add("size", "10");
+    // when
+    mockMvc.perform((MockMvcRequestBuilders.get("/posts")
+            .params(map)
+            .contentType(MediaType.APPLICATION_JSON)
+            responseFields(
+                fieldWithPath("postSliceResponses[]").type(JsonFieldType.ARRAY)
+                    .description("게시글 반환 리스트"),
+                fieldWithPath("postSliceResponses[].id").type(JsonFieldType.NUMBER)
+                    .description("글 번호"),
+                fieldWithPath("postSliceResponses[].title").type(JsonFieldType.STRING)
+                    .description("글 제목"),
+                fieldWithPath("postSliceResponses[].townName").type(JsonFieldType.STRING)
+                    .description("글이 작성된 동네 이름"),
+                fieldWithPath("postSliceResponses[].imageUrl").type(JsonFieldType.STRING)
+                    .description("글 대표 이미지 링크"),
+                fieldWithPath("postSliceResponses[].price").type(JsonFieldType.NUMBER)
+                    .description("상품 가격"),
+                fieldWithPath("postSliceResponses[].createdAt").type(JsonFieldType.STRING)
+                    .description("글 생성일시"),
+                fieldWithPath("postSliceResponses[].likeCount").type(JsonFieldType.NUMBER)
+                    .description("좋아요 개수"),
+                fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 글 존재 여부")
+            )
+        ));
   }
 
   @Test

@@ -22,8 +22,10 @@ import com.dangdang.server.controller.pay.TestHelper;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.application.PayMemberService;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberSignupResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.PasswordSizeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import javax.transaction.Transactional;
@@ -32,7 +34,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -42,6 +46,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.validation.BindException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
@@ -104,45 +109,89 @@ class PayMemberControllerTest extends TestHelper {
         );
   }
 
-  @Test
-  @DisplayName("당근머니 출금 API 성공")
-  void withdraw() throws Exception {
-    PayRequest payRequest = new PayRequest(1L, 10000);
-    String json = objectMapper.writeValueAsString(payRequest);
-    PayResponse payResponse = new PayResponse("신한은행", "234716230423", 20000, LocalDateTime.now());
+  @Nested
+  @DisplayName("당근페이 가입 API는")
+  class Signup {
 
-    doReturn(payResponse).when(payMemberService).withdraw(any(), any());
+    @Nested
+    @DisplayName("empty 혹은 길이가 맞지 않는 값이 들어오면")
+    class EmptyOrMinSize {
 
-    mockMvc.perform(
-            patch("/pay-members/money/withdraw")
-                .header("AccessToken", accessToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8")
-                .content(json)
-        )
-        .andExpect(status().isOk())
-        .andDo(
-            document(
-                "PayMemberController/charge",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                requestHeaders(
-                    headerWithName("AccessToken").description("jwt header")
-                ),
-                requestFields(
-                    fieldWithPath("bankAccountId").type(JsonFieldType.NUMBER)
-                        .description("bankAccountId"),
-                    fieldWithPath("amount").type(JsonFieldType.NUMBER).description("충전 금액")
-                ),
-                responseFields(
-                    fieldWithPath("bank").type(JsonFieldType.STRING).description("출금 계좌 은행명"),
-                    fieldWithPath("accountNumber").type(JsonFieldType.STRING)
-                        .description("출금 계좌번호"),
-                    fieldWithPath("money").type(JsonFieldType.NUMBER).description("당근머니 잔액"),
-                    fieldWithPath("createdAt").type(JsonFieldType.STRING).description("거래시간")
-                )
+      @ParameterizedTest
+      @EmptySource
+      @DisplayName("BadRequest를 응답한다")
+      void failInquiryReceiveTest(String input) throws Exception {
+        mockMvc.perform(
+                post("/pay-members")
+                    .header("AccessToken", accessToken)
+                    .param("password", input)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("UTF-8")
             )
-        );
+            .andExpect(status().isBadRequest())
+            .andExpect(
+                response -> assertTrue(
+                    response.getResolvedException() instanceof PasswordSizeException));
+      }
+    }
+
+    @Nested
+    @DisplayName("null 값이 들어오면")
+    class Null {
+
+      @ParameterizedTest
+      @NullSource
+      @DisplayName("BadRequest를 응답한다")
+      void failInquiryReceiveTest(String input) throws Exception {
+        mockMvc.perform(
+                post("/pay-members")
+                    .header("AccessToken", accessToken)
+                    .param("password", input)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("UTF-8")
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(
+                response -> assertTrue(
+                    response.getResolvedException() instanceof MissingServletRequestParameterException));
+      }
+    }
+
+    @Nested
+    @DisplayName("유효한 요청값이 들어오면")
+    class Success {
+
+      @Test
+      @DisplayName("payMemberId를 반환한다.")
+      void successSignup() throws Exception {
+        PostPayMemberSignupResponse postPayMemberSignupResponse = PostPayMemberSignupResponse.from(
+            1L);
+        doReturn(postPayMemberSignupResponse).when(payMemberService).signup(any(), any());
+
+        mockMvc.perform(
+                post("/pay-members")
+                    .header("AccessToken", accessToken)
+                    .param("password", "password123")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("UTF-8")
+            )
+            .andExpect(status().isOk())
+            .andDo(
+                document(
+                    "PayMemberController/signup",
+                    preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint()),
+                    requestHeaders(
+                        headerWithName("AccessToken").description("jwt header")
+                    ),
+                    responseFields(
+                        fieldWithPath("payMemberId").type(JsonFieldType.NUMBER)
+                            .description("payMemberId")
+                    )
+                )
+            );
+      }
+    }
   }
 
   @Nested

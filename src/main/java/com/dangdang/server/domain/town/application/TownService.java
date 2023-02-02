@@ -43,7 +43,7 @@ public class TownService {
       for (String currLevel : rangeLevels.keySet()) {
         int distance = rangeLevels.get(currLevel);
         List<AdjacentTownResponse> adjacentTownResponses = townRepository.findAdjacentTownsByPoint(
-            town.getLatitude(), town.getLongitude(), distance);
+            town.getLongitude(), town.getLatitude(), distance);
 
         List<Long> ids = adjacentTownResponses.stream().map(AdjacentTownResponse::getTownId)
             .toList();
@@ -62,7 +62,7 @@ public class TownService {
     Town town = townRepository.findById(adjacentTownRequest.townId())
         .orElseThrow(() -> new TownNotFoundException(TOWN_NOT_FOUND));
     List<AdjacentTownResponse> adjacentTowns = townRepository.findAdjacentTownsByPoint(
-        town.getLatitude(), town.getLongitude(), adjacentTownRequest.rangeType().getDistance());
+        town.getLongitude(), town.getLatitude(), adjacentTownRequest.rangeType().getDistance());
     return adjacentTowns.stream().map(AdjacentTownResponse::getTownId).toList();
   }
 

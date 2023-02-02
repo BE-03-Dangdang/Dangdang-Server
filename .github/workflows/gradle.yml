@@ -70,4 +70,4 @@ jobs:
             docker rm -f cloudwi/server
             docker rmi server
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/server
-            docker run -d -p 8080:8080 --net mybridge cloudwi/server
+            docker run -d -p 8080:8080 cloudwi/server

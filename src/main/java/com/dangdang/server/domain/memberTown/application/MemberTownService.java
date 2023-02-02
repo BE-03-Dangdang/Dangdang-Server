@@ -146,7 +146,7 @@ public class MemberTownService {
         .orElseThrow(() -> new MemberTownNotFoundException(ExceptionCode.MEMBER_TOWN_NOT_FOUND));
 
     for (AdjacentTownResponse adjacentTown : towns) {
-      if (activeMemberTown.getMemberTownName().equals(adjacentTown.getName())) {
+      if (activeMemberTown.getTownName().equals(adjacentTown.getName())) {
         isCertified = true;
         activeMemberTown.updateMemberTownAuthStatus(TownAuthStatus.TOWN_CERTIFIED);
         break;

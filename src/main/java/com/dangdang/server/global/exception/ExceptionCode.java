@@ -41,7 +41,11 @@ public enum ExceptionCode {
 
 
   // membertown
-  NO_ACTIVE_TOWN(HttpStatus.INTERNAL_SERVER_ERROR.value(), "활성화된 동네가 없습니다.");
+  NO_ACTIVE_TOWN(HttpStatus.INTERNAL_SERVER_ERROR.value(), "활성화된 동네가 없습니다."),
+
+  // review
+  REVIEW_WRONG_ACCESS(HttpStatus.BAD_REQUEST.value(), "거래가 완료된 후에만 리뷰 작성이 가능합니다.");
+
 
   int status;
   String message;

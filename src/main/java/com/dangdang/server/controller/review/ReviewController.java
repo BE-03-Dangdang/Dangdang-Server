@@ -29,7 +29,7 @@ public class ReviewController {
     ReviewResponse reviewResponse = reviewService.saveReview(reviewRequest, reviewer);
     return ResponseEntity.created(
             URI.create(
-                "/" + reviewResponse.reviewer().memberId() + "/reviews-sent/"
+                "/" + reviewResponse.reviewer().id() + "/reviews-sent/"
                     + reviewResponse.reviewId()))
         .body(reviewResponse);
   }

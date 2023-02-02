@@ -18,7 +18,7 @@ public class PostSliceResponse {
   private int likeCount;
 
   private PostSliceResponse(Long id, String title, String townName,
-      String imageUrl, Integer price, LocalDateTime createdAt) {
+      String imageUrl, Integer price, LocalDateTime createdAt, int likeCount) {
     this.id = id;
     this.title = title;
     this.townName = townName;
@@ -30,13 +30,14 @@ public class PostSliceResponse {
 
   public static PostSliceResponse from(Post post) {
     return new PostSliceResponse(post.getId(), post.getTitle(), post.getTownName(),
-        S3ImageUtil.makeImageLink(post.getImageUrl()), post.getPrice(), post.getCreatedAt());
+        S3ImageUtil.makeImageLink(post.getImageUrl()), post.getPrice(), post.getCreatedAt(),
+        post.getLikeCount());
   }
 
   public static PostSliceResponse from(PostSearch postSearch) {
     assert postSearch.getId() != null;
     return new PostSliceResponse(Long.parseLong(postSearch.getId()), postSearch.getTitle(),
         postSearch.getTownName(), postSearch.getImageUrl(), postSearch.getPrice(),
-        postSearch.getCreatedAt());
+        postSearch.getCreatedAt(), 0);
   }
 }

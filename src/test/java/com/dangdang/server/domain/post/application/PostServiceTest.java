@@ -96,7 +96,7 @@ class PostServiceTest {
         Category.디지털기기, 1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false,
         "서현동", postImageRequest);
     savedPostResponse = postService.savePost(postSaveRequest, this.member.getId());
-    //postService.uploadToES();
+    postService.uploadToES();
   }
 
   @TestConfiguration
@@ -168,7 +168,7 @@ class PostServiceTest {
       latch.await();
       PostDetailResponse resultPostResponse = postService.findPostDetailById(
           savedPost.getId());
-      Assertions.assertThat(resultPostResponse.postResponse().getView())
+      Assertions.assertThat(resultPostResponse.postResponse().view())
           .isEqualTo(threadCount);
     } catch (Exception e) {
       log.info("####### viewUpTest Exception: {}, {} ", e, e.getMessage());
@@ -183,13 +183,12 @@ class PostServiceTest {
     setup();
     PostDetailResponse postDetailResponse = postService.savePost(postSaveRequest,
         member.getId());
-
     PostDetailResponse foundPostDetailResponse = postService.findPostDetailById(
-        postDetailResponse.getPostId());
+        postDetailResponse.postId());
     assertThat(postDetailResponse.postResponse()).usingRecursiveComparison()
         .isEqualTo(foundPostDetailResponse.postResponse());
-    assertThat(postDetailResponse.member()).usingRecursiveComparison()
-        .isEqualTo(foundPostDetailResponse.member());
+    assertThat(postDetailResponse.memberResponse()).usingRecursiveComparison()
+        .isEqualTo(foundPostDetailResponse.memberResponse());
   }
 
   @Test
@@ -208,7 +207,7 @@ class PostServiceTest {
     PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest,
         member.getId());
     PostDetailResponse foundPost = postService.findPostDetailById(
-        savedPostDetailResponse.postResponse().getId());
+        savedPostDetailResponse.postResponse().id());
 
     assertThat(foundPost).isNotNull();
     assertThat(foundPost.imageUrls()).hasSize(2);
@@ -222,12 +221,12 @@ class PostServiceTest {
     PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest,
         member.getId());
     postService.clickLikes(
-        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
+        new PostLikeRequest(savedPostDetailResponse.postResponse().id(), member.getId()));
 
-    PostDetailResponse foundPost = postService.findPostDetailById(
-        savedPostDetailResponse.postResponse().getId());
+    PostDetailResponse foundDetailResponse = postService.findPostDetailById(
+        savedPostDetailResponse.postId());
 
-    assertThat(foundPost.postResponse().getLikeCount()).isEqualTo(1);
+    assertThat(foundDetailResponse.postResponse().likeCount()).isEqualTo(1);
   }
 
   @Test
@@ -237,26 +236,25 @@ class PostServiceTest {
     PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest,
         member.getId());
     postService.clickLikes(
-        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
+        new PostLikeRequest(savedPostDetailResponse.postResponse().id(), member.getId()));
 
     postService.clickLikes(
-        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
+        new PostLikeRequest(savedPostDetailResponse.postResponse().id(), member.getId()));
 
     entityManager.flush();
     entityManager.clear();
 
     PostDetailResponse foundPost = postService.findPostDetailById(
-        savedPostDetailResponse.postResponse().getId());
+        savedPostDetailResponse.postResponse().id());
 
-    assertThat(foundPost.postResponse().getLikeCount()).isEqualTo(0);
+    assertThat(foundPost.postResponse().likeCount()).isEqualTo(0);
   }
 
   @Test
   @DisplayName("게시글을 상세 조회 시 열어볼 수 있는 이미지 링크를 제공할 수 있다.")
   void findPostDetailByIdOpenImageLink() {
     setup();
-
-    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getPostId());
+    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.postId());
     Assertions.assertThat(foundPost.imageUrls()).hasSize(2);
   }
 
@@ -274,7 +272,7 @@ class PostServiceTest {
         member.getId());
 
     assertThatThrownBy(
-        () -> postService.findPostDetailById(savedPostResponse.getPostId())).isInstanceOf(
+        () -> postService.findPostDetailById(savedPostResponse.postId())).isInstanceOf(
         UrlInValidException.class);
   }
 

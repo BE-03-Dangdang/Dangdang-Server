@@ -102,7 +102,7 @@ public class PostService {
     updatedPostRepository.save(updatedPost);
 
     List<String> imageUrls = postImageService.savePostImage(savedPost,
-        postSaveRequest.getPostImageRequest());
+        postSaveRequest.postImageRequest());
 
     return PostDetailResponse.from(savedPost, member, imageUrls);
   }
@@ -120,7 +120,6 @@ public class PostService {
       PostUpdateStatusRequest postUpdateStatusRequest, Long authorId) {
     Post post = postRepository.findPostDetailById(postId)
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
-
     if (!post.getMemberId().equals(authorId)) {
       throw new MemberUnmatchedAuthorException(MEMBER_UNMATCH_AUTHOR);
     }

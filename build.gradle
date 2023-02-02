@@ -1,16 +1,8 @@
-buildscript {
-    ext {
-        queryDslVersion = "5.0.0"
-    }
-}
-
 plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.7'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
-    //querydsl 추가
-    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.dangdang'
@@ -39,12 +31,8 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     //elasticsearch
-    implementation 'org.springframework.data:spring-data-elasticsearch'
+    implementation 'org.springframework.data:spring-data-elasticsearch:4.4.6'
     implementation("jakarta.json:jakarta.json-api:2.0.1")
-
-    //querydsl
-    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 
     // mongodb
     implementation ('org.springframework.boot:spring-boot-starter-data-mongodb')
@@ -85,39 +73,6 @@ dependencies {
     // validation
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 }
-//
-//bootJar {
-//    dependsOn asciidoctor
-//    copy {
-//        from "${asciidoctor.outputDir}"
-//        into 'BOOT-INF/classes/static/docs'
-//    }
-//}
-//
-//tasks.named('test') {
-//    outputs.dir snippetsDir
-//    useJUnitPlatform()
-//}
-//
-//tasks.named('asciidoctor') {
-//    inputs.dir snippetsDir
-//    configurations 'asciidoctorExtensions'
-//    dependsOn test
-//}
-//
-//asciidoctor.doFirst {
-//    delete file('src/main/resources/static/docs')
-//}
-//
-//task copyDocument(type: Copy) {
-//    dependsOn asciidoctor
-//    from file("build/docs/asciidoc")
-//    into file("src/main/resources/static/docs")
-//}
-//
-//build {
-//    dependsOn copyDocument
-//}
 
 tasks.named('test') {
     useJUnitPlatform()
@@ -145,19 +100,4 @@ task copyDocument(type: Copy) {
 
 build {
     dependsOn copyDocument
-}
-
-def querydslDir = "$buildDir/generated/querydsl"
-querydsl {
-    jpa = true
-    querydslSourcesDir = querydslDir
-}
-sourceSets {
-    main.java.srcDir querydslDir
-}
-configurations {
-    querydsl.extendsFrom compileClasspath
-}
-compileQuerydsl {
-    options.annotationProcessorPath = configurations.querydsl
 }

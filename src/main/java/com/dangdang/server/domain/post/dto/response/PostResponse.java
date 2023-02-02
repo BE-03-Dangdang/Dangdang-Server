@@ -22,6 +22,7 @@ public class PostResponse {
   private Boolean sharing;
   private String townName;
   private StatusType statusType;
+  private int likeCount;
 
   private PostResponse(Post post) {
     this.id = post.getId();
@@ -36,6 +37,7 @@ public class PostResponse {
     this.sharing = post.getSharing();
     this.townName = post.getTownName();
     this.statusType = post.getStatus();
+    this.likeCount = post.getLikeCount();
   }
 
   public static PostResponse from(Post post) {

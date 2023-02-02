@@ -111,7 +111,7 @@ public class MemberService {
     String accessToken = jwtTokenProvider.createAccessToken(member.getId());
     String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
 
-    member.setRefreshToken(refreshToken);
+    member.refresh(refreshToken);
 
     return MemberCertifyResponse.from(accessToken, refreshToken, true);
   }
@@ -135,5 +135,13 @@ public class MemberService {
     }
 
     return getMemberCertifyResponse(principal);
+  }
+
+  @Transactional
+  public void logout(long memberId) {
+    Member member = memberRepository.findById(memberId)
+        .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
+
+    member.logout();
   }
 }

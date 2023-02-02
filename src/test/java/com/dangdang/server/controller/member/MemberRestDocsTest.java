@@ -1,6 +1,9 @@
 package com.dangdang.server.controller.member;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -58,7 +61,6 @@ class MemberRestDocsTest {
 
   @Test
   @DisplayName("회원 가입 시 핸드폰 번호와 인증 번호로 요청함, 회원 가입이 되어 있지 않다면 Http 200 상태코드가 응답됨")
-  @Transactional
   void signupCertifyTest() throws Exception {
     //given
     //인증 문자 발송
@@ -106,7 +108,6 @@ class MemberRestDocsTest {
 
   @Test
   @DisplayName("로그인 시 핸드폰 번호와 인증 코드로 요청해야 하며, 성공 시 http 200 status code와 accessToken 이 발급됨")
-  @Transactional
   void loginCertifyTest() throws Exception {
     //회원 가입된 정보 생성
     long id = 1L;
@@ -153,7 +154,6 @@ class MemberRestDocsTest {
 
   @Test
   @DisplayName("/api/v1/signup -> 닉네임과 프로필 이미지 핸드폰 번호 지역 이름으로 요청, 성공 시 http 200 status code와 accessToken으로 응답")
-  @Transactional
   void signUpTest() throws Exception {
     //회원 가입된 정보 생성
     long id = 1L;
@@ -209,7 +209,7 @@ class MemberRestDocsTest {
     Member save = memberRepository.save(member);
 
     String refreshToken = jwtTokenProvider.createRefreshToken(save.getId());
-    member.setRefreshToken(refreshToken);
+    member.refresh(refreshToken);
 
     MemberRefreshRequest memberRefreshRequest = new MemberRefreshRequest(refreshToken);
 
@@ -235,6 +235,34 @@ class MemberRestDocsTest {
                         .description("accessToken"),
                     fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("리플레쉬 토큰"),
                     fieldWithPath("isCertified").type(JsonFieldType.BOOLEAN).description("인증 여부")
+                )
+            )
+        );
+  }
+
+  @Test
+  @DisplayName("로그아웃 restdoce test")
+  void logout() throws Exception {
+    //회원 가입된 정보 생성
+    Member member = new Member("99988877778", "cloudwi");
+    member = memberRepository.save(member);
+
+    //accessToken create
+    String accessToken = "Bearer " + jwtTokenProvider.createAccessToken(member.getId());
+
+    mockMvc.perform(
+            delete("/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .header("AccessToken", accessToken)
+        )
+        .andExpect(status().isOk())
+        .andDo(
+            document("MemberController/logout",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("AccessToken").description("accessToken")
                 )
             )
         );

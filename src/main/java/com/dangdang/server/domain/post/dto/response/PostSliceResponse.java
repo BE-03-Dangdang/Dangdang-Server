@@ -15,14 +15,16 @@ public class PostSliceResponse {
   private final String imageUrl;
   private final Integer price;
   private final LocalDateTime createdAt;
+  private int likeCount;
 
-  private PostSliceResponse(Long id, String title, String townName, String imageUrl, Integer price,
-      LocalDateTime createdAt) {
+  private PostSliceResponse(Long id, String title, String townName,
+      String imageUrl, Integer price, LocalDateTime createdAt) {
     this.id = id;
     this.title = title;
     this.townName = townName;
     this.imageUrl = imageUrl;
     this.price = price;
+    this.likeCount = likeCount;
     this.createdAt = createdAt;
   }
 

@@ -1,22 +1,26 @@
 package com.dangdang.server.domain.post.domain;
 
+import static com.dangdang.server.global.exception.ExceptionCode.POST_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.dangdang.server.domain.common.StatusType;
+import com.dangdang.server.domain.likes.domain.LikesRepository;
+import com.dangdang.server.domain.likes.domain.entity.Likes;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.entity.Post;
 import com.dangdang.server.domain.post.domain.entity.PostSearch;
 import com.dangdang.server.domain.post.domain.entity.UpdatedPost;
 import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
+import com.dangdang.server.domain.post.exception.PostNotFoundException;
 import com.dangdang.server.domain.post.infrastructure.PostSearchRepositoryImpl;
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,67 +50,97 @@ class PostRepositoryTest {
   MemberRepository memberRepository;
   @Autowired
   TownRepository townRepository;
+  @Autowired
+  LikesRepository likesRepository;
 
+  Member member;
+  Town town;
+  Post post;
 
-  @BeforeAll
-  void setUp() throws Exception {
-    Member member = new Member("01064083433", "yb");
-    memberRepository.save(member);
-    Post post;
-    for (int i = 1; i <= 40; i++) {
-      //given
-      Town town = townRepository.findByName("천호동").get();
-      if (i >= 1 && i <= 10) {
-        post = new Post("지우개 팝니다.", "한 번도 안쓴 미개봉 지우개입니다. 수량은 " + i + "개씩 팔아요.", Category.디지털기기,
-            10000,
-            null, null, null, 0, false,
-            member, town, "http://s3.amazonaws.com/test1.png", StatusType.SELLING);
-      } else if (i >= 11 && i <= 20) {
-        post = new Post("지우개 팝니다.", "한 번도 안쓴 미개봉 지우개입니다. 수량은 " + i + "개씩 팔아요.", Category.생활가전,
-            20000,
-            null, null, null, 0, false,
-            member, town, "http://s3.amazonaws.com/test1.png", StatusType.SELLING);
-      } else if (i >= 21 && i <= 30) {
-        post = new Post("지우개 팝니다.", "한 번도 안쓴 미개봉 지우개입니다. 수량은 " + i + "개씩 팔아요.", Category.유아도서,
-            30000,
-            null, null, null, 0, false,
-            member, town, "http://s3.amazonaws.com/test1.png", StatusType.SELLING);
-      } else {
-        post = new Post("지우개 팝니다.", "한 번도 안쓴 미개봉 지우개입니다. 수량은 " + i + "개씩 팔아요.", Category.유아동,
-            40000,
-            null, null, null, 0, false,
-            member, town, "http://s3.amazonaws.com/test1.png", StatusType.RESERVED);
-      }
+  void savePost() {
+    Member newMember = new Member("테스트 멤버", "01012341234", "testImgUrl");
+    member = memberRepository.save(newMember);
+    Town newTown = new Town("서현동", null, null);
+    town = townRepository.save(newTown);
 
-      // "image_url"은 기존 테스트 코드의 동작을 보장하기 위한 임의의 image link String 값입니다.
-      // when
-      postRepository.save(post);
-      postSearchRepository.save(PostSearch.from(UpdatedPost.from(post)));
-    }
-    //then
+    post = new Post("title1", "content1", Category.디지털기기, 10000, "desiredName1",
+        new BigDecimal("126.1111"), new BigDecimal("36.111111"), 0, false, member, town,
+        "http://s3.amazonaws.com/test1.png", StatusType.SELLING);
+
+    postRepository.save(post);
   }
 
   @Test
-  @DisplayName("게시글을 페이징 처리 할 수 있다.")
-  public void getAllPosts() throws Exception {
+  @DisplayName("게시글 상세 조회시 좋아요를 함께 가져올 수 있다.")
+  public void getPostDetailForLikesTest() {
+    savePost();
     //given
-    List<Post> posts = postRepository.findAll();
-    List<Long> adjacency = posts.stream().map(post -> post.getTown().getId())
-        .collect(Collectors.toList());
-    int pageNum = 0;
-    int size = 2;
-    // when
-    Slice<Post> findPosts = postRepository.findPostsByTownIdFetchJoinSortByCreatedAt(adjacency,
-        PageRequest.of(pageNum, size, Sort.by("createdAt").descending()));
+    Likes likes = new Likes(post, member);
+    likesRepository.save(likes);
+    likes.addLikes();
+
     //then
-    assertThat(findPosts).hasSize(2);
-    assertThat(findPosts.getContent().get(0).getCreatedAt())
-        .isAfter(findPosts.getContent().get(1).getCreatedAt());
+    Post foundPost = postRepository.findPostDetailById(post.getId())
+        .orElseThrow(() -> new PostNotFoundException(
+            POST_NOT_FOUND));
+    assertThat(foundPost.getLikes().size()).isEqualTo(1);
+
   }
 
   @Nested
   @DisplayName("게시글 검색 테스트")
   class PostSearchTest {
+
+    @BeforeAll
+    void setUpForSearch() throws Exception {
+      Member member = new Member("01064083433", "yb");
+      memberRepository.save(member);
+      Post post;
+      for (int i = 1; i <= 40; i++) {
+        //given
+        Town town = townRepository.findByName("천호동").get();
+        if (i >= 1 && i <= 10) {
+          post = new Post("지우개 팝니다.", "한 번도 안쓴 미개봉 지우개입니다. 수량은 " + i + "개씩 팔아요.", Category.디지털기기,
+              10000,
+              null, null, null, 0, false,
+              member, town, "http://s3.amazonaws.com/test1.png", StatusType.SELLING);
+        } else if (i >= 11 && i <= 20) {
+          post = new Post("지우개 팝니다.", "한 번도 안쓴 미개봉 지우개입니다. 수량은 " + i + "개씩 팔아요.", Category.생활가전,
+              20000,
+              null, null, null, 0, false,
+              member, town, "http://s3.amazonaws.com/test1.png", StatusType.SELLING);
+        } else if (i >= 21 && i <= 30) {
+          post = new Post("지우개 팝니다.", "한 번도 안쓴 미개봉 지우개입니다. 수량은 " + i + "개씩 팔아요.", Category.유아도서,
+              30000,
+              null, null, null, 0, false,
+              member, town, "http://s3.amazonaws.com/test1.png", StatusType.SELLING);
+        } else {
+          post = new Post("지우개 팝니다.", "한 번도 안쓴 미개봉 지우개입니다. 수량은 " + i + "개씩 팔아요.", Category.유아동,
+              40000,
+              null, null, null, 0, false,
+              member, town, "http://s3.amazonaws.com/test1.png", StatusType.RESERVED);
+        }
+
+        // "image_url"은 기존 테스트 코드의 동작을 보장하기 위한 임의의 image link String 값입니다.
+        // when
+        postRepository.save(post);
+        postSearchRepository.save(PostSearch.from(UpdatedPost.from(post)));
+      }
+
+      //given
+      List<Post> posts = postRepository.findAll();
+      List<Long> adjacency = posts.stream().map(onePost -> onePost.getTown().getId())
+          .collect(Collectors.toList());
+      int pageNum = 0;
+      int size = 2;
+      // when
+      Slice<Post> findPosts = postRepository.findPostsByTownIdFetchJoinSortByCreatedAt(adjacency,
+          PageRequest.of(pageNum, size, Sort.by("createdAt").descending()));
+      //then
+      assertThat(findPosts).hasSize(2);
+      assertThat(findPosts.getContent().get(0).getCreatedAt())
+          .isAfter(findPosts.getContent().get(1).getCreatedAt());
+    }
 
     @Nested
     @DisplayName("최소, 최대 가격 입력 여부에 따라")
@@ -270,9 +304,6 @@ class PostRepositoryTest {
         //then
         assertThat(posts.getContent()).hasSize(40);
       }
-
     }
   }
-
-
 }

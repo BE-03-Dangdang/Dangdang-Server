@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @AutoConfigureMockMvc(addFilters = false)
 @SpringBootTest
+@Transactional
 class MemberControllerTest {
 
   @Autowired
@@ -57,9 +58,8 @@ class MemberControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .characterEncoding("UTF-8")
             .content(objectMapper.writeValueAsString(memberSignUpRequest)))
-        .andExpect(status().isNotFound())
+        .andExpect(status().isUnauthorized())
         .andDo(print());
-
   }
 
   @Test
@@ -95,19 +95,17 @@ class MemberControllerTest {
             .content(objectMapper.writeValueAsString(memberSignUpRequest)))
         .andExpect(status().isNotFound())
         .andDo(print());
-
   }
-
 
   @Test
   @DisplayName("이미 계정이 있는 경우 - 로그인 시 번호 검증")
   @Transactional
   void loginPhoneNumberCertify_success() throws Exception {
     // given
-    redisSmsRepository.save(new RedisSms("01012345678", "123456"));
+    redisSmsRepository.save(new RedisSms("88893937275", "123456"));
     PhoneNumberCertifyRequest phoneNumberCertifyRequest = new PhoneNumberCertifyRequest(
-        "01012345678", "123456");
-    memberRepository.save(new Member("01012345678", null, "딸기2"));
+        "88893937275", "123456");
+    memberRepository.save(new Member("88893937275", null, "딸기2"));
 
     // when, then
     mockMvc.perform(post("/members/login-certify")

@@ -1,20 +1,32 @@
-package com.dangdang.server.controller;
+package com.dangdang.server.controller.post;
 
 import static com.dangdang.server.global.exception.ExceptionCode.POST_STATUS_IS_NULL;
 
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.application.PostService;
+import com.dangdang.server.domain.post.domain.Category;
+import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
+import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
+import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
 import com.dangdang.server.domain.post.dto.request.PostUpdateStatusRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
+import com.dangdang.server.domain.post.dto.response.PostsSliceResponse;
 import com.dangdang.server.domain.post.exception.NullParameterException;
+import com.dangdang.server.domain.postImage.dto.PostImageRequest;
+import java.util.Collections;
+import java.util.List;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,12 +56,10 @@ public class PostController {
   }
    */
 
-  @PatchMapping("/{id}")
-  public ResponseEntity<PostDetailResponse> updatePostStatus(
-      @PathVariable("id") long postId,
+  @PatchMapping("/{id}/status")
+  public ResponseEntity<PostDetailResponse> updatePostStatus(@PathVariable("id") long postId,
       @RequestBody @Valid PostUpdateStatusRequest postUpdateStatusRequest,
-      Authentication authentication,
-      BindingResult bindingResult) {
+      Authentication authentication, BindingResult bindingResult) {
     if (bindingResult.hasErrors()) {
       throw new NullParameterException(POST_STATUS_IS_NULL);
     }
@@ -58,5 +68,15 @@ public class PostController {
     PostDetailResponse postDetailResponse = postService.updatePostStatus(postId,
         postUpdateStatusRequest, memberId);
     return ResponseEntity.ok(postDetailResponse);
+  }
+
+  @GetMapping("/search")
+  public ResponseEntity<PostsSliceResponse> search(@Valid PostSearchOptionRequest searchOption,
+      @RequestParam("query") @NotBlank String query, @Valid PostSliceRequest postSliceRequest,
+      Authentication authentication) {
+    Long memberId = ((Member) authentication.getPrincipal()).getId();
+    PostsSliceResponse searchResult = postService.search(query, searchOption, memberId,
+        postSliceRequest);
+    return ResponseEntity.ok(searchResult);
   }
 }

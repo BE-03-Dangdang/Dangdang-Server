@@ -19,7 +19,7 @@ public abstract class BaseEntity {
 
   @CreatedDate
   @Column(updatable = false)
-  private LocalDateTime createdAt;
+  protected LocalDateTime createdAt;
 
   @LastModifiedDate
   @Column

@@ -8,7 +8,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.stream.Stream;
 
 public enum Category {
-  디지털기기("DigitalDevices"), 생활가전("HouseholdAppliances");
+
+  디지털기기("DigitalDevices"), 생활가전("HouseholdAppliances"), 유아동("Child"), 유아도서("ChildBook");
 
   private final String name;
 

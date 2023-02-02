@@ -77,12 +77,12 @@ public class MemberTownService {
 
     // Inactive 지운 경우 -> Active 만 남게 된다 (삭제)
     // Active 지운 경우 -> Inactive 가 Active 로 변경됨  (삭제 + 변경)
-    if (memberTown1.getMemberTownName().equals(memberTownRequest.townName())) {
+    if (memberTown1.getTownName().equals(memberTownRequest.townName())) {
       if (memberTown1.getStatus() == StatusType.ACTIVE) {
         memberTown2.updateMemberTownStatus(StatusType.ACTIVE);
       }
       memberTownRepository.delete(memberTown1);
-    } else if (memberTown2.getMemberTownName().equals(memberTownRequest.townName())) {
+    } else if (memberTown2.getTownName().equals(memberTownRequest.townName())) {
       if (memberTown2.getStatus() == StatusType.ACTIVE) {
         memberTown1.updateMemberTownStatus(StatusType.ACTIVE);
       }
@@ -104,7 +104,7 @@ public class MemberTownService {
     }
     for (MemberTown memberTown : memberTownList) {
       // 요구되는 이름인 경우 -> active
-      if (memberTown.getMemberTownName().equals(memberTownRequest.townName())) {
+      if (memberTown.getTownName().equals(memberTownRequest.townName())) {
         memberTown.updateMemberTownStatus(StatusType.ACTIVE);
       } else {
         memberTown.updateMemberTownStatus(StatusType.INACTIVE);

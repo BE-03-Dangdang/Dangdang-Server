@@ -65,7 +65,7 @@ public class MemberTown extends BaseEntity {
     this.townAuthStatus = townAuthStatus;
   }
 
-  public String getMemberTownName() {
+  public String getTownName() {
     return this.getTown().getName();
   }
 

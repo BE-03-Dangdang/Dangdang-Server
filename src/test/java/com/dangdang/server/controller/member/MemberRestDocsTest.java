@@ -17,10 +17,13 @@ import com.dangdang.server.domain.member.domain.RedisAuthCodeRepository;
 import com.dangdang.server.domain.member.domain.RedisSmsTenRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
+import com.dangdang.server.domain.member.dto.request.MemberRefreshRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.request.SmsRequest;
+import com.dangdang.server.global.security.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +51,8 @@ class MemberRestDocsTest {
   MemberRepository memberRepository;
   @Autowired
   RedisAuthCodeRepository redisAuthCodeRepository;
+  @Autowired
+  JwtTokenProvider jwtTokenProvider;
   @Autowired
   RedisSmsTenRepository redisSmsTenRepository;
 
@@ -92,6 +97,7 @@ class MemberRestDocsTest {
                 responseFields(
                     fieldWithPath("accessToken").type(JsonFieldType.NULL)
                         .description("accessToken"),
+                    fieldWithPath("refreshToken").type(JsonFieldType.NULL).description("리플레쉬 토큰"),
                     fieldWithPath("isCertified").type(JsonFieldType.BOOLEAN).description("인증 여부")
                 )
             )
@@ -138,6 +144,7 @@ class MemberRestDocsTest {
                 responseFields(
                     fieldWithPath("accessToken").type(JsonFieldType.STRING)
                         .description("accessToken"),
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("리플레쉬 토큰"),
                     fieldWithPath("isCertified").type(JsonFieldType.BOOLEAN).description("인증 여부")
                 )
             )
@@ -187,6 +194,46 @@ class MemberRestDocsTest {
                 responseFields(
                     fieldWithPath("accessToken").type(JsonFieldType.STRING)
                         .description("accessToken"),
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("리플레쉬 토큰"),
+                    fieldWithPath("isCertified").type(JsonFieldType.BOOLEAN).description("인증 여부")
+                )
+            )
+        );
+  }
+
+  @Test
+  @DisplayName("/api/v1/refresh -> 회원은 리플레쉬 토큰으로 2개의 토큰을 재 발급 받을 수 있다.")
+  void refresh() throws Exception {
+    //회원 가입된 정보 생성
+    Member member = new Member("01012345678", "cloudwi");
+    Member save = memberRepository.save(member);
+
+    String refreshToken = jwtTokenProvider.createRefreshToken(save.getId());
+    member.setRefreshToken(refreshToken);
+
+    MemberRefreshRequest memberRefreshRequest = new MemberRefreshRequest(refreshToken);
+
+    String json = objectMapper.writeValueAsString(memberRefreshRequest);
+
+    mockMvc.perform(
+            post("/members/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .content(json)
+        )
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "MemberController/signup",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("리플레쉬 토큰")
+                ),
+                responseFields(
+                    fieldWithPath("accessToken").type(JsonFieldType.STRING)
+                        .description("accessToken"),
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("리플레쉬 토큰"),
                     fieldWithPath("isCertified").type(JsonFieldType.BOOLEAN).description("인증 여부")
                 )
             )

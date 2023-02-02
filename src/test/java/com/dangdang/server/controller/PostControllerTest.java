@@ -79,7 +79,7 @@ class PostControllerTest {
     PostSaveRequest postSaveRequest = new PostSaveRequest("테스트 제목", "테스트 내용", Category.디지털기기, 20000,
         null, null, null, false, "천호동",
         postImageRequest);
-    PostDetailResponse postDetailResponse = postService.savePost(postSaveRequest, member);
+    PostDetailResponse postDetailResponse = postService.savePost(postSaveRequest, member.getId());
     postId = postDetailResponse.postId();
   }
 

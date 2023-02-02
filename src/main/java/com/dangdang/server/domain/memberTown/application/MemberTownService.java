@@ -7,14 +7,18 @@ import com.dangdang.server.domain.member.exception.MemberNotFoundException;
 import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.memberTown.domain.entity.RangeType;
+import com.dangdang.server.domain.memberTown.domain.entity.TownAuthStatus;
+import com.dangdang.server.domain.memberTown.dto.request.MemberTownCertifyRequest;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRangeRequest;
 import com.dangdang.server.domain.memberTown.dto.request.MemberTownRequest;
+import com.dangdang.server.domain.memberTown.dto.response.MemberTownCertifyResponse;
 import com.dangdang.server.domain.memberTown.dto.response.MemberTownRangeResponse;
 import com.dangdang.server.domain.memberTown.dto.response.MemberTownResponse;
 import com.dangdang.server.domain.memberTown.exception.MemberTownNotFoundException;
 import com.dangdang.server.domain.memberTown.exception.NotAppropriateCountException;
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
+import com.dangdang.server.domain.town.dto.AdjacentTownResponse;
 import com.dangdang.server.domain.town.exception.TownNotFoundException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import java.util.List;
@@ -25,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberTownService {
 
+  private final int MY_TOWN_CERTIFY_DISTANCE = 10;
   private final MemberTownRepository memberTownRepository;
   private final TownRepository townRepository;
   private final MemberRepository memberRepository;
@@ -72,12 +77,12 @@ public class MemberTownService {
 
     // Inactive 지운 경우 -> Active 만 남게 된다 (삭제)
     // Active 지운 경우 -> Inactive 가 Active 로 변경됨  (삭제 + 변경)
-    if (memberTown1.getMemberTownName().equals(memberTownRequest.townName())) {
+    if (memberTown1.getTownName().equals(memberTownRequest.townName())) {
       if (memberTown1.getStatus() == StatusType.ACTIVE) {
         memberTown2.updateMemberTownStatus(StatusType.ACTIVE);
       }
       memberTownRepository.delete(memberTown1);
-    } else if (memberTown2.getMemberTownName().equals(memberTownRequest.townName())) {
+    } else if (memberTown2.getTownName().equals(memberTownRequest.townName())) {
       if (memberTown2.getStatus() == StatusType.ACTIVE) {
         memberTown1.updateMemberTownStatus(StatusType.ACTIVE);
       }
@@ -99,7 +104,7 @@ public class MemberTownService {
     }
     for (MemberTown memberTown : memberTownList) {
       // 요구되는 이름인 경우 -> active
-      if (memberTown.getMemberTownName().equals(memberTownRequest.townName())) {
+      if (memberTown.getTownName().equals(memberTownRequest.townName())) {
         memberTown.updateMemberTownStatus(StatusType.ACTIVE);
       } else {
         memberTown.updateMemberTownStatus(StatusType.INACTIVE);
@@ -125,6 +130,31 @@ public class MemberTownService {
         memberTownRangeRequest.level());
   }
 
+  @Transactional
+  public MemberTownCertifyResponse certifyMemberTown(
+      MemberTownCertifyRequest memberTownCertifyRequest, Member member) {
+    boolean isCertified = false;
+    // 1. 현재 위도, 경도를 기준으로 Town list 조회
+    List<AdjacentTownResponse> towns = townRepository.findAdjacentTownsByPoint(
+        memberTownCertifyRequest.longitude(),
+        memberTownCertifyRequest.latitude(), MY_TOWN_CERTIFY_DISTANCE);
+    // 2. Active 로 설정한 동네가 list 안에 있는지 확인
+    MemberTown activeMemberTown = memberTownRepository.findByMemberId(member.getId())
+        .stream()
+        .filter(memberTown -> memberTown.getStatus() == StatusType.ACTIVE)
+        .findFirst()
+        .orElseThrow(() -> new MemberTownNotFoundException(ExceptionCode.MEMBER_TOWN_NOT_FOUND));
+
+    for (AdjacentTownResponse adjacentTown : towns) {
+      if (activeMemberTown.getTownName().equals(adjacentTown.getName())) {
+        isCertified = true;
+        activeMemberTown.updateMemberTownAuthStatus(TownAuthStatus.TOWN_CERTIFIED);
+        break;
+      }
+    }
+    return new MemberTownCertifyResponse(isCertified);
+  }
+
   private Member getMemberByMemberId(Long memberId) {
     return memberRepository.findById(memberId)
         .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
@@ -134,4 +164,6 @@ public class MemberTownService {
     return townRepository.findByName(townName)
         .orElseThrow(() -> new TownNotFoundException(ExceptionCode.TOWN_NOT_FOUND));
   }
+
+
 }

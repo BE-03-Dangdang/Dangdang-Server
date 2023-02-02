@@ -3,6 +3,7 @@ ifndef::snippets[]
 :snippets: ../ ../ ../build/generated-snippets
 endif::[]
 
+<<<<<<< HEAD
 
 == 게시글
 
@@ -18,3 +19,45 @@ include::{snippets}/post/api/put/update/request-fields.adoc[]
 .Response
 include::{snippets}/post/api/put/update/http-response.adoc[]
 include::{snippets}/post/api/put/update/response-fields.adoc[]
+=======
+== 게시글
+
+=== 게시글 작성
+
+=== /posts
+
+.Request
+include::{snippets}/post/api/post/save/http-request.adoc[]
+include::{snippets}/post/api/post/save/request-headers.adoc[]
+include::{snippets}/post/api/post/save/request-fields.adoc[]
+
+.Response
+include::{snippets}/post/api/post/save/http-response.adoc[]
+include::{snippets}/post/api/post/save/response-fields.adoc[]
+
+=== 게시글 상세조회
+
+=== /posts/{id}
+
+.Request
+include::{snippets}/post/api/get/findById/http-request.adoc[]
+include::{snippets}/post/api/get/findById/request-headers.adoc[]
+
+.Response
+include::{snippets}/post/api/get/findById/http-response.adoc[]
+include::{snippets}/post/api/get/findById/response-fields.adoc[]
+
+=== 게시글 상태값 변경
+
+=== /posts/status/{id}
+
+.Request
+include::{snippets}/post/api/patch/updateStatus/http-request.adoc[]
+include::{snippets}/post/api/patch/updateStatus/request-headers.adoc[]
+include::{snippets}/post/api/patch/updateStatus/request-fields.adoc[]
+
+.Response
+include::{snippets}/post/api/patch/updateStatus/http-response.adoc[]
+include::{snippets}/post/api/patch/updateStatus/response-fields.adoc[]
+
+>>>>>>> develop/v1.0.0

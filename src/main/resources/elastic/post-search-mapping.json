@@ -1,0 +1,36 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "title": {
+      "type": "text",
+      "analyzer": "nori"
+    },
+    "content": {
+      "type": "text",
+      "analyzer": "nori"
+    },
+    "category": {
+      "type": "keyword"
+    },
+    "price": {
+      "type": "integer"
+    },
+    "sharing": {
+      "type": "boolean"
+    },
+    "townId" : {
+      "type" : "long"
+    },
+    "townName": {
+      "type": "keyword"
+    },
+    "imageUrl": {
+      "type": "keyword"
+    },
+    "status": {
+      "type": "keyword"
+    }
+  }
+}

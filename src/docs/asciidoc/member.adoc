@@ -17,7 +17,6 @@ include::{snippets}/api/v1/post/member-town/request-fields.adoc[]
 .Response
 include::{snippets}/api/v1/post/member-town/http-response.adoc[]
 
-== 멤버타운
 === 멤버타운 삭제
 === api/v1/member-town
 
@@ -29,7 +28,6 @@ include::{snippets}/api/v1/delete/member-town/request-fields.adoc[]
 .Response
 include::{snippets}/api/v1/delete/member-town/http-response.adoc[]
 
-== 멤버타운
 === 멤버타운 활성화 변경
 === api/v1/member-town/active
 
@@ -42,7 +40,6 @@ include::{snippets}/api/v1/put/member-town/active/request-fields.adoc[]
 include::{snippets}/api/v1/put/member-town/active/http-response.adoc[]
 
 
-== 멤버타운
 === 멤버타운 범위 변경
 === api/v1/member-town/range
 
@@ -53,3 +50,24 @@ include::{snippets}/api/v1/put/member-town/range/request-fields.adoc[]
 
 .Response
 include::{snippets}/api/v1/put/member-town/range/http-response.adoc[]
+
+=== 내 동네 인증
+=== api/v1/member-town/certification
+.Request
+include::{snippets}/api/v1/post/member-town/certification/http-request.adoc[]
+include::{snippets}/api/v1/post/member-town/certification/request-headers.adoc[]
+include::{snippets}/api/v1/post/member-town/certification/request-fields.adoc[]
+
+.Response
+include::{snippets}/api/v1/post/member-town/certification/http-response.adoc[]
+
+== 채팅방
+=== 채팅방 생성
+=== api/v1/chat-room
+
+.Request
+include::{snippets}/api/v1/chat-room/http-request.adoc[]
+
+.Response
+include::{snippets}/api/v1/chat-room/http-response.adoc[]
+

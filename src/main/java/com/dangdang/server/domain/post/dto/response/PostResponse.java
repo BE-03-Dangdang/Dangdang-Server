@@ -5,41 +5,27 @@ import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.domain.entity.Post;
 import java.math.BigDecimal;
-import lombok.Getter;
 
-@Getter
-public class PostResponse {
-
-  private Long id;
-  private String title;
-  private String content;
-  private Category category;
-  private Integer price;
-  private String desiredPlaceName;
-  private BigDecimal desiredPlaceLongitude;
-  private BigDecimal desiredPlaceLatitude;
-  private Integer view;
-  private Boolean sharing;
-  private String townName;
-  private StatusType statusType;
-
-  private PostResponse(Post post) {
-    this.id = post.getId();
-    this.title = post.getTitle();
-    this.content = post.getContent();
-    this.category = post.getCategory();
-    this.price = post.getPrice();
-    this.desiredPlaceName = post.getDesiredPlaceName();
-    this.desiredPlaceLongitude = post.getDesiredPlaceLongitude();
-    this.desiredPlaceLatitude = post.getDesiredPlaceLatitude();
-    this.view = post.getView();
-    this.sharing = post.getSharing();
-    this.townName = post.getTownName();
-    this.statusType = post.getStatus();
-  }
+public record PostResponse(
+    Long id,
+    String title,
+    String content,
+    Category category,
+    Integer price,
+    String desiredPlaceName,
+    BigDecimal desiredPlaceLongitude,
+    BigDecimal desiredPlaceLatitude,
+    Integer view,
+    Boolean sharing,
+    String townName,
+    StatusType statusType,
+    Integer likeCount
+) {
 
   public static PostResponse from(Post post) {
-    return new PostResponse(post);
+    return new PostResponse(post.getId(), post.getTitle(), post.getContent(), post.getCategory(),
+        post.getPrice(), post.getDesiredPlaceName(), post.getDesiredPlaceLongitude(),
+        post.getDesiredPlaceLatitude(), post.getView(), post.getSharing(), post.getTownName(),
+        post.getStatus(), post.getLikeCount());
   }
-
 }

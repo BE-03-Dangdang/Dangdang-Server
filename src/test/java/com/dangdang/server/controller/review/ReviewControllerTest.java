@@ -99,7 +99,7 @@ class ReviewControllerTest {
   @DisplayName("Review를 작성할 수 있다.")
   void saveReviewTest() throws Exception {
     ReviewRequest reviewRequest = new ReviewRequest(post.getId(),
-        reviewer.getId(), reviewee.getId(), "preference1",
+        reviewee.getId(), "preference1",
         "nicePoint", "content1");
     mockMvc.perform((MockMvcRequestBuilders.post("/reviews"))
             .contentType(MediaType.APPLICATION_JSON)

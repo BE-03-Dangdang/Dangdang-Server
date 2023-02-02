@@ -27,7 +27,9 @@ public class SecurityConfig {
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return web -> web.ignoring()
-        .antMatchers("/docs/**");
+        .antMatchers("/**")
+        .antMatchers("/docs/**")
+        .antMatchers("/dangdang-chat/**");
   }
 
   @Bean
@@ -41,7 +43,8 @@ public class SecurityConfig {
         .authorizeRequests()
         .antMatchers(HttpMethod.POST, "/sms-message/**").permitAll()
         .antMatchers(HttpMethod.POST, "/members/**").permitAll()
-        .antMatchers(HttpMethod.POST, "/api/v1/sms-message/**").permitAll()
+        .antMatchers(HttpMethod.GET, "/open-banking/**").permitAll()
+        .antMatchers(HttpMethod.POST, "/chat-room").permitAll()
         .anyRequest().authenticated()
         .and()
         .addFilterBefore(new JwtAccessTokenFilter(jwtTokenProvider),

@@ -22,6 +22,7 @@ repositories {
 
 ext {
     set('snippetsDir', file("build/generated-snippets"))
+    set('springCloudVersion', "2021.0.3")
 }
 
 dependencies {
@@ -30,8 +31,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    //elasticsearch
+    implementation 'org.springframework.data:spring-data-elasticsearch:4.4.6'
+    implementation("jakarta.json:jakarta.json-api:2.0.1")
+
     // mongodb
-    implementation ('org.springframework.boot:spring-boot-starter-data-mongodb')
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
 
     // S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
@@ -68,40 +73,19 @@ dependencies {
 
     // validation
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+
+    // feign
+    implementation 'org.springframework.cloud:spring-cloud-dependencies:2021.0.3'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 }
-//
-//bootJar {
-//    dependsOn asciidoctor
-//    copy {
-//        from "${asciidoctor.outputDir}"
-//        into 'BOOT-INF/classes/static/docs'
-//    }
-//}
-//
-//tasks.named('test') {
-//    outputs.dir snippetsDir
-//    useJUnitPlatform()
-//}
-//
-//tasks.named('asciidoctor') {
-//    inputs.dir snippetsDir
-//    configurations 'asciidoctorExtensions'
-//    dependsOn test
-//}
-//
-//asciidoctor.doFirst {
-//    delete file('src/main/resources/static/docs')
-//}
-//
-//task copyDocument(type: Copy) {
-//    dependsOn asciidoctor
-//    from file("build/docs/asciidoc")
-//    into file("src/main/resources/static/docs")
-//}
-//
-//build {
-//    dependsOn copyDocument
-//}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+    }
+}
+
 
 tasks.named('test') {
     useJUnitPlatform()
@@ -109,4 +93,24 @@ tasks.named('test') {
 
 jar {
     enabled = false
+}
+
+tasks.named('asciidoctor') {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExtensions'
+    dependsOn test
+}
+
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+build {
+    dependsOn copyDocument
 }

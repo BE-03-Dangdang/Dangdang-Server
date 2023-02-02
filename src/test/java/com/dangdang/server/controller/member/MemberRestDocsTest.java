@@ -1,6 +1,9 @@
 package com.dangdang.server.controller.member;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -14,12 +17,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.dangdang.server.domain.member.application.SmsMessageService;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.RedisAuthCodeRepository;
+import com.dangdang.server.domain.member.domain.RedisSmsTenRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
+import com.dangdang.server.domain.member.dto.request.MemberRefreshRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.request.SmsRequest;
+import com.dangdang.server.global.security.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
 @SpringBootTest
-@Transactional
 class MemberRestDocsTest {
 
   @Autowired
@@ -48,6 +54,10 @@ class MemberRestDocsTest {
   MemberRepository memberRepository;
   @Autowired
   RedisAuthCodeRepository redisAuthCodeRepository;
+  @Autowired
+  JwtTokenProvider jwtTokenProvider;
+  @Autowired
+  RedisSmsTenRepository redisSmsTenRepository;
 
   @Test
   @DisplayName("회원 가입 시 핸드폰 번호와 인증 번호로 요청함, 회원 가입이 되어 있지 않다면 Http 200 상태코드가 응답됨")
@@ -56,6 +66,8 @@ class MemberRestDocsTest {
     //인증 문자 발송
     String phoneNumber = "01012345678";
     SmsRequest smsRequest = new SmsRequest(phoneNumber);
+    redisSmsTenRepository.deleteAll();
+
     String authCode = smsMessageService.sendMessage(smsRequest);
 
     //인증 요청
@@ -87,6 +99,7 @@ class MemberRestDocsTest {
                 responseFields(
                     fieldWithPath("accessToken").type(JsonFieldType.NULL)
                         .description("accessToken"),
+                    fieldWithPath("refreshToken").type(JsonFieldType.NULL).description("리플레쉬 토큰"),
                     fieldWithPath("isCertified").type(JsonFieldType.BOOLEAN).description("인증 여부")
                 )
             )
@@ -132,6 +145,7 @@ class MemberRestDocsTest {
                 responseFields(
                     fieldWithPath("accessToken").type(JsonFieldType.STRING)
                         .description("accessToken"),
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("리플레쉬 토큰"),
                     fieldWithPath("isCertified").type(JsonFieldType.BOOLEAN).description("인증 여부")
                 )
             )
@@ -180,7 +194,75 @@ class MemberRestDocsTest {
                 responseFields(
                     fieldWithPath("accessToken").type(JsonFieldType.STRING)
                         .description("accessToken"),
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("리플레쉬 토큰"),
                     fieldWithPath("isCertified").type(JsonFieldType.BOOLEAN).description("인증 여부")
+                )
+            )
+        );
+  }
+
+  @Test
+  @DisplayName("/api/v1/refresh -> 회원은 리플레쉬 토큰으로 2개의 토큰을 재 발급 받을 수 있다.")
+  void refresh() throws Exception {
+    //회원 가입된 정보 생성
+    Member member = new Member("01012345678", "cloudwi");
+    Member save = memberRepository.save(member);
+
+    String refreshToken = jwtTokenProvider.createRefreshToken(save.getId());
+    member.refresh(refreshToken);
+
+    MemberRefreshRequest memberRefreshRequest = new MemberRefreshRequest(refreshToken);
+
+    String json = objectMapper.writeValueAsString(memberRefreshRequest);
+
+    mockMvc.perform(
+            post("/members/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .content(json)
+        )
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "MemberController/signup",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("리플레쉬 토큰")
+                ),
+                responseFields(
+                    fieldWithPath("accessToken").type(JsonFieldType.STRING)
+                        .description("accessToken"),
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("리플레쉬 토큰"),
+                    fieldWithPath("isCertified").type(JsonFieldType.BOOLEAN).description("인증 여부")
+                )
+            )
+        );
+  }
+
+  @Test
+  @DisplayName("로그아웃 restdoce test")
+  void logout() throws Exception {
+    //회원 가입된 정보 생성
+    Member member = new Member("99988877778", "cloudwi");
+    member = memberRepository.save(member);
+
+    //accessToken create
+    String accessToken = "Bearer " + jwtTokenProvider.createAccessToken(member.getId());
+
+    mockMvc.perform(
+            delete("/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .header("AccessToken", accessToken)
+        )
+        .andExpect(status().isOk())
+        .andDo(
+            document("MemberController/logout",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("AccessToken").description("accessToken")
                 )
             )
         );

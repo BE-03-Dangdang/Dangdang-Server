@@ -2,7 +2,7 @@ package com.dangdang.server.domain.member.application;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -82,7 +82,7 @@ class MemberServiceUnitTest {
         //then
         verify(redisSmsRepository).findById(any());
         verify(memberRepository).findByPhoneNumber(any());
-        assertThat(memberCertifyResponse.getIsCertified(), is(true));
+        assertThat(memberCertifyResponse.isCertified(), is(true));
       }
     }
 
@@ -131,7 +131,7 @@ class MemberServiceUnitTest {
             phoneNumberCertifyRequest);
 
         //then
-        assertThat(memberCertifyResponse.getAccessToken().isEmpty(), is(false));
+        assertThat(memberCertifyResponse.accessToken().isEmpty(), is(false));
       }
     }
   }
@@ -169,7 +169,7 @@ class MemberServiceUnitTest {
         verify(memberRepository).findByPhoneNumber(any());
         verify(jwtTokenProvider).createAccessToken(1L);
 
-        assertThat(memberCertifyResponse.getAccessToken().isEmpty(), is(false));
+        assertThat(memberCertifyResponse.accessToken().isEmpty(), is(false));
       }
     }
 
@@ -227,7 +227,7 @@ class MemberServiceUnitTest {
         MemberCertifyResponse memberCertifyResponse = memberService.signup(memberSignUpRequest);
 
         //then
-        assertThat(memberCertifyResponse.getAccessToken().isEmpty(), is(false));
+        assertThat(memberCertifyResponse.accessToken().isEmpty(), is(false));
       }
     }
 

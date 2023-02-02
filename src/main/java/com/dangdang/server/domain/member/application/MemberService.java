@@ -9,16 +9,17 @@ import com.dangdang.server.domain.member.domain.RedisSmsRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.member.domain.entity.RedisAuthCode;
 import com.dangdang.server.domain.member.domain.entity.RedisSms;
+import com.dangdang.server.domain.member.dto.request.MemberRefreshRequest;
 import com.dangdang.server.domain.member.dto.request.MemberSignUpRequest;
 import com.dangdang.server.domain.member.dto.request.PhoneNumberCertifyRequest;
 import com.dangdang.server.domain.member.dto.response.MemberCertifyResponse;
 import com.dangdang.server.domain.member.exception.MemberCertifiedFailException;
 import com.dangdang.server.domain.member.exception.MemberNotFoundException;
-import com.dangdang.server.domain.member.exception.TownNotFoundException;
 import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
+import com.dangdang.server.domain.town.exception.TownNotFoundException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import com.dangdang.server.global.security.JwtTokenProvider;
 import java.util.Optional;
@@ -53,27 +54,26 @@ public class MemberService {
 
     // 시작하기 -> User DB에 있는 경우 -> token 발급
     Optional<Member> member = memberRepository.findByPhoneNumber(
-        phoneNumberCertifyRequest.getPhoneNumber());
+        phoneNumberCertifyRequest.phoneNumber());
 
     if (member.isPresent()) {
-      return getMemberCertifyResponse(member.get().getId());
+      return getMemberCertifyResponse(member.get());
     }
 
-    RedisAuthCode redisAuthCode = toRedisAuthCode(
-        phoneNumberCertifyRequest);
+    RedisAuthCode redisAuthCode = toRedisAuthCode(phoneNumberCertifyRequest);
     redisAuthCodeRepository.save(redisAuthCode);
 
-    return new MemberCertifyResponse(null,true);
+    return MemberCertifyResponse.from(null, null, true);
   }
 
   @Transactional
   public MemberCertifyResponse loginCertify(PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
     phoneNumberCertify(phoneNumberCertifyRequest);
 
-    Member member = memberRepository.findByPhoneNumber(phoneNumberCertifyRequest.getPhoneNumber())
+    Member member = memberRepository.findByPhoneNumber(phoneNumberCertifyRequest.phoneNumber())
         .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
 
-    return getMemberCertifyResponse(member.getId());
+    return getMemberCertifyResponse(member);
   }
 
   @Transactional
@@ -93,26 +93,55 @@ public class MemberService {
     MemberTown memberTown = new MemberTown(member, town);
     memberTownRepository.save(memberTown);
 
-    return getMemberCertifyResponse(member.getId());
+    return getMemberCertifyResponse(member);
   }
 
   private void phoneNumberCertify(PhoneNumberCertifyRequest phoneNumberCertifyRequest) {
-    RedisSms redisSms = redisSmsRepository.findById(phoneNumberCertifyRequest.getPhoneNumber())
+    RedisSms redisSms = redisSmsRepository.findById(phoneNumberCertifyRequest.phoneNumber())
         .orElseThrow(() ->
             new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL)
         );
 
-    String authCode = redisSms.getAuthCode();
+    redisSms.validateAuthCode(phoneNumberCertifyRequest.authCode());
 
-    if (!authCode.equals(phoneNumberCertifyRequest.getAuthCode())) {
+    redisSmsRepository.deleteById(phoneNumberCertifyRequest.phoneNumber());
+  }
+
+  private MemberCertifyResponse getMemberCertifyResponse(Member member) {
+    String accessToken = jwtTokenProvider.createAccessToken(member.getId());
+    String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
+
+    member.refresh(refreshToken);
+
+    return MemberCertifyResponse.from(accessToken, refreshToken, true);
+  }
+
+  @Transactional
+  public MemberCertifyResponse refresh(MemberRefreshRequest memberRefreshRequest) {
+    String refreshToken = memberRefreshRequest.refreshToken();
+
+    if (jwtTokenProvider.validateRefreshToken(refreshToken)) {
       throw new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL);
     }
 
-    redisSmsRepository.deleteById(phoneNumberCertifyRequest.getPhoneNumber());
+    Member principal = ((Member) jwtTokenProvider.getRefreshTokenAuthentication(refreshToken)
+        .getPrincipal());
+
+    Member member = memberRepository.findById(principal.getId())
+        .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
+
+    if (!member.getRefreshToken().equals(refreshToken)) {
+      throw new MemberCertifiedFailException(ExceptionCode.CERTIFIED_FAIL);
+    }
+
+    return getMemberCertifyResponse(principal);
   }
 
-  private MemberCertifyResponse getMemberCertifyResponse(Long memberId) {
-    String accessToken = jwtTokenProvider.createAccessToken(memberId);
-    return new MemberCertifyResponse(accessToken, true);
+  @Transactional
+  public void logout(long memberId) {
+    Member member = memberRepository.findById(memberId)
+        .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
+
+    member.logout();
   }
 }

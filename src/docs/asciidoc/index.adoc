@@ -7,3 +7,33 @@ backtony.github.io(Rest Docs)
 :toclevels: 2
 :sectlinks:
 
+[[PayMember-API]]
+== PayMember API
+
+[[PayMember-당근머니-충전]]
+=== PayMember 당근머니 충전
+
+operation::PayMemberController/charge[snippets='http-request,request-headers,http-response,response-fields']
+
+[[PayMember-당근머니-출금]]
+=== PayMember 당근머니 출금
+
+operation::PayMemberController/charge[snippets='http-request,request-headers,http-response,response-fields']
+
+[[PayMember-수취조회]]
+=== PayMember 수취 조회
+
+operation::PayMemberController/inquiryReceive[snippets='http-request,request-headers,request-body,http-response,response-fields']
+
+[[ConnectionAccount-API]]
+== ConnectionAccount API
+
+[[ConnectionAccount-연결계좌-추가]]
+=== ConnectionAccount 연결계좌 추가
+
+operation::ConnectionAccountDatabaseController/addConnectionAccount[snippets='http-request,request-headers,http-response']
+
+[[ConnectionAccount-전체-연결계좌-조회]]
+=== ConnectionAccount 전체 연결계좌 조회
+
+operation::ConnectionAccountDatabaseController/getAllConnectionAccountResponse[snippets='http-request,request-headers,http-response,response-fields']

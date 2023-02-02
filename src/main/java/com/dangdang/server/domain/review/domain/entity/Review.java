@@ -28,11 +28,11 @@ public class Review extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "reviewer_id")
-  private Member reviewerId;
+  private Member reviewer;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "reviewee_id")
-  private Member revieweeId;
+  private Member reviewee;
 
   @Column(nullable = false, length = 100)
   private String preference;
@@ -46,4 +46,14 @@ public class Review extends BaseEntity {
   protected Review() {
   }
 
+  public Review(Post post, Member reviewer, Member reviewee, String preference,
+      String nicePoint,
+      String content) {
+    this.post = post;
+    this.reviewer = reviewer;
+    this.reviewee = reviewee;
+    this.preference = preference;
+    this.nicePoint = nicePoint;
+    this.content = content;
+  }
 }

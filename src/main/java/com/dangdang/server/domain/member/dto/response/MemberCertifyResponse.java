@@ -1,19 +1,14 @@
 package com.dangdang.server.domain.member.dto.response;
 
-import lombok.Getter;
+public record MemberCertifyResponse(
+    String accessToken,
+    String refreshToken,
+    Boolean isCertified
+) {
 
-@Getter
-public class MemberCertifyResponse {
-
-  private String accessToken;
-  private Boolean isCertified;
-
-  private MemberCertifyResponse() {
-
-  }
-
-  public MemberCertifyResponse(String accessToken, Boolean isCertified) {
-    this.accessToken = accessToken;
-    this.isCertified = isCertified;
+  public static MemberCertifyResponse from(String accessToken, String refreshToken,
+      Boolean isCertified) {
+    return new MemberCertifyResponse(accessToken, refreshToken, isCertified);
   }
 }
+

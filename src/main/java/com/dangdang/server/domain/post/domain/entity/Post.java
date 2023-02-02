@@ -104,6 +104,10 @@ public class Post extends BaseEntity {
     super.status = statusType;
   }
 
+  public Long getMemberId() {
+    return member.getId();
+  }
+
   public String getTownName() {
     return town.getName();
   }
@@ -114,5 +118,9 @@ public class Post extends BaseEntity {
 
   public void addLikes(Likes likes) {
     this.likes.add(likes);
+  }
+  
+  public void changeStatus(StatusType statusType) {
+    this.status = statusType;
   }
 }

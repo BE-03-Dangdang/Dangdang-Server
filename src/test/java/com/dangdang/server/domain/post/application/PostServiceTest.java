@@ -7,17 +7,24 @@ import com.dangdang.server.domain.common.StatusType;
 import com.dangdang.server.domain.likes.domain.LikesRepository;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
+import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
+import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.domain.PostRepository;
 import com.dangdang.server.domain.post.domain.entity.Post;
 import com.dangdang.server.domain.post.dto.request.PostLikeRequest;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
+import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
+import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
+import com.dangdang.server.domain.post.dto.response.PostsSliceResponse;
 import com.dangdang.server.domain.post.exception.PostNotFoundException;
 import com.dangdang.server.domain.postImage.domain.PostImageRepository;
 import com.dangdang.server.domain.postImage.dto.PostImageRequest;
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
+import com.dangdang.server.domain.town.exception.TownNotFoundException;
+import com.dangdang.server.global.exception.ExceptionCode;
 import com.dangdang.server.global.exception.UrlInValidException;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -25,8 +32,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.persistence.EntityManager;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -51,6 +60,8 @@ class PostServiceTest {
   TownRepository townRepository;
   @Autowired
   PostImageRepository postImageRepository;
+  @Autowired
+  MemberTownRepository memberTownRepository;
 
   @Autowired
   EntityManager entityManager;
@@ -63,9 +74,32 @@ class PostServiceTest {
   Member member;
   Town town;
   PostSaveRequest postSaveRequest;
+  MemberTown memberTown;
 
   @Autowired
   private SaveClassForViewUpdate saveClassForViewUpdate;
+  
+  private PostDetailResponse savedPostResponse;
+
+  void setUp() {
+    Member newMember = new Member("01064083433", "yb");
+    member =memberRepository.save(newMember);
+    town = townRepository.findByName("천호동")
+        .orElseThrow(() -> new TownNotFoundException(ExceptionCode.TOWN_NOT_FOUND));
+
+    MemberTown newMemberTown = new MemberTown(this.loginMember, town);
+    memberTown = memberTownRepository.save(newMemberTown);
+
+    PostImageRequest postImageRequest = new PostImageRequest(Arrays.asList(
+        "https://" + bucketName + ".s3." + region + ".amazonaws.com/post-image/test2.png",
+        "https://" + bucketName + ".s3." + region + ".amazonaws.com/post-image/test3.png"));
+
+    PostSaveRequest postSaveRequest = new PostSaveRequest("맛있는 커피팝니다.", "아메리카노가 단돈 1000원!",
+        Category.디지털기기, 1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false,
+        "서현동", postImageRequest);
+    savedPostResponse = postService.savePost(postSaveRequest, this.loginMember.getId());
+    postService.uploadToES();
+  }
 
   @Autowired
   private LikesRepository likeRepository;
@@ -133,13 +167,14 @@ class PostServiceTest {
   @DisplayName("게시글을 작성할 수 있다.")
   void postSaveTest() {
     setup();
+    PostDetailResponse postDetailResponse = postService.savePost(postSaveRequest,
+        loginMember.getId());
 
-    PostDetailResponse postDetailResponse = postService.savePost(postSaveRequest, member);
-    System.out.println("######## posResponseId:" + postDetailResponse.postResponse().getId());
-    PostDetailResponse resultDetailResponse = postService.findPostDetailById(
-        postDetailResponse.postResponse().getId());
-    assertThat(postDetailResponse.postResponse().getId()).usingRecursiveComparison()
-        .isEqualTo(resultDetailResponse.postResponse().getId());
+    PostDetailResponse foundPost = postService.findPostDetailById(postDetailResponse.getPostId());
+    assertThat(savedPostResponse.getPostResponse()).usingRecursiveComparison()
+        .isEqualTo(foundPost.getPostResponse());
+    assertThat(savedPostResponse.getMember()).usingRecursiveComparison()
+        .isEqualTo(foundPost.getMember());
   }
 
   @Test
@@ -231,10 +266,9 @@ class PostServiceTest {
   void findPostDetailByIdOpenImageLink() {
     setup();
     PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
-
-    PostDetailResponse foundPost = postService.findPostDetailById(
-        savedPostDetailResponse.postResponse().getId());
-    Assertions.assertThat(foundPost.imageUrls()).hasSize(2);
+    
+    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getPostId());
+    Assertions.assertThat(foundPost.getImageUrls()).hasSize(2);
   }
 
   @Test
@@ -247,10 +281,27 @@ class PostServiceTest {
         1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "서현동",
         wrongPostImageRequest);
 
-    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
+    PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest,
+        loginMember.getId());
 
     assertThatThrownBy(
-        () -> postService.findPostDetailById(savedPostDetailResponse.postResponse().getId()))
-        .isInstanceOf(UrlInValidException.class);
+        () -> postService.findPostDetailById(savedPostResponse.getPostId())).isInstanceOf(
+        UrlInValidException.class);
+  }
+
+  @Test
+  @DisplayName("검색어와 각종 파라미터를 사용해서 ES로 검색할 수 있다.")
+  public void searchWithQueryAndOptionsES() throws Exception {
+    setup();
+    //given
+    String query = "아메리카노";
+    PostSearchOptionRequest postSearchOption = new PostSearchOptionRequest(List.of(Category.디지털기기),
+        0L, 40000L, 1, true);
+
+    // when
+    PostsSliceResponse posts = postService.search(query, postSearchOption, loginMember.getId(),
+        new PostSliceRequest(0, 10));
+    //then
+    Assertions.assertThat(posts.getPostSliceResponses()).hasSizeGreaterThan(0);
   }
 }

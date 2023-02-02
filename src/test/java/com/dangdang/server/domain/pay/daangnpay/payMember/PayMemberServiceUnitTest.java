@@ -63,7 +63,7 @@ public class PayMemberServiceUnitTest {
 
       verify(openBankingFacadeService, times(1)).inquiryReceive(any());
       verify(connectionAccountDatabaseService,
-          times(1)).findIsMyAccountAndChargeAccountByReceiveRequest(any(), any());
+          times(1)).findIsMyAccountAndChargeAccount(any(), any());
     }
 
     void checkOpenApiAndConnectionAccount() {
@@ -76,7 +76,7 @@ public class PayMemberServiceUnitTest {
       doReturn(openBankingInquiryReceiveResponse).when(openBankingFacadeService)
           .inquiryReceive(any());
       doReturn(getConnectionAccountReceiveResponse).when(connectionAccountDatabaseService)
-          .findIsMyAccountAndChargeAccountByReceiveRequest(any(), any());
+          .findIsMyAccountAndChargeAccount(any(), any());
     }
 
     @Nested

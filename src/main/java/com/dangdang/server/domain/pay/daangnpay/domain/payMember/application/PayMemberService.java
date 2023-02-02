@@ -19,6 +19,8 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemb
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberSignupResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.RemittanceRequest;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.RemittanceResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.MinAmountException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application.PayUsageHistoryService;
 import com.dangdang.server.domain.pay.kftc.OpenBankingService;
@@ -115,6 +117,14 @@ public class PayMemberService {
     }
 
     PayMember payMember = getPayMember(memberId);
+    return withdrawRequestLogic(payMember, payRequest);
+  }
+
+  /**
+   * 출금이체 요청
+   */
+  @Transactional
+  public PayResponse withdrawRequestLogic(PayMember payMember, PayRequest payRequest) {
     OpenBankingDepositRequest openBankingDepositRequestFromWithdraw = createOpenBankingDepositRequest(
         payMember.getId(), payRequest);
 
@@ -138,8 +148,8 @@ public class PayMemberService {
     PayMember payMember = getPayMember(memberId);
     Long payMemberId = payMember.getId();
 
-    GetConnectionAccountReceiveResponse getConnectionAccountReceiveResponse = connectionAccountDatabaseService.findIsMyAccountAndChargeAccountByReceiveRequest(
-        payMemberId, receiveRequest);
+    GetConnectionAccountReceiveResponse getConnectionAccountReceiveResponse = connectionAccountDatabaseService.findIsMyAccountAndChargeAccount(
+        payMemberId, receiveRequest.bankAccountNumber());
 
     OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest = createOpenBankingInquiryReceiveRequest(
         payMemberId, receiveRequest, getConnectionAccountReceiveResponse);
@@ -150,6 +160,31 @@ public class PayMemberService {
     FeeInfo feeInfo = payMember.getFeeInfo();
     return ReceiveResponse.of(openBankingInquiryReceiveResponse,
         getConnectionAccountReceiveResponse, autoChargeAmount, feeInfo);
+  }
+
+  /**
+   * 당근머니 송금
+   */
+  @Transactional
+  public RemittanceResponse remittance(Long memberId, RemittanceRequest remittanceRequest) {
+    PayMember payMember = getPayMember(memberId);
+    Long payMemberId = payMember.getId();
+
+    GetConnectionAccountReceiveResponse getConnectionAccountReceiveResponse = connectionAccountDatabaseService.findIsMyAccountAndChargeAccount(
+        payMemberId, remittanceRequest.bankAccountNumber());
+
+    int autoChargeAmount = payMember.calculateAutoChargeAmount(remittanceRequest.depositAmount());
+    payMember.addMoney(autoChargeAmount);
+
+    FeeInfo feeInfo = payMember.getFeeInfo();
+    payMember.minusMoney(feeInfo.getFeeAmount());
+
+    PayResponse payResponse = withdrawRequestLogic(payMember,
+        new PayRequest(remittanceRequest.openBankingToken(),
+            remittanceRequest.bankAccountNumber(), remittanceRequest.depositAmount()));
+
+    return RemittanceResponse.of(getConnectionAccountReceiveResponse, autoChargeAmount, feeInfo,
+        payResponse);
   }
 
   private PayMember getPayMember(Long memberId) {

@@ -1,7 +1,6 @@
 package com.dangdang.server.domain.pay.kftc.common.dto;
 
-import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.domain.BankType;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostReceiveResponse;
 import java.time.LocalDateTime;
 
 public record OpenBankingInquiryReceiveResponse(Long payMemberId, String bankCode, String bankName,
@@ -10,12 +9,12 @@ public record OpenBankingInquiryReceiveResponse(Long payMemberId, String bankCod
                                                 LocalDateTime createdAt) {
 
   public static OpenBankingInquiryReceiveResponse of(Long payMemberId,
-      BankOpenBankingApiResponse bankOpenBankingApiResponse, LocalDateTime createdAt) {
-    BankType bankType = BankType.from(bankOpenBankingApiResponse.bankName());
+      PostReceiveResponse postReceiveResponse,
+      OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest, LocalDateTime createdAt) {
 
-    return new OpenBankingInquiryReceiveResponse(payMemberId, bankType.getBankCode(),
-        bankType.getBankName(),
-        bankOpenBankingApiResponse.clientName(), bankOpenBankingApiResponse.accountNumber(),
-        createdAt);
+    return new OpenBankingInquiryReceiveResponse(payMemberId,
+        postReceiveResponse.bank_code_std(), openBankingInquiryReceiveRequest.bankName(),
+        postReceiveResponse.account_holder_name(),
+        openBankingInquiryReceiveRequest.bankAccountNumber(), createdAt);
   }
 }

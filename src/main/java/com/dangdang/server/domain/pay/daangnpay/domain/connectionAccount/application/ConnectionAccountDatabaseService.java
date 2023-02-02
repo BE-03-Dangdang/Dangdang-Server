@@ -83,17 +83,15 @@ public class ConnectionAccountDatabaseService {
         .filter(connectionAccount -> connectionAccount.getStatus().equals(StatusType.ACTIVE))
         .findFirst().orElseThrow();
 
-    return new GetConnectionAccountReceiveResponse(isMyAccount, findChargeAccount.getBank(),
+    return new GetConnectionAccountReceiveResponse(isMyAccount,
+        findChargeAccount.getAccountHolder(), findChargeAccount.getBank(),
         findChargeAccount.getBankAccountNumber());
   }
 
-  /**
-   * 핀테크 이용 번호 찾기
-   */
-  public String getFintechUseNum(String accountNumber) {
+  public ConnectionAccount findByAccountNumber(String accountNumber) {
     ConnectionAccount connectionAccount = connectionAccountRepository.findByBankAccountNumber(
         accountNumber).orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
-    return connectionAccount.getFintechUseNum();
+    return connectionAccount;
   }
 
   private PayMember getPayMemberByMemberId(Long memberId) {

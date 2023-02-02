@@ -2,7 +2,6 @@ package com.dangdang.server.controller.pay;
 
 import static com.dangdang.server.global.exception.ExceptionCode.BINDING_WRONG;
 
-import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.application.PayMemberService;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
@@ -13,8 +12,6 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.Passw
 import com.dangdang.server.global.aop.CurrentUserId;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,15 +32,15 @@ public class PayMemberController {
   /**
    * 당근페이 가입 API
    */
+  @CurrentUserId
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("")
   public PostPayMemberSignupResponse createPayMember(@RequestParam String password,
-      Authentication authentication) {
+      Long memberId) {
     if (password.length() < 6) {
       throw new PasswordSizeException(BINDING_WRONG);
     }
-    Member member = (Member) authentication.getPrincipal();
-    return payMemberService.signup(password, member);
+    return payMemberService.signup(password, memberId);
   }
 
   /**
@@ -51,7 +48,7 @@ public class PayMemberController {
    */
   @CurrentUserId
   @ResponseStatus(HttpStatus.OK)
-  @PatchMapping("/money/charge")
+  @PostMapping("/money/charge")
   public PayResponse charge(Long memberId, @RequestBody @Valid PayRequest payRequest) {
     return payMemberService.charge(memberId, payRequest);
   }
@@ -61,7 +58,7 @@ public class PayMemberController {
    */
   @CurrentUserId
   @ResponseStatus(HttpStatus.OK)
-  @PatchMapping("/money/withdraw")
+  @PostMapping("/money/withdraw")
   public PayResponse withdraw(Long memberId, @RequestBody @Valid PayRequest payRequest) {
     return payMemberService.withdraw(memberId, payRequest);
   }

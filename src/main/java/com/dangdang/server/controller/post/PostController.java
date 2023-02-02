@@ -1,4 +1,4 @@
-package com.dangdang.server.controller;
+package com.dangdang.server.controller.post;
 
 import static com.dangdang.server.global.exception.ExceptionCode.POST_STATUS_IS_NULL;
 

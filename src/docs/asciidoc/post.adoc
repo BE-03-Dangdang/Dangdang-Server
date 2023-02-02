@@ -12,6 +12,7 @@ endif::[]
 
 .Request
 include::{snippets}/post/api/put/update/http-request.adoc[]
+include::{snippets}/post/api/put/update/request-headers.adoc[]
 include::{snippets}/post/api/put/update/request-fields.adoc[]
 
 .Response

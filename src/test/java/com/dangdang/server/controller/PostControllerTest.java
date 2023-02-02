@@ -1,5 +1,7 @@
 package com.dangdang.server.controller;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -129,6 +131,9 @@ class PostControllerTest {
         .andDo(document("post/api/put/update",
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
+            requestHeaders(
+                headerWithName("AccessToken").description("Access Token")
+            ),
             requestFields(
                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("게시글 식별자"),
                 fieldWithPath("title").type(JsonFieldType.STRING).description("게시글 제목"),

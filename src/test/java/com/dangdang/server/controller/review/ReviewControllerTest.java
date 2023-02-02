@@ -1,4 +1,4 @@
-package com.dangdang.server.controller;
+package com.dangdang.server.controller.review;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;

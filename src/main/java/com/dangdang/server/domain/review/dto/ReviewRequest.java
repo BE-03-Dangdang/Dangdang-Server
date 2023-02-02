@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 
 public record ReviewRequest(
     @NotNull @JsonProperty("postId") Long postId,
-    @NotNull @JsonProperty("reviewerId") Long reviewerId,
     @NotNull @JsonProperty("revieweeId") Long revieweeId,
     @NotBlank @JsonProperty("preference") String preference,
     @NotBlank @JsonProperty("nicePoint") String nicePoint,

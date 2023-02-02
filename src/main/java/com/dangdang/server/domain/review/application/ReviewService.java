@@ -35,18 +35,16 @@ public class ReviewService {
   }
 
   @Transactional
-  public ReviewResponse saveReview(ReviewRequest reviewRequest) {
+  public ReviewResponse saveReview(ReviewRequest reviewRequest, Member reviewer) {
     Post foundPost = postRepository.findById(reviewRequest.postId())
         .orElseThrow(() -> new PostNotFoundException(
             POST_NOT_FOUND));
 
     canWriteReview(foundPost);
 
-    Member reviewer = memberRepository.findById(reviewRequest.reviewerId())
-        .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
     Member reviewee = memberRepository.findById(reviewRequest.revieweeId())
         .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
-    
+
     Review review = reviewRepository.save(
         ReviewRequest.to(reviewRequest, foundPost, reviewer, reviewee));
     return ReviewResponse.from(review);

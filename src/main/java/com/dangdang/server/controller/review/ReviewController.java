@@ -1,9 +1,6 @@
-package com.dangdang.server.controller;
-
-import static com.dangdang.server.global.exception.ExceptionCode.MEMBER_UNMATCH_AUTHOR;
+package com.dangdang.server.controller.review;
 
 import com.dangdang.server.domain.member.domain.entity.Member;
-import com.dangdang.server.domain.member.exception.MemberUnmatchedAuthorException;
 import com.dangdang.server.domain.review.application.ReviewService;
 import com.dangdang.server.domain.review.dto.ReviewRequest;
 import com.dangdang.server.domain.review.dto.ReviewResponse;
@@ -27,12 +24,9 @@ public class ReviewController {
   public ResponseEntity<ReviewResponse> saveReview(@RequestBody ReviewRequest reviewRequest,
       Authentication authentication) {
 
-    Long memberId = ((Member) authentication.getPrincipal()).getId();
-    if (memberId == reviewRequest.reviewerId()) {
-      throw new MemberUnmatchedAuthorException(MEMBER_UNMATCH_AUTHOR);
-    }
+    Member reviewer = (Member) authentication.getPrincipal();
 
-    ReviewResponse reviewResponse = reviewService.saveReview(reviewRequest);
+    ReviewResponse reviewResponse = reviewService.saveReview(reviewRequest, reviewer);
     return ResponseEntity.created(
             URI.create(
                 "/" + reviewResponse.reviewer().memberId() + "/reviews-sent/"

@@ -1,7 +1,7 @@
 package com.dangdang.server.global.security;
 
 import com.dangdang.server.domain.member.domain.MemberRepository;
-import com.dangdang.server.global.exception.BusinessException;
+import com.dangdang.server.domain.member.exception.MemberNotFoundException;
 import com.dangdang.server.global.exception.ExceptionCode;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
-    return memberRepository.findById(Long.parseLong(memberId)).orElseThrow(() -> new BusinessException(
+    return memberRepository.findById(Long.parseLong(memberId)).orElseThrow(() -> new MemberNotFoundException(
         ExceptionCode.MEMBER_NOT_FOUND));
   }
 }

@@ -1,18 +1,23 @@
-package com.dangdang.server.controller;
+package com.dangdang.server.controller.post;
 
 import static com.dangdang.server.global.exception.ExceptionCode.POST_STATUS_IS_NULL;
 
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.application.PostService;
+import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostUpdateStatusRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
 import com.dangdang.server.domain.post.exception.NullParameterException;
+import java.net.URI;
 import javax.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +49,25 @@ public class PostController {
   }
    */
 
-  @PatchMapping("/{id}")
+  @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<PostDetailResponse> savePost(
+      @RequestBody PostSaveRequest postSaverequest, Authentication authentication) {
+
+    Member loginMember = (Member) authentication.getPrincipal();
+
+    PostDetailResponse postDetailResponse = postService.savePost(postSaverequest, loginMember);
+
+    return ResponseEntity.created(URI.create("/posts/" + postDetailResponse.postId()))
+        .body(postDetailResponse);
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<PostDetailResponse> findPostDetailById(@PathVariable("id") long postId) {
+    PostDetailResponse postDetailResponse = postService.findPostDetailById(postId);
+    return ResponseEntity.ok(postDetailResponse);
+  }
+
+  @PatchMapping("/status/{id}")
   public ResponseEntity<PostDetailResponse> updatePostStatus(
       @PathVariable("id") long postId,
       @RequestBody @Valid PostUpdateStatusRequest postUpdateStatusRequest,

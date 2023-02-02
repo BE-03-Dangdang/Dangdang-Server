@@ -11,7 +11,6 @@ import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
 import com.dangdang.server.domain.post.dto.request.PostUpdateStatusRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
-import com.dangdang.server.domain.post.dto.response.PostResponse;
 import com.dangdang.server.domain.post.dto.response.PostsSliceResponse;
 import com.dangdang.server.domain.post.exception.PostNotFoundException;
 import com.dangdang.server.domain.postImage.application.PostImageService;
@@ -61,12 +60,12 @@ public class PostService {
 
   @Transactional
   public PostDetailResponse savePost(PostSaveRequest postSaveRequest, Member loginMember) {
-    Town foundTown = townRepository.findByName(postSaveRequest.getTownName())
+    Town foundTown = townRepository.findByName(postSaveRequest.townName())
         .orElseThrow(() -> new TownNotFoundException(TOWN_NOT_FOUND));
     Post post = PostSaveRequest.toPost(postSaveRequest, loginMember, foundTown);
     Post savedPost = postRepository.save(post);
     List<String> imageUrls = postImageService.savePostImage(savedPost,
-        postSaveRequest.getPostImageRequest());
+        postSaveRequest.postImageRequest());
 
     return PostDetailResponse.from(savedPost, loginMember, imageUrls);
   }
@@ -80,11 +79,12 @@ public class PostService {
   }
 
   @Transactional
-  public PostDetailResponse updatePostStatus(Long postId, PostUpdateStatusRequest postUpdateStatusRequest, Long authorId) {
+  public PostDetailResponse updatePostStatus(Long postId,
+      PostUpdateStatusRequest postUpdateStatusRequest, Long authorId) {
     Post post = postRepository.findPostDetailById(postId)
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 
-    if(!Objects.equals(post.getMemberId(), authorId)) {
+    if (!Objects.equals(post.getMemberId(), authorId)) {
       throw new MemberUnmatchedAuthorException(ExceptionCode.MEMBER_UNMATCH_AUTHOR);
     }
 

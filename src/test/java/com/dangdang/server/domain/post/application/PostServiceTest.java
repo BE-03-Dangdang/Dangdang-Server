@@ -1,6 +1,5 @@
 package com.dangdang.server.domain.post.application;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -8,10 +7,7 @@ import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
-import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
-import com.dangdang.server.domain.post.dto.response.PostResponse;
-import com.dangdang.server.domain.post.dto.response.PostsSliceResponse;
 import com.dangdang.server.domain.post.exception.PostNotFoundException;
 import com.dangdang.server.domain.postImage.domain.PostImageRepository;
 import com.dangdang.server.domain.postImage.dto.PostImageRequest;
@@ -24,7 +20,6 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -66,11 +61,12 @@ class PostServiceTest {
         postImageRequest);
     PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
 
-    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getPostId());
-    assertThat(savedPostResponse.getPostResponse()).usingRecursiveComparison()
-        .isEqualTo(foundPost.getPostResponse());
-    assertThat(savedPostResponse.getMember()).usingRecursiveComparison()
-        .isEqualTo(foundPost.getMember());
+    PostDetailResponse foundPostDetail = postService.findPostDetailById(
+        savedPostResponse.postId());
+    assertThat(savedPostResponse.postResponse()).usingRecursiveComparison()
+        .isEqualTo(foundPostDetail.postResponse());
+    assertThat(savedPostResponse.postResponse().id())
+        .isEqualTo(foundPostDetail.postResponse());
   }
 
   @Test
@@ -99,9 +95,9 @@ class PostServiceTest {
 
     PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
 
-    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getPostId());
+    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.postId());
     assertThat(foundPost).isNotNull();
-    assertThat(foundPost.getImageUrls()).hasSize(2);
+    assertThat(foundPost.imageUrls()).hasSize(2);
   }
 
   @Test
@@ -122,8 +118,8 @@ class PostServiceTest {
 
     PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
 
-    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getPostId());
-    Assertions.assertThat(foundPost.getImageUrls()).hasSize(2);
+    PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.postId());
+    Assertions.assertThat(foundPost.imageUrls()).hasSize(2);
   }
 
   @Test
@@ -143,7 +139,7 @@ class PostServiceTest {
     PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest, loginMember);
 
     assertThatThrownBy(
-        () -> postService.findPostDetailById(savedPostResponse.getPostId()))
+        () -> postService.findPostDetailById(savedPostResponse.postId()))
         .isInstanceOf(UrlInValidException.class);
   }
 }

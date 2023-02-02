@@ -16,11 +16,15 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.P
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberSignupResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.MinAmountException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application.PayUsageHistoryService;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.OpenBankingFacadeService;
+import com.dangdang.server.domain.pay.kftc.OpenBankingService;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenRequest;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
@@ -29,23 +33,42 @@ import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWith
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
 @Service
 public class PayMemberService {
 
-  private final OpenBankingFacadeService openBankingFacadeService;
+  private final OpenBankingService openBankingService;
   private final PayUsageHistoryService payUsageHistoryService;
   private final ConnectionAccountDatabaseService connectionAccountDatabaseService;
   private final PayMemberRepository payMemberRepository;
 
-  public PayMemberService(OpenBankingFacadeService openBankingFacadeService,
+  public PayMemberService(OpenBankingService openBankingService,
       PayUsageHistoryService payUsageHistoryService,
       ConnectionAccountDatabaseService connectionAccountDatabaseService,
       PayMemberRepository payMemberRepository) {
-    this.openBankingFacadeService = openBankingFacadeService;
+    this.openBankingService = openBankingService;
     this.payUsageHistoryService = payUsageHistoryService;
     this.connectionAccountDatabaseService = connectionAccountDatabaseService;
     this.payMemberRepository = payMemberRepository;
+  }
+
+  public void createOpenBankingMemberFromState(PostPayMemberRequest postPayMemberRequest) {
+    Long memberId = postPayMemberRequest.memberId();
+    PayMember payMember = getPayMember(memberId);
+    openBankingService.createOpenBankingMemberFromState(postPayMemberRequest.state(), payMember);
+  }
+
+  /**
+   * openAPI token
+   */
+  public GetAuthTokenResponse getAuthTokenResponse(GetAuthTokenRequest getAuthTokenRequest) {
+    return openBankingService.getAuthToken(getAuthTokenRequest);
+  }
+
+  /**
+   * openAPI 사용자 정보 조회
+   */
+  public GetUserMeResponse getUserMeResponse(String token, String user_seq_no) {
+    return openBankingService.getUserMeResponse(token, user_seq_no);
   }
 
   /**
@@ -69,7 +92,7 @@ public class PayMemberService {
     PayMember payMember = getPayMember(memberId);
     OpenBankingWithdrawRequest openBankingWithdrawRequest = createOpenBankingWithdrawRequest(
         payMember.getId(), payRequest);
-    OpenBankingResponse openBankingResponse = openBankingFacadeService.withdraw(
+    OpenBankingResponse openBankingResponse = openBankingService.withdraw(
         openBankingWithdrawRequest);
 
     int balanceMoney = addPayMemberMoney(payMember, payRequest);
@@ -78,11 +101,6 @@ public class PayMemberService {
         payMember);
 
     return PayResponse.from(openBankingResponse, balanceMoney);
-  }
-
-  private int addPayMemberMoney(PayMember payMember, PayRequest payRequest) {
-    int amount = payRequest.amount();
-    return payMember.addMoney(amount);
   }
 
   /**
@@ -98,7 +116,7 @@ public class PayMemberService {
     OpenBankingDepositRequest openBankingDepositRequestFromWithdraw = createOpenBankingDepositRequest(
         payMember.getId(), payRequest);
 
-    OpenBankingResponse openBankingResponse = openBankingFacadeService.deposit(
+    OpenBankingResponse openBankingResponse = openBankingService.deposit(
         openBankingDepositRequestFromWithdraw);
 
     int balanceMoney = minusPayMemberMoney(payMember, payRequest);
@@ -107,11 +125,6 @@ public class PayMemberService {
         payMember);
 
     return PayResponse.from(openBankingResponse, balanceMoney);
-  }
-
-  private int minusPayMemberMoney(PayMember payMember, PayRequest payRequest) {
-    int amount = payRequest.amount();
-    return payMember.minusMoney(amount);
   }
 
   // TODO : 비밀번호 입력 로직 추가
@@ -125,7 +138,7 @@ public class PayMemberService {
 
     OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest = createOpenBankingInquiryReceiveRequest(
         payMemberId, receiveRequest);
-    OpenBankingInquiryReceiveResponse openBankingInquiryReceiveResponse = openBankingFacadeService.inquiryReceive(
+    OpenBankingInquiryReceiveResponse openBankingInquiryReceiveResponse = openBankingService.inquiryReceive(
         openBankingInquiryReceiveRequest);
 
     GetConnectionAccountReceiveResponse getConnectionAccountReceiveResponse = connectionAccountDatabaseService.findIsMyAccountAndChargeAccountByReceiveRequest(
@@ -158,5 +171,15 @@ public class PayMemberService {
       ReceiveRequest receiveRequest) {
     return new OpenBankingInquiryReceiveRequest(payMemberId,
         receiveRequest.bankAccountNumber(), receiveRequest.bankCode());
+  }
+
+  private int minusPayMemberMoney(PayMember payMember, PayRequest payRequest) {
+    int amount = payRequest.amount();
+    return payMember.minusMoney(amount);
+  }
+
+  private int addPayMemberMoney(PayMember payMember, PayRequest payRequest) {
+    int amount = payRequest.amount();
+    return payMember.addMoney(amount);
   }
 }

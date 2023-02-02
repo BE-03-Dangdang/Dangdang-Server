@@ -1,11 +1,11 @@
 package com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto;
 
-import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
+import java.util.List;
 
-public record GetAllConnectionAccountResponse(String bankName, String connectionAccountNumber) {
+public record GetAllConnectionAccountResponse(List<AllConnectionAccount> allConnectionAccounts) {
 
-  public static GetAllConnectionAccountResponse from(ConnectionAccount connectionAccount) {
-    return new GetAllConnectionAccountResponse(connectionAccount.getBank(),
-        connectionAccount.getBankAccountNumber());
+  public static GetAllConnectionAccountResponse from(
+      List<AllConnectionAccount> allConnectionAccounts) {
+    return new GetAllConnectionAccountResponse(allConnectionAccounts);
   }
 }

@@ -13,7 +13,7 @@ import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.applica
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.ConnectionAccountRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
-import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetAllConnectionAccountResponse;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AllConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import java.util.List;
@@ -134,7 +134,7 @@ class ConnectionAccountDatabaseServiceTest {
 
           Long memberId = member.getId();
 
-          List<GetAllConnectionAccountResponse> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
+          List<AllConnectionAccount> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
               memberId);
 
           assertThat(allConnectionAccount).hasSize(allBankAccountSize);
@@ -150,7 +150,7 @@ class ConnectionAccountDatabaseServiceTest {
         void getZeroList() {
           Long memberId = member.getId();
 
-          List<GetAllConnectionAccountResponse> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
+          List<AllConnectionAccount> allConnectionAccount = connectionAccountDataBaseService.getAllConnectionAccount(
               memberId);
 
           assertThat(allConnectionAccount).isEmpty();

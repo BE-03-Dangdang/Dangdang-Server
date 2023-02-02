@@ -14,7 +14,7 @@ public enum TrustAccount {
     this.bank = bank;
   }
 
-  public Long getAccountId() {
-    return accountId;
+  public String getAccountNumber() {
+    return accountNumber;
   }
 }

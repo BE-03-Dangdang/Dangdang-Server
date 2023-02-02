@@ -20,14 +20,14 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResp
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.MinAmountException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application.PayUsageHistoryService;
 import com.dangdang.server.domain.pay.kftc.OpenBankingService;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingDepositRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveResponse;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingResponse;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingWithdrawRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveRequest;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -146,19 +146,21 @@ public class PayMemberService {
 
   private OpenBankingWithdrawRequest createOpenBankingWithdrawRequest(Long payMemberId,
       PayRequest payRequest) {
-    return new OpenBankingWithdrawRequest(payMemberId, OPEN_BANKING_CONTRACT_ACCOUNT.getAccountId(),
-        payRequest.bankAccountId(), payRequest.amount());
+    return new OpenBankingWithdrawRequest(payMemberId, payRequest.openBankingToken(),
+        OPEN_BANKING_CONTRACT_ACCOUNT.getAccountNumber(),
+        payRequest.bankAccountNumber(), payRequest.amount());
   }
 
   private OpenBankingDepositRequest createOpenBankingDepositRequest(Long payMemberId,
       PayRequest payRequest) {
-    return new OpenBankingDepositRequest(payMemberId, payRequest.bankAccountId(),
-        OPEN_BANKING_CONTRACT_ACCOUNT.getAccountId(), payRequest.amount());
+    return new OpenBankingDepositRequest(payMemberId, payRequest.openBankingToken(),
+        payRequest.bankAccountNumber(), OPEN_BANKING_CONTRACT_ACCOUNT.getAccountNumber(),
+        payRequest.amount());
   }
 
   private OpenBankingInquiryReceiveRequest createOpenBankingInquiryReceiveRequest(Long payMemberId,
       ReceiveRequest receiveRequest) {
-    return new OpenBankingInquiryReceiveRequest(payMemberId,
+    return new OpenBankingInquiryReceiveRequest(payMemberId, receiveRequest.openBankingToken(),
         receiveRequest.bankAccountNumber(), receiveRequest.bankCode());
   }
 

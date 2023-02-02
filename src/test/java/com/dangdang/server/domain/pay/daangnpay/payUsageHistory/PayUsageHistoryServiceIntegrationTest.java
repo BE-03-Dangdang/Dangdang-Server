@@ -10,8 +10,8 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.P
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application.PayUsageHistoryService;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.PayUsageHistoryRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.entity.PayUsageHistory;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingResponse;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.domain.BankType;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

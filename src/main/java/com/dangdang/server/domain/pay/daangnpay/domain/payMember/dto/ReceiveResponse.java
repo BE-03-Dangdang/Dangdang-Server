@@ -2,7 +2,7 @@ package com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto;
 
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetConnectionAccountReceiveResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.FeeInfo;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveResponse;
 
 public record ReceiveResponse(
     String receiveClientName,

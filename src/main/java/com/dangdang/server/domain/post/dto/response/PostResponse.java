@@ -18,13 +18,14 @@ public record PostResponse(
     Integer view,
     Boolean sharing,
     String townName,
-    StatusType statusType
+    StatusType statusType,
+    Integer likeCount
 ) {
 
   public static PostResponse from(Post post) {
     return new PostResponse(post.getId(), post.getTitle(), post.getContent(), post.getCategory(),
         post.getPrice(), post.getDesiredPlaceName(), post.getDesiredPlaceLongitude(),
         post.getDesiredPlaceLatitude(), post.getView(), post.getSharing(), post.getTownName(),
-        post.getStatus());
+        post.getStatus(), post.getLikeCount());
   }
 }

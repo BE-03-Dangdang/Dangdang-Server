@@ -53,9 +53,9 @@ public class PostController {
   public ResponseEntity<PostDetailResponse> savePost(
       @RequestBody PostSaveRequest postSaverequest, Authentication authentication) {
 
-    Member loginMember = (Member) authentication.getPrincipal();
+    Long memberId = ((Member) authentication.getPrincipal()).getId();
 
-    PostDetailResponse postDetailResponse = postService.savePost(postSaverequest, loginMember);
+    PostDetailResponse postDetailResponse = postService.savePost(postSaverequest, memberId);
 
     return ResponseEntity.created(URI.create("/posts/" + postDetailResponse.postId()))
         .body(postDetailResponse);

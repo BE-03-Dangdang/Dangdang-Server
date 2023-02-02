@@ -23,6 +23,7 @@ import com.dangdang.server.domain.post.dto.request.PostLikeRequest;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
 import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
+import com.dangdang.server.domain.post.dto.request.PostUpdateRequest;
 import com.dangdang.server.domain.post.dto.request.PostUpdateStatusRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
 import com.dangdang.server.domain.post.dto.response.PostSliceResponse;
@@ -49,7 +50,6 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final PostImageService postImageService;
-  ;
   private final LikesRepository likesRepository;
   private final MemberRepository memberRepository;
 
@@ -111,7 +111,7 @@ public class PostService {
     Post foundPost = postRepository.findPostDetailById(postId)
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 
-    List<String> imageUrls = postImageService.findPostImagesByPostId(postId);
+    List<String> imageUrls = postImageService.findImageUrlsByPostId(postId);
     return PostDetailResponse.from(foundPost, foundPost.getMember(), imageUrls);
   }
 
@@ -125,8 +125,24 @@ public class PostService {
     }
 
     post.changeStatus(postUpdateStatusRequest.status());
-    List<String> imageUrls = postImageService.findPostImagesByPostId(postId);
+    List<String> imageUrls = postImageService.findImageUrlsByPostId(postId);
     return PostDetailResponse.from(post, post.getMember(), imageUrls);
+  }
+
+  @Transactional
+  public PostDetailResponse updatePost(PostUpdateRequest postUpdateRequest, Member loginMember) {
+    Post foundPost = postRepository.findById(postUpdateRequest.id())
+        .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
+
+    if (loginMember.getId() != foundPost.getMemberId()) {
+      throw new MemberUnmatchedAuthorException(MEMBER_UNMATCH_AUTHOR);
+    }
+
+    List<String> imageUrls = postUpdateRequest.postImageRequest().urls();
+    postImageService.renewPostImage(foundPost, imageUrls);
+    foundPost.changePost(PostUpdateRequest.to(postUpdateRequest));
+
+    return PostDetailResponse.from(foundPost, foundPost.getMember(), imageUrls);
   }
 
   public PostsSliceResponse search(String query, PostSearchOptionRequest postSearchOption,

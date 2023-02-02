@@ -5,6 +5,7 @@ import static com.dangdang.server.global.exception.ExceptionCode.SLICE_PARAMETER
 
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.application.PostService;
+import com.dangdang.server.domain.post.dto.request.PostUpdateRequest;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostUpdateStatusRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,6 +89,16 @@ public class PostController {
 
     PostDetailResponse postDetailResponse = postService.updatePostStatus(postId,
         postUpdateStatusRequest, memberId);
+    return ResponseEntity.ok(postDetailResponse);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<PostDetailResponse> updatePost(@PathVariable("id") Long postId,
+      @RequestBody PostUpdateRequest postUpdateRequest, Authentication authentication) {
+
+    Member loginMember = (Member) authentication.getPrincipal();
+
+    PostDetailResponse postDetailResponse = postService.updatePost(postUpdateRequest, loginMember);
     return ResponseEntity.ok(postDetailResponse);
   }
 }

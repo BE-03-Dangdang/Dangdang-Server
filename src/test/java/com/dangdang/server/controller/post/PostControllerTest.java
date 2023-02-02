@@ -9,8 +9,10 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,6 +24,7 @@ import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.post.application.PostService;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
+import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
 import com.dangdang.server.domain.post.dto.request.PostUpdateStatusRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
 import com.dangdang.server.domain.postImage.dto.PostImageRequest;
@@ -32,6 +35,7 @@ import com.dangdang.server.global.exception.ExceptionCode;
 import com.dangdang.server.global.security.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,8 +50,11 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
@@ -114,7 +121,7 @@ class PostControllerTest {
             .header("AccessToken", accessToken)
             .content(objectMapper.writeValueAsString(new PostUpdateStatusRequest(
                 StatusType.valueOf(status)))))
-        .andDo(MockMvcResultHandlers.print())
+        .andDo(print())
         .andExpect(status().isOk())
         .andDo(document("post/api/patch/updateStatus",
             preprocessRequest(prettyPrint()),
@@ -170,7 +177,7 @@ class PostControllerTest {
             .content(objectMapper.writeValueAsString(postSaveRequest)))
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated())
-        .andDo(MockMvcResultHandlers.print())
+        .andDo(print())
         .andDo(document("post/api/post/save",
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
@@ -226,20 +233,30 @@ class PostControllerTest {
                 fieldWithPath("imageUrls").type(JsonFieldType.ARRAY)
                     .description("게시글 이미지 url 리스트").optional()))
         );
+  }
 
- @DisplayName("사용자는 게시글 메인 페이지에서 페이지네이션을 적용한 전체 게시글을 조회할 수 있다.")
+  @Test
+  @DisplayName("사용자는 게시글 메인 페이지에서 페이지네이션을 적용한 전체 게시글을 조회할 수 있다.")
   public void findAll() throws Exception {
     // given
-    LinkedMultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-    map.add("page", "0");
-    map.add("size", "10");
+    PostSliceRequest postSliceRequest = new PostSliceRequest(0, 10);
     // when
-    mockMvc.perform((MockMvcRequestBuilders.get("/posts")
-            .params(map)
+    mockMvc.perform((get("/posts?size=1&page=0")
             .contentType(MediaType.APPLICATION_JSON)
+            .header("AccessToken", accessToken)
+            .characterEncoding(StandardCharsets.UTF_8)
+        ))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(print())
+        .andDo(document("PostController/findAll",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint()),
+//            requestFields(
+//                fieldWithPath("size").type(JsonFieldType.NUMBER).description("한 페이지에 보여줄 사이즈"),
+//                fieldWithPath("page").type(JsonFieldType.NUMBER).description("페이지 번호")
+//            ),
             responseFields(
-                fieldWithPath("postSliceResponses[]").type(JsonFieldType.ARRAY)
-                    .description("게시글 반환 리스트"),
                 fieldWithPath("postSliceResponses[].id").type(JsonFieldType.NUMBER)
                     .description("글 번호"),
                 fieldWithPath("postSliceResponses[].title").type(JsonFieldType.STRING)
@@ -252,11 +269,35 @@ class PostControllerTest {
                     .description("상품 가격"),
                 fieldWithPath("postSliceResponses[].createdAt").type(JsonFieldType.STRING)
                     .description("글 생성일시"),
-                fieldWithPath("postSliceResponses[].likeCount").type(JsonFieldType.NUMBER)
-                    .description("좋아요 개수"),
                 fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 글 존재 여부")
             )
         ));
+  }
+
+  @Test
+  @DisplayName("사용자는 게시글을 검색 옵션을 사용해서 검색할 수 있다.")
+  public void search() throws Exception {
+    //given
+    String query = "지우개";
+    // when
+    MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+    paramMap.add("query", query);
+    paramMap.add("rangeLevel", "4");
+    paramMap.add("category", "생활가전,디지털기기");
+    paramMap.add("isTransactionAvailableOnly", "true");
+    paramMap.add("isTransactionAvailableOnly", "true");
+    paramMap.add("minPrice", "1000");
+    paramMap.add("page", "0");
+    paramMap.add("size", "10");
+
+    mockMvc.perform(get("/posts/search")
+            .queryParams(paramMap)
+            .header("AccessToken", accessToken))
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    //then
+
   }
 
   @Test
@@ -267,7 +308,7 @@ class PostControllerTest {
             .header("AccessToken", accessToken))
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andDo(MockMvcResultHandlers.print())
+        .andDo(print())
         .andDo(document("post/api/get/findById",
             preprocessResponse(prettyPrint()),
             requestHeaders(
@@ -307,7 +348,6 @@ class PostControllerTest {
                 fieldWithPath("imageUrls").type(JsonFieldType.ARRAY)
                     .description("게시글 이미지 url 리스트").optional()))
         );
-
   }
 
 }

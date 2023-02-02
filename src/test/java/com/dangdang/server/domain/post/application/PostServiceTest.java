@@ -10,15 +10,18 @@ import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.domain.PostRepository;
+import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
+import com.dangdang.server.domain.post.dto.request.PostUpdateRequest;
+import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
+import com.dangdang.server.domain.post.dto.response.PostResponse;
 import com.dangdang.server.domain.post.domain.entity.Post;
 import com.dangdang.server.domain.post.dto.request.PostLikeRequest;
-import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
 import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
-import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
 import com.dangdang.server.domain.post.dto.response.PostsSliceResponse;
 import com.dangdang.server.domain.post.exception.PostNotFoundException;
 import com.dangdang.server.domain.postImage.domain.PostImageRepository;
+import com.dangdang.server.domain.postImage.domain.entity.PostImage;
 import com.dangdang.server.domain.postImage.dto.PostImageRequest;
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
@@ -28,6 +31,7 @@ import com.dangdang.server.global.exception.UrlInValidException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -244,10 +248,10 @@ class PostServiceTest {
     entityManager.flush();
     entityManager.clear();
 
-    PostDetailResponse foundPost = postService.findPostDetailById(
+    PostDetailResponse foundPostDetailResponse = postService.findPostDetailById(
         savedPostDetailResponse.postResponse().id());
 
-    assertThat(foundPost.postResponse().likeCount()).isEqualTo(0);
+    assertThat(foundPostDetailResponse.postResponse().likeCount()).isEqualTo(0);
   }
 
   @Test
@@ -290,5 +294,55 @@ class PostServiceTest {
         new PostSliceRequest(0, 10));
     //then
     Assertions.assertThat(posts.getPostSliceResponses()).hasSizeGreaterThan(0);
+  }
+
+  @Test
+  @DisplayName("게시글을 수정할 수 있다.")
+  void updatePostTest() {
+    //given
+    Member newMember = new Member("테스트 멤버", "01012341234", "testImgUrl");
+    Member member = memberRepository.save(newMember);
+
+    PostImageRequest postImageRequest = new PostImageRequest(
+        Arrays.asList("http://s3.amazonaws.com/test1.png", "http://s3.amazonaws.com/test2.png"));
+
+    PostSaveRequest postSaveRequest = new PostSaveRequest("title1", "content1", Category.디지털기기,
+        1000, "천호동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "천호동",
+        postImageRequest);
+
+    PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest, member.getId());
+    PostResponse postResponse = savedPostResponse.postResponse();
+
+    String updateTitle = "updateTitle";
+    String updateContent = "updateContent";
+    Integer updatePrice = 2000;
+    Category updateCategory = Category.생활가전;
+    String updateDesiredPlaceName = "길거리";
+    BigDecimal updateLongitude = BigDecimal.valueOf(127.0000);
+    BigDecimal updateLatitude = BigDecimal.valueOf(36.0000);
+    String updateUrlOne = "http://s3.amazonaws.com/updateTest1";
+    String updateUrlTwo = "http://s3.amazonaws.com/updateTest2";
+    PostImageRequest updatePostImageRequest = new PostImageRequest(
+        Arrays.asList(updateUrlOne, updateUrlTwo));
+
+    //when
+    PostUpdateRequest postUpdateRequest = new PostUpdateRequest(postResponse.id(),
+        updateTitle, updateContent,
+        updateCategory, updatePrice,
+        updateDesiredPlaceName,
+        updateLongitude,
+        updateLatitude, false, updatePostImageRequest);
+
+    PostDetailResponse postDetailResponse = postService.updatePost(postUpdateRequest, member);
+
+    //then
+    PostDetailResponse resultPostDetail = postService.findPostDetailById(postResponse.id());
+
+    assertThat(postDetailResponse.postResponse()).usingRecursiveComparison()
+        .isEqualTo(resultPostDetail.postResponse());
+    List<String> imageUrls = postImageRepository.findPostImagesByPostId(postResponse.id())
+        .stream().map(
+            PostImage::getUrl).collect(Collectors.toList());
+    Assertions.assertThat(imageUrls).contains(updateUrlOne, updateUrlTwo);
   }
 }

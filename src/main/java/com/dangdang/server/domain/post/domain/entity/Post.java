@@ -104,6 +104,21 @@ public class Post extends BaseEntity {
     super.status = statusType;
   }
 
+  public Post(String title, String content, Category category, Integer price,
+      String desiredPlaceName,
+      BigDecimal desiredPlaceLongitude, BigDecimal desiredPlaceLatitude, Boolean sharing,
+      String imageUrl) {
+    this.title = title;
+    this.content = content;
+    this.category = category;
+    this.price = price;
+    this.desiredPlaceName = desiredPlaceName;
+    this.desiredPlaceLongitude = desiredPlaceLongitude;
+    this.desiredPlaceLatitude = desiredPlaceLatitude;
+    this.sharing = sharing;
+    this.imageUrl = imageUrl;
+  }
+
   public Long getMemberId() {
     return member.getId();
   }
@@ -119,8 +134,20 @@ public class Post extends BaseEntity {
   public void addLikes(Likes likes) {
     this.likes.add(likes);
   }
-  
+
   public void changeStatus(StatusType statusType) {
     this.status = statusType;
+  }
+
+  public void changePost(Post post) {
+    this.title = post.getTitle();
+    this.content = post.getContent();
+    this.category = post.getCategory();
+    this.price = post.getPrice();
+    this.desiredPlaceName = post.getDesiredPlaceName();
+    this.desiredPlaceLongitude = post.getDesiredPlaceLongitude();
+    this.desiredPlaceLatitude = post.getDesiredPlaceLatitude();
+    this.sharing = post.getSharing();
+    this.imageUrl = post.getImageUrl();
   }
 }

@@ -9,7 +9,14 @@ public record PostImageRequest(
     @JsonProperty List<String> urls
 ) {
 
+  private static final int REPRESENTATIVE_IMAGE_INDEX = 0;
+
   public static PostImage toPostImage(Post post, String url) {
     return new PostImage(post, url);
   }
+
+  public String representativeImage() {
+    return urls.get(REPRESENTATIVE_IMAGE_INDEX);
+  }
+
 }

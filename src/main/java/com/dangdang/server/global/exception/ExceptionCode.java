@@ -37,7 +37,10 @@ public enum ExceptionCode {
   POST_STATUS_IS_NULL(HttpStatus.BAD_REQUEST.value(), "글 상태값은 비어있을 수 없습니다."),
   SLICE_PARAMETER_UNDER_ZERO(HttpStatus.BAD_REQUEST.value(), "글 페이지, 사이즈는 음수일 수 없습니다."),
   STATUS_TYPE_MISMATCH(HttpStatus.BAD_REQUEST.value(), "일치하는 상태값이 없습니다."),
-  INVALID_POST_STATUS(HttpStatus.BAD_REQUEST.value(), "글 상태값에 적절한 값이 아닙니다.");
+  INVALID_POST_STATUS(HttpStatus.BAD_REQUEST.value(), "글 상태값에 적절한 값이 아닙니다."),
+
+  // token
+  INVALID_TOKEN(HttpStatus.UNAUTHORIZED.value(), "유효한 토큰 값이 아닙니다");
 
   private final int status;
   private final String message;

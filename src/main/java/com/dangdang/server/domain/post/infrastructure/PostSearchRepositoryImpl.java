@@ -20,6 +20,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
@@ -103,6 +104,7 @@ public class PostSearchRepositoryImpl {
           StatusType.SELLING);
       boolQueryBuilder.filter(transactionalOnlyBuilder);
     }
+
     return new NativeSearchQueryBuilder()
         .withQuery(boolQueryBuilder)
         .withPageable(pageable)

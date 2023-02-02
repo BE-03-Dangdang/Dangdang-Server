@@ -66,7 +66,7 @@ class ReviewServiceTest {
 
     ReviewRequest reviewRequest = new ReviewRequest(post.getId(), reviewee.getId(), "preference",
         "nicePoint", "content");
-    ReviewResponse reviewResponse = reviewService.saveReview(reviewRequest, reviewer);
+    ReviewResponse reviewResponse = reviewService.saveReview(reviewRequest, reviewer.getId());
 
     Review foundReview = reviewRepository.findById(reviewResponse.reviewId()).get();
     assertThat(foundReview.getId()).isEqualTo(reviewResponse.reviewId());
@@ -89,7 +89,7 @@ class ReviewServiceTest {
     ReviewRequest reviewRequest = new ReviewRequest(post.getId(), reviewee.getId(), "preference",
         "nicePoint", "content");
 
-    assertThatThrownBy(() -> reviewService.saveReview(reviewRequest, reviewer)).isInstanceOf(
+    assertThatThrownBy(() -> reviewService.saveReview(reviewRequest, reviewer.getId())).isInstanceOf(
         ReviewWrongAccessException.class);
   }
 }

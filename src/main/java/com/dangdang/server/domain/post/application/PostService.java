@@ -61,8 +61,8 @@ public class PostService {
   public PostService(PostRepository postRepository, PostImageService postImageService,
       MemberTownRepository memberTownRepository, TownService townService,
       UpdatedPostRepository updatedPostRepository,
-      PostSearchRepositoryImpl postSearchRepositoryImpl,
-      LikesRepository likesRepository, MemberRepository memberRepository) {
+      PostSearchRepositoryImpl postSearchRepositoryImpl, LikesRepository likesRepository,
+      MemberRepository memberRepository) {
     this.postRepository = postRepository;
     this.postImageService = postImageService;
     this.memberTownRepository = memberTownRepository;
@@ -130,11 +130,11 @@ public class PostService {
   }
 
   @Transactional
-  public PostDetailResponse updatePost(PostUpdateRequest postUpdateRequest, Member loginMember) {
+  public PostDetailResponse updatePost(PostUpdateRequest postUpdateRequest, Long loginMemberId) {
     Post foundPost = postRepository.findById(postUpdateRequest.id())
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 
-    if (loginMember.getId() != foundPost.getMemberId()) {
+    if (!loginMemberId.equals(foundPost.getMemberId())) {
       throw new MemberUnmatchedAuthorException(MEMBER_UNMATCH_AUTHOR);
     }
 
@@ -183,19 +183,17 @@ public class PostService {
   }
 
   @Transactional
-  public void clickLikes(PostLikeRequest postLikeRequest) {
-    Post foundPost = postRepository.findById(postLikeRequest.postId())
+  public void clickLikes(Long postId, Long memberId) {
+    Post foundPost = postRepository.findById(postId)
         .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
 
-    Member foundMember = memberRepository.findById(postLikeRequest.memberId())
+    Member foundMember = memberRepository.findById(memberId)
         .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
-    likesRepository.findByPostIdAndMemberId(
-            postLikeRequest.postId(), postLikeRequest.memberId())
-        .ifPresentOrElse(likes -> likesRepository.delete(likes),
-            () -> {
-              Likes saveLikes = likesRepository.save(new Likes(foundPost, foundMember));
-              saveLikes.addLikes();
-            });
+    likesRepository.findByPostIdAndMemberId(postId, memberId)
+        .ifPresentOrElse(likes -> likesRepository.delete(likes), () -> {
+          Likes saveLikes = likesRepository.save(new Likes(foundPost, foundMember));
+          saveLikes.addLikes();
+        });
   }
 }

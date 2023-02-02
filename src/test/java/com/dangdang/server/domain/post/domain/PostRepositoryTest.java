@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,10 +33,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
+@Rollback
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestInstance(Lifecycle.PER_CLASS)
 class PostRepositoryTest {
@@ -88,6 +91,9 @@ class PostRepositoryTest {
   }
 
   @Nested
+  @TestInstance(Lifecycle.PER_CLASS)
+  @Rollback
+  @Transactional
   @DisplayName("게시글 검색 테스트")
   class PostSearchTest {
 
@@ -126,7 +132,11 @@ class PostRepositoryTest {
         postRepository.save(post);
         postSearchRepository.save(PostSearch.from(UpdatedPost.from(post)));
       }
+    }
 
+    @Test
+    @DisplayName("게시글을 페이징 처리 할 수 있다.")
+    public void getAllPosts() throws Exception {
       //given
       List<Post> posts = postRepository.findAll();
       List<Long> adjacency = posts.stream().map(onePost -> onePost.getTown().getId())
@@ -304,6 +314,12 @@ class PostRepositoryTest {
         //then
         assertThat(posts.getContent()).hasSize(40);
       }
+    }
+
+    @AfterAll
+    void tearDownForSearch() {
+      postSearchRepository.deleteAll();
+
     }
   }
 }

@@ -136,8 +136,9 @@ public class MemberTownService {
     boolean isCertified = false;
     // 1. 현재 위도, 경도를 기준으로 Town list 조회
     List<AdjacentTownResponse> towns = townRepository.findAdjacentTownsByPoint(
+        memberTownCertifyRequest.latitude(),
         memberTownCertifyRequest.longitude(),
-        memberTownCertifyRequest.latitude(), MY_TOWN_CERTIFY_DISTANCE);
+        MY_TOWN_CERTIFY_DISTANCE);
     // 2. Active 로 설정한 동네가 list 안에 있는지 확인
     MemberTown activeMemberTown = memberTownRepository.findByMemberId(member.getId())
         .stream()

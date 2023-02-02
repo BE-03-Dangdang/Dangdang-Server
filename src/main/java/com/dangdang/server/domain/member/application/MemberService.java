@@ -139,7 +139,7 @@ public class MemberService {
   }
 
   @Transactional
-  public void logout(long memberId) {
+  public void logout(Long memberId) {
     Member member = memberRepository.findById(memberId)
         .orElseThrow(() -> new MemberNotFoundException(ExceptionCode.MEMBER_NOT_FOUND));
 

@@ -10,6 +10,7 @@ import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.domain.PostRepository;
+import com.dangdang.server.domain.post.domain.PostSearchRepository;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostUpdateRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
@@ -64,6 +65,8 @@ class PostServiceTest {
   PostImageRepository postImageRepository;
   @Autowired
   MemberTownRepository memberTownRepository;
+  @Autowired
+  PostSearchRepository postSearchRepository;
 
   @Autowired
   EntityManager entityManager;
@@ -100,7 +103,6 @@ class PostServiceTest {
         Category.디지털기기, 1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false,
         "서현동", postImageRequest);
     savedPostResponse = postService.savePost(postSaveRequest, this.member.getId());
-    postService.uploadToES();
   }
 
   @TestConfiguration
@@ -224,8 +226,7 @@ class PostServiceTest {
     setup();
     PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest,
         member.getId());
-    postService.clickLikes(
-        new PostLikeRequest(savedPostDetailResponse.postResponse().id(), member.getId()));
+    postService.clickLikes(savedPostDetailResponse.postResponse().id(), member.getId());
 
     PostDetailResponse foundDetailResponse = postService.findPostDetailById(
         savedPostDetailResponse.postId());
@@ -239,11 +240,9 @@ class PostServiceTest {
     setup();
     PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest,
         member.getId());
-    postService.clickLikes(
-        new PostLikeRequest(savedPostDetailResponse.postResponse().id(), member.getId()));
+    postService.clickLikes(savedPostDetailResponse.postResponse().id(), member.getId());
 
-    postService.clickLikes(
-        new PostLikeRequest(savedPostDetailResponse.postResponse().id(), member.getId()));
+    postService.clickLikes(savedPostDetailResponse.postResponse().id(), member.getId());
 
     entityManager.flush();
     entityManager.clear();
@@ -278,37 +277,33 @@ class PostServiceTest {
     assertThatThrownBy(
         () -> postService.findPostDetailById(savedPostResponse.postId())).isInstanceOf(
         UrlInValidException.class);
+    postSearchRepository.deleteById(savedPostResponse.postId());
   }
 
   @Test
   @DisplayName("검색어와 각종 파라미터를 사용해서 ES로 검색할 수 있다.")
   public void searchWithQueryAndOptionsES() throws Exception {
     setup();
+    postService.uploadToES();
+    Thread.sleep(1000);
+
     //given
     String query = "아메리카노";
     PostSearchOptionRequest postSearchOption = new PostSearchOptionRequest(List.of(Category.디지털기기),
-        0L, 40000L, 1, true);
+        0L, 40000L, 4, true);
 
     // when
     PostsSliceResponse posts = postService.search(query, postSearchOption, member.getId(),
         new PostSliceRequest(0, 10));
     //then
     Assertions.assertThat(posts.getPostSliceResponses()).hasSizeGreaterThan(0);
+    postSearchRepository.deleteAll();
   }
 
   @Test
   @DisplayName("게시글을 수정할 수 있다.")
   void updatePostTest() {
-    //given
-    Member newMember = new Member("테스트 멤버", "01012341234", "testImgUrl");
-    Member member = memberRepository.save(newMember);
-
-    PostImageRequest postImageRequest = new PostImageRequest(
-        Arrays.asList("http://s3.amazonaws.com/test1.png", "http://s3.amazonaws.com/test2.png"));
-
-    PostSaveRequest postSaveRequest = new PostSaveRequest("title1", "content1", Category.디지털기기,
-        1000, "천호동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "천호동",
-        postImageRequest);
+    setup();
 
     PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest, member.getId());
     PostResponse postResponse = savedPostResponse.postResponse();
@@ -333,7 +328,8 @@ class PostServiceTest {
         updateLongitude,
         updateLatitude, false, updatePostImageRequest);
 
-    PostDetailResponse postDetailResponse = postService.updatePost(postUpdateRequest, member);
+    PostDetailResponse postDetailResponse = postService.updatePost(postUpdateRequest,
+        member.getId());
 
     //then
     PostDetailResponse resultPostDetail = postService.findPostDetailById(postResponse.id());

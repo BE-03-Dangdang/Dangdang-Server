@@ -10,8 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface TownRepository extends JpaRepository<Town, Long> {
+
   Optional<Town> findByName(String townName);
-  
+
   @Query(value =
       """
           SELECT t.town_id as townId, t.name, 
@@ -22,8 +23,8 @@ public interface TownRepository extends JpaRepository<Town, Long> {
           HAVING distance <= :distanceLevel 
           ORDER BY name 
           """, nativeQuery = true)
-  List<AdjacentTownResponse> findAdjacentTownsByPoint(@Param("longitude") BigDecimal longitude,
-      @Param("latitude") BigDecimal latitude,
+  List<AdjacentTownResponse> findAdjacentTownsByPoint(@Param("latitude") BigDecimal latitude,
+      @Param("longitude") BigDecimal longitude,
       @Param("distanceLevel") int distanceLevel);
 
   @Query(value =

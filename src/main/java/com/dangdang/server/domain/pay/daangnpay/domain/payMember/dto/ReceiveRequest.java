@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
 public record ReceiveRequest(
+    String openBankingToken,
     @NotNull @Min(1)
     int depositAmount,
     @NotBlank

@@ -4,7 +4,7 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayType;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.PayUsageHistoryRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.domain.entity.PayUsageHistory;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

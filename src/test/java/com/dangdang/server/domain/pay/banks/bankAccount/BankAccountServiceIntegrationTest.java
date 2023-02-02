@@ -13,7 +13,7 @@ import com.dangdang.server.domain.pay.banks.bankAccount.exception.InactiveBankAc
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.InsufficientBankAccountException;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingWithdrawRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -25,11 +25,13 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
 @DisplayName("BankAccountService 통합 테스트")
+@ActiveProfiles("internal")
 class BankAccountServiceIntegrationTest {
 
   @Autowired
@@ -45,6 +47,7 @@ class BankAccountServiceIntegrationTest {
   BankAccount bankAccount;
   BankAccount bankAccountInactive;
   int beforeBankBalance = 1000;
+  String fintechUseNum = "128947";
 
   @BeforeEach
   void setUp() {
@@ -58,7 +61,7 @@ class BankAccountServiceIntegrationTest {
         StatusType.INACTIVE);
     bankAccountRepository.save(bankAccountInactive);
 
-    bankAccount = new BankAccount("11239847", "신한은행", 1000, payMember, "홍길동");
+    bankAccount = new BankAccount("1123967847", "신한은행", 1000, payMember, "홍길동");
     bankAccountRepository.save(bankAccount);
   }
 
@@ -78,7 +81,8 @@ class BankAccountServiceIntegrationTest {
         int result = balance - amountReq;
 
         OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-            payMember.getId(), 1L, bankAccount.getId(), amountReq);
+            payMember.getId(), null, fintechUseNum, "1111", bankAccount.getAccountNumber(),
+            amountReq);
 
         bankAccountService.withdraw(openBankingWithdrawRequest);
 
@@ -101,7 +105,8 @@ class BankAccountServiceIntegrationTest {
         @DisplayName("InactiveBankAccountException이 발생하고")
         void inactiveBankAccountException() {
           OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-              payMember.getId(), 1L, bankAccountInactive.getId(), 10000);
+              payMember.getId(), null, fintechUseNum, "1111",
+              bankAccountInactive.getAccountNumber(), 10000);
 
           assertThrows(InactiveBankAccountException.class,
               () -> bankAccountService.withdraw(openBankingWithdrawRequest));
@@ -127,7 +132,7 @@ class BankAccountServiceIntegrationTest {
         void bankAccountAuthenticationException() {
           Long payMemberIdReq = Long.MAX_VALUE;
           OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-              payMemberIdReq, 1L, bankAccount.getId(), 10000);
+              payMemberIdReq, null, fintechUseNum, "11231", bankAccount.getAccountNumber(), 10000);
 
           assertThrows(BankAccountAuthenticationException.class,
               () -> bankAccountService.withdraw(openBankingWithdrawRequest));
@@ -153,7 +158,8 @@ class BankAccountServiceIntegrationTest {
         void insufficientBankAccountException() {
           int amountReq = beforeBankBalance + 1000;
           OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-              payMember.getId(), 1L, bankAccount.getId(), amountReq);
+              payMember.getId(), null, fintechUseNum, "1111", bankAccount.getAccountNumber(),
+              amountReq);
 
           assertThrows(InsufficientBankAccountException.class,
               () -> bankAccountService.withdraw(openBankingWithdrawRequest));

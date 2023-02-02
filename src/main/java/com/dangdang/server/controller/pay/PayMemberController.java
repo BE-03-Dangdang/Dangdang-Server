@@ -45,7 +45,7 @@ public class PayMemberController {
     Member member = (Member) authentication.getPrincipal();
     return payMemberService.signup(password, member);
   }
-  
+
   /**
    * 당근머니 충전 API
    */

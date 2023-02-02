@@ -18,8 +18,8 @@ import com.dangdang.server.domain.pay.banks.trustAccount.exception.InactiveTrust
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.exception.InsufficientBankAccountException;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingWithdrawRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.application.OpenBankingFacadeService;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -31,11 +31,13 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
 @DisplayName("오픈뱅킹 API 통합테스트")
+@ActiveProfiles("internal")
 class OpenBankingFacadeServiceIntegrationTest {
 
   @Autowired
@@ -57,6 +59,8 @@ class OpenBankingFacadeServiceIntegrationTest {
   TrustAccount trustAccount;
   TrustAccount trustAccountInactive;
 
+  String fintechUseNum = "128947";
+
   @BeforeEach
   void setUp() {
     Member member = new Member("닉네임", "핸드폰");
@@ -65,7 +69,7 @@ class OpenBankingFacadeServiceIntegrationTest {
     payMember = new PayMember("password", member);
     payMemberRepository.save(payMember);
 
-    trustAccount = new TrustAccount("23947182", 100000, "당근페이_신탁");
+    trustAccount = new TrustAccount("257182", 100000, "당근페이_신탁");
     trustAccountInactive = new TrustAccount("23947182", 100000, "당근페이_신탁", StatusType.INACTIVE);
     trustAccountRepository.save(trustAccountInactive);
     trustAccountRepository.save(trustAccount);
@@ -101,7 +105,8 @@ class OpenBankingFacadeServiceIntegrationTest {
         int resultTrust = beforeTrustBalance + amountReq;
 
         OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-            payMember.getId(), trustAccount.getId(), bankAccount.getId(), amountReq);
+            payMember.getId(), null, fintechUseNum, trustAccount.getAccountNumber(),
+            bankAccount.getAccountNumber(), amountReq);
 
         openBankingFacadeService.withdraw(openBankingWithdrawRequest);
 
@@ -135,7 +140,8 @@ class OpenBankingFacadeServiceIntegrationTest {
           beforeTrustBalance = trustAccount.getBalance();
 
           OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-              payMember.getId(), trustAccount.getId(), zeroBankAccount.getId(), 10000);
+              payMember.getId(), null, fintechUseNum, trustAccount.getAccountNumber(),
+              zeroBankAccount.getAccountNumber(), 10000);
 
           assertThrows(InsufficientBankAccountException.class,
               () -> openBankingFacadeService.withdraw(openBankingWithdrawRequest));
@@ -173,7 +179,8 @@ class OpenBankingFacadeServiceIntegrationTest {
           beforeTrustBalance = trustAccount.getBalance();
 
           OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-              payMember.getId(), trustAccount.getId(), inactiveBankAccount.getId(), 10000);
+              payMember.getId(), null, fintechUseNum, trustAccount.getAccountNumber(),
+              inactiveBankAccount.getAccountNumber(), 10000);
 
           assertThrows(InactiveBankAccountException.class,
               () -> openBankingFacadeService.withdraw(openBankingWithdrawRequest));
@@ -203,7 +210,8 @@ class OpenBankingFacadeServiceIntegrationTest {
           beforeTrustBalance = trustAccount.getBalance();
 
           OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-              payMemberIdReq, trustAccount.getId(), bankAccount.getId(), 10000);
+              payMemberIdReq, null, fintechUseNum, trustAccount.getAccountNumber(),
+              bankAccount.getAccountNumber(), 10000);
 
           assertThrows(BankAccountAuthenticationException.class,
               () -> openBankingFacadeService.withdraw(openBankingWithdrawRequest));
@@ -232,7 +240,8 @@ class OpenBankingFacadeServiceIntegrationTest {
           beforeTrustBalance = trustAccountInactive.getBalance();
 
           OpenBankingWithdrawRequest openBankingWithdrawRequest = new OpenBankingWithdrawRequest(
-              payMember.getId(), trustAccountInactive.getId(), bankAccount.getId(), 10000);
+              payMember.getId(), null, fintechUseNum, trustAccountInactive.getAccountNumber(),
+              bankAccount.getAccountNumber(), 10000);
 
           assertThrows(InactiveTrustAccountException.class,
               () -> openBankingFacadeService.withdraw(openBankingWithdrawRequest));

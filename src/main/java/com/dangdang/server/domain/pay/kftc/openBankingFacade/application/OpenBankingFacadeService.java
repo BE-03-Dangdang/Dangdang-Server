@@ -7,14 +7,14 @@ import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiRe
 import com.dangdang.server.domain.pay.banks.trustAccount.application.TrustAccountService;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.kftc.OpenBankingService;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingDepositRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveResponse;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingResponse;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingWithdrawRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveRequest;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.exception.NotSupportedFunctionException;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
@@ -37,22 +37,6 @@ public class OpenBankingFacadeService implements OpenBankingService {
     this.trustAccountService = trustAccountService;
   }
 
-
-  @Override
-  public void createOpenBankingMemberFromState(String state, PayMember payMember) {
-    throw new NotSupportedFunctionException(NOT_SUPPORTED);
-  }
-
-  @Override
-  public GetAuthTokenResponse getAuthToken(GetAuthTokenRequest getAuthTokenRequest) {
-    throw new NotSupportedFunctionException(NOT_SUPPORTED);
-  }
-
-  @Override
-  public GetUserMeResponse getUserMeResponse(String token, String user_seq_no) {
-    throw new NotSupportedFunctionException(NOT_SUPPORTED);
-  }
-
   /**
    * 입금 이체
    */
@@ -62,7 +46,7 @@ public class OpenBankingFacadeService implements OpenBankingService {
     BankOpenBankingApiResponse bankOpenBankingApiResponse = bankAccountService.deposit(
         openBankingDepositRequest);
 
-    return OpenBankingResponse.of(openBankingDepositRequest.payMemberId(),
+    return OpenBankingResponse.ofInternal(openBankingDepositRequest.payMemberId(),
         bankOpenBankingApiResponse, LocalDateTime.now());
   }
 
@@ -75,7 +59,7 @@ public class OpenBankingFacadeService implements OpenBankingService {
         openBankingWithdrawRequest);
     trustAccountService.deposit(openBankingWithdrawRequest);
 
-    return OpenBankingResponse.of(openBankingWithdrawRequest.payMemberId(),
+    return OpenBankingResponse.ofInternal(openBankingWithdrawRequest.payMemberId(),
         bankOpenBankingApiResponse, LocalDateTime.now());
   }
 
@@ -91,6 +75,21 @@ public class OpenBankingFacadeService implements OpenBankingService {
         openBankingInquiryReceiveRequest.bankCode(), bankOpenBankingApiREsponse.bankName(),
         bankOpenBankingApiREsponse.clientName(), bankOpenBankingApiREsponse.accountNumber(),
         LocalDateTime.now());
+  }
+
+  @Override
+  public void createOpenBankingMemberFromState(String state, PayMember payMember) {
+    throw new NotSupportedFunctionException(NOT_SUPPORTED);
+  }
+
+  @Override
+  public GetAuthTokenResponse getAuthToken(GetAuthTokenRequest getAuthTokenRequest) {
+    throw new NotSupportedFunctionException(NOT_SUPPORTED);
+  }
+
+  @Override
+  public GetUserMeResponse getUserMeResponse(String token, String user_seq_no) {
+    throw new NotSupportedFunctionException(NOT_SUPPORTED);
   }
 
 }

@@ -62,6 +62,7 @@ class PayMemberControllerTest extends TestHelper {
   ObjectMapper objectMapper;
 
   String accessToken;
+  String bankAccountNumber = "12354324534";
 
   @BeforeEach
   void setUp() {
@@ -71,7 +72,7 @@ class PayMemberControllerTest extends TestHelper {
   @Test
   @DisplayName("당근머니 충전 API 성공")
   void charge() throws Exception {
-    PayRequest payRequest = new PayRequest(1L, 10000);
+    PayRequest payRequest = new PayRequest(null, bankAccountNumber, 10000);
     String json = objectMapper.writeValueAsString(payRequest);
     PayResponse payResponse = new PayResponse("신한은행", "234716230423", 20000, LocalDateTime.now());
 
@@ -94,8 +95,53 @@ class PayMemberControllerTest extends TestHelper {
                     headerWithName("AccessToken").description("jwt header")
                 ),
                 requestFields(
-                    fieldWithPath("bankAccountId").type(JsonFieldType.NUMBER)
-                        .description("bankAccountId"),
+                    fieldWithPath("openBankingToken").type(JsonFieldType.STRING)
+                        .description("openAPI 액세스 토큰").optional(),
+                    fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)
+                        .description("충전 계좌 번호"),
+                    fieldWithPath("amount").type(JsonFieldType.NUMBER).description("충전 금액")
+                ),
+                responseFields(
+                    fieldWithPath("bank").type(JsonFieldType.STRING).description("출금 계좌 은행명"),
+                    fieldWithPath("accountNumber").type(JsonFieldType.STRING)
+                        .description("출금 계좌번호"),
+                    fieldWithPath("money").type(JsonFieldType.NUMBER).description("당근머니 잔액"),
+                    fieldWithPath("createdAt").type(JsonFieldType.STRING).description("거래시간")
+                )
+            )
+        );
+  }
+
+  @Test
+  @DisplayName("당근머니 출금 API 성공")
+  void withdraw() throws Exception {
+    PayRequest payRequest = new PayRequest(null, bankAccountNumber, 10000);
+    String json = objectMapper.writeValueAsString(payRequest);
+    PayResponse payResponse = new PayResponse("신한은행", "234716230423", 20000, LocalDateTime.now());
+
+    doReturn(payResponse).when(payMemberService).withdraw(any(), any());
+
+    mockMvc.perform(
+            patch("/pay-members/money/withdraw")
+                .header("AccessToken", accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .content(json)
+        )
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "PayMemberController/charge",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("AccessToken").description("jwt header")
+                ),
+                requestFields(
+                    fieldWithPath("openBankingToken").type(JsonFieldType.STRING)
+                        .description("openAPI 액세스 토큰").optional(),
+                    fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)
+                        .description("출금 계좌 번호"),
                     fieldWithPath("amount").type(JsonFieldType.NUMBER).description("충전 금액")
                 ),
                 responseFields(
@@ -205,7 +251,7 @@ class PayMemberControllerTest extends TestHelper {
       @Test
       @DisplayName("BadRequest를 응답한다")
       void failInquiryReceiveTest() throws Exception {
-        ReceiveRequest receiveRequest = new ReceiveRequest(0, "231321", "097");
+        ReceiveRequest receiveRequest = new ReceiveRequest(null, 0, bankAccountNumber, "097");
         String json = objectMapper.writeValueAsString(receiveRequest);
         String message = BINDING_WRONG.getMessage();
 
@@ -232,7 +278,7 @@ class PayMemberControllerTest extends TestHelper {
       @NullAndEmptySource
       @DisplayName("BadRequest를 응답한다")
       void failInquiryReceiveTest(String input) throws Exception {
-        ReceiveRequest receiveRequest = new ReceiveRequest(0, input, input);
+        ReceiveRequest receiveRequest = new ReceiveRequest(null, 0, input, input);
         String json = objectMapper.writeValueAsString(receiveRequest);
         String message = BINDING_WRONG.getMessage();
 
@@ -258,7 +304,7 @@ class PayMemberControllerTest extends TestHelper {
       @Test
       @DisplayName("BadRequest를 응답한다")
       void failInquiryReceiveTest() throws Exception {
-        ReceiveRequest receiveRequest = new ReceiveRequest(0, "34143234", "4");
+        ReceiveRequest receiveRequest = new ReceiveRequest(null, 0, bankAccountNumber, "4");
         String json = objectMapper.writeValueAsString(receiveRequest);
         String message = BINDING_WRONG.getMessage();
 
@@ -284,7 +330,7 @@ class PayMemberControllerTest extends TestHelper {
       @Test
       @DisplayName("수취 조회 정보를 반환한다.")
       void successInquiryReceiveTest() throws Exception {
-        ReceiveRequest receiveRequest = new ReceiveRequest(10000, "328427", "097");
+        ReceiveRequest receiveRequest = new ReceiveRequest(null, 10000, bankAccountNumber, "097");
         String json = objectMapper.writeValueAsString(receiveRequest);
         ReceiveResponse receiveResponse = new ReceiveResponse("홍길동", false, "케이뱅크", "3274623",
             10000,
@@ -309,6 +355,8 @@ class PayMemberControllerTest extends TestHelper {
                         headerWithName("AccessToken").description("jwt header")
                     ),
                     requestFields(
+                        fieldWithPath("openBankingToken").type(JsonFieldType.STRING)
+                            .description("openAPI 액세스 토큰").optional(),
                         fieldWithPath("depositAmount").type(JsonFieldType.NUMBER)
                             .description("입금 요청 금액"),
                         fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)

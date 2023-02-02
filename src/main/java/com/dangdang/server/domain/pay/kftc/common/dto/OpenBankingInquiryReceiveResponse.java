@@ -1,4 +1,4 @@
-package com.dangdang.server.domain.pay.kftc.openBankingFacade.dto;
+package com.dangdang.server.domain.pay.kftc.common.dto;
 
 import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiResponse;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.domain.BankType;

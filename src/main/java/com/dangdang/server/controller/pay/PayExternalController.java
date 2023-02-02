@@ -1,10 +1,13 @@
 package com.dangdang.server.controller.pay;
 
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.application.PayMemberService;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayRequest;
+import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PayResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.PostPayMemberRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
+import com.dangdang.server.global.aop.CurrentUserId;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,4 +63,16 @@ public class PayExternalController {
       @RequestHeader(value = "Authorization") String token, @RequestParam String userSeqNo) {
     return payMemberService.getUserMeResponse(token, userSeqNo);
   }
+
+  /**
+   * 당근머니 충전
+   */
+  @CurrentUserId
+  @ResponseStatus(HttpStatus.OK)
+  @PostMapping("/transfer/withdraw/fin_num")
+  public PayResponse charge(Long memberId, @RequestBody PayRequest payRequest) {
+    return payMemberService.charge(memberId, payRequest);
+  }
+
+
 }

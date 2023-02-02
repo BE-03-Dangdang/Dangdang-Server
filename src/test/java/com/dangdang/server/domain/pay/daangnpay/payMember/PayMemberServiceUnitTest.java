@@ -14,8 +14,8 @@ import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.P
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.dto.ReceiveResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.payUsageHistory.application.PayUsageHistoryService;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveResponse;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.application.OpenBankingFacadeService;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PayMemberService 단위테스트")
-public class PayMemberDatabaseServiceUnitTest {
+public class PayMemberServiceUnitTest {
 
   @Spy
   @InjectMocks
@@ -42,7 +42,6 @@ public class PayMemberDatabaseServiceUnitTest {
   PayUsageHistoryService payUsageHistoryService;
   @Mock
   ConnectionAccountDatabaseService connectionAccountDatabaseService;
-
   int moneyBalance = 50000;
   int freeFeeCount = 0;
   PayMember payMember = new PayMember(moneyBalance, freeFeeCount);
@@ -53,7 +52,8 @@ public class PayMemberDatabaseServiceUnitTest {
 
     int depositAmountRequest = 10000;
 
-    ReceiveRequest receiveRequest = new ReceiveRequest(depositAmountRequest, "38471032472", "097");
+    ReceiveRequest receiveRequest = new ReceiveRequest(null, depositAmountRequest, "38471032472",
+        "097");
 
     @Test
     @DisplayName("수취 계좌 예금주명과 당근페이 연결계좌 여부, 충전 계좌 정보를 확인하고")

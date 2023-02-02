@@ -1,14 +1,14 @@
 package com.dangdang.server.domain.pay.kftc;
 
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingDepositRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveResponse;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingResponse;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingWithdrawRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveRequest;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
 import org.springframework.stereotype.Service;
 
 @Service

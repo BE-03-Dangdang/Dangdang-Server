@@ -27,7 +27,7 @@ public class SecurityConfig {
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return web -> web.ignoring()
-        .antMatchers("/**");
+        .antMatchers("/**")
         .antMatchers("/docs/**")
         .antMatchers("/dangdang-chat/**");
   }

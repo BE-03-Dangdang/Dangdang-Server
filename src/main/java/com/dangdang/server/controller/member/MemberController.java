@@ -76,6 +76,7 @@ public class MemberController {
       @RequestBody @Valid PhoneNumberVerifyRequest phoneNumberVerifyRequest) {
     Long memberId = memberService.phoneNumberVerify(phoneNumberVerifyRequest);
     return new PhoneNumberVerifyResponse(memberId);
+  }
 
   @PostMapping("/refresh")
   public ResponseEntity<MemberCertifyResponse> refresh(

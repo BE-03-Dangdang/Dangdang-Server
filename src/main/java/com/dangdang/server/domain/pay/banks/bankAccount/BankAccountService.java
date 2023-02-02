@@ -6,9 +6,9 @@ import com.dangdang.server.domain.pay.banks.bankAccount.domain.BankAccountReposi
 import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccount;
 import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiResponse;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveRequest;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingDepositRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingWithdrawRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,17 +23,17 @@ public class BankAccountService {
     this.bankAccountRepository = bankAccountRepository;
   }
 
-  public BankAccount findById(Long bankAccountId) {
-    return bankAccountRepository.findById(bankAccountId)
+  public BankAccount findByAccountNumber(String bankAccountNumber) {
+    return bankAccountRepository.findByAccountNumber(bankAccountNumber)
         .orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
   }
 
   @Transactional(propagation = Propagation.MANDATORY)
   public BankOpenBankingApiResponse withdraw(
       OpenBankingWithdrawRequest openBankingWithdrawRequest) {
-    Long fromBankAccountId = openBankingWithdrawRequest.fromBankAccountId();
+    String fromBankAccountNumber = openBankingWithdrawRequest.fromBankAccountNumber();
 
-    BankAccount bankAccount = findById(fromBankAccountId);
+    BankAccount bankAccount = findByAccountNumber(fromBankAccountNumber);
     bankAccount.withdraw(openBankingWithdrawRequest);
 
     return BankOpenBankingApiResponse.from(bankAccount);
@@ -41,9 +41,9 @@ public class BankAccountService {
 
   @Transactional(propagation = Propagation.MANDATORY)
   public BankOpenBankingApiResponse deposit(OpenBankingDepositRequest openBankingDepositRequest) {
-    Long toBankAccountId = openBankingDepositRequest.toBankAccountId();
+    String toBankAccountNumber = openBankingDepositRequest.toBankAccountNumber();
 
-    BankAccount bankAccount = findById(toBankAccountId);
+    BankAccount bankAccount = findByAccountNumber(toBankAccountNumber);
     bankAccount.deposit(openBankingDepositRequest);
 
     return BankOpenBankingApiResponse.from(bankAccount);

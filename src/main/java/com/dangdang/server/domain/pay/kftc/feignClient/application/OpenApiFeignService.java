@@ -5,6 +5,11 @@ import static com.dangdang.server.global.exception.ExceptionCode.OPEN_OAUTH_NOT_
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.exception.EmptyResultException;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import com.dangdang.server.domain.pay.kftc.OpenBankingService;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingDepositRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveRequest;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveResponse;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingResponse;
+import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingWithdrawRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.OpenApiFeignClient;
 import com.dangdang.server.domain.pay.kftc.feignClient.domain.OpenBankingMember;
 import com.dangdang.server.domain.pay.kftc.feignClient.domain.OpenBankingMemberRepository;
@@ -12,11 +17,9 @@ import com.dangdang.server.domain.pay.kftc.feignClient.dto.AuthTokenRequestPrope
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingDepositRequest;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveRequest;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingInquiryReceiveResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingResponse;
-import com.dangdang.server.domain.pay.kftc.openBankingFacade.dto.OpenBankingWithdrawRequest;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawRequest;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawResponse;
+import java.time.LocalDateTime;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,16 +84,36 @@ public class OpenApiFeignService implements OpenBankingService {
     return openApiFeignClient.getUserInfo(token, user_seq_no);
   }
 
+  /**
+   * 입금 이체
+   */
   @Override
   public OpenBankingResponse deposit(OpenBankingDepositRequest openBankingDepositRequest) {
     return null;
   }
 
+  /**
+   * 출금 이체
+   */
   @Override
   public OpenBankingResponse withdraw(OpenBankingWithdrawRequest openBankingWithdrawRequest) {
-    return null;
+    PostWithdrawRequest postWithdrawRequest = new PostWithdrawRequest(
+        openBankingWithdrawRequest.toTrustAccountNumber(), "당근페이",
+        openBankingWithdrawRequest.fintechUseNum(), openBankingWithdrawRequest.fintechUseNum(),
+        openBankingWithdrawRequest.amount().toString(), "20201001150133", "김오픈", "KIMOPEN1234",
+        "당당페이", "088", "34");
+
+    PostWithdrawResponse postWithdrawResponse = openApiFeignClient.withdraw(
+        openBankingWithdrawRequest.openBankingToken(), postWithdrawRequest);
+
+    return OpenBankingResponse.ofExternal(openBankingWithdrawRequest.payMemberId(),
+        openBankingWithdrawRequest.fromBankAccountNumber(), postWithdrawResponse,
+        LocalDateTime.now());
   }
 
+  /**
+   * 수취 조회
+   */
   @Override
   public OpenBankingInquiryReceiveResponse inquiryReceive(
       OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest) {

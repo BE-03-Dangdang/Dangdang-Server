@@ -1,6 +1,7 @@
-package com.dangdang.server.domain.pay.kftc.openBankingFacade.dto;
+package com.dangdang.server.domain.pay.kftc.common.dto;
 
 import com.dangdang.server.domain.pay.banks.bankAccount.dto.BankOpenBankingApiResponse;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawResponse;
 import com.dangdang.server.domain.pay.kftc.openBankingFacade.domain.BankType;
 import java.time.LocalDateTime;
 
@@ -8,11 +9,17 @@ public record OpenBankingResponse(Long payMemberId, String bankCode, String bank
                                   String accountNumber,
                                   LocalDateTime createdAt) {
 
-  public static OpenBankingResponse of(Long payMemberId,
+  public static OpenBankingResponse ofInternal(Long payMemberId,
       BankOpenBankingApiResponse bankOpenBankingApiResponse, LocalDateTime createdAt) {
     BankType bankType = BankType.from(bankOpenBankingApiResponse.bankName());
 
     return new OpenBankingResponse(payMemberId, bankType.getBankCode(), bankType.getBankName(),
         bankOpenBankingApiResponse.accountNumber(), createdAt);
+  }
+
+  public static OpenBankingResponse ofExternal(Long payMemberId, String accountNumber,
+      PostWithdrawResponse postWithdrawResponse, LocalDateTime createdAt) {
+    return new OpenBankingResponse(payMemberId, postWithdrawResponse.bank_code_std(),
+        postWithdrawResponse.bank_name(), accountNumber, createdAt);
   }
 }

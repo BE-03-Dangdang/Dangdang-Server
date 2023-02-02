@@ -26,11 +26,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @Transactional
 @SpringBootTest
 @DisplayName("당근페이 멤버 Service 통합테스트")
-class PayMemberDatabaseServiceIntegrationTest {
+@ActiveProfiles("internal")
+class PayMemberServiceIntegrationTest {
 
   static Member member;
   static List<BankAccount> bankAccounts;
@@ -78,21 +80,20 @@ class PayMemberDatabaseServiceIntegrationTest {
       PayResponse payResponse = null;
 
       for (BankAccount bankAccount : bankAccounts) {
-        Long bankAccountId = bankAccount.getId();
-        PayRequest payRequest = new PayRequest(bankAccountId, 1000);
+        String accountNumber = bankAccount.getAccountNumber();
+        PayRequest payRequest = new PayRequest(null, accountNumber, 1000);
 
         payResponse = payMemberService.withdraw(member.getId(),
             payRequest);
 
         assertThat(payResponse.bank()).isEqualTo(bankAccount.getBankName());
-        assertThat(payResponse.accountNumber()).isEqualTo(bankAccount.getAccountNumber());
+        assertThat(payResponse.accountNumber()).isEqualTo(accountNumber);
       }
 
       assert payResponse != null;
       assertThat(payResponse.money()).isEqualTo(payMemberMoney - (amountRequest * bankAccountSize));
     }
   }
-
 
   @Nested
   @DisplayName("당근머니를 충전하면")
@@ -103,8 +104,8 @@ class PayMemberDatabaseServiceIntegrationTest {
     void charge() {
       final int amountRequest = 10000;
       BankAccount bankAccount = bankAccounts.get(0);
-      Long bankAccountId = bankAccounts.get(0).getId();
-      PayRequest payRequest = new PayRequest(bankAccountId, amountRequest);
+      String accountNumber = bankAccount.getAccountNumber();
+      PayRequest payRequest = new PayRequest(null, accountNumber, amountRequest);
 
       PayResponse payResponse = payMemberService.charge(member.getId(), payRequest);
 
@@ -132,7 +133,7 @@ class PayMemberDatabaseServiceIntegrationTest {
         String bankCode = BankType.from(myBankAccount.getBankName()).getBankCode();
         int freeMonthlyFeeCount = payMember.getFreeMonthlyFeeCount();
 
-        ReceiveRequest receiveRequest = new ReceiveRequest(depositAmountRequest,
+        ReceiveRequest receiveRequest = new ReceiveRequest(null, depositAmountRequest,
             myBankAccount.getAccountNumber(), bankCode);
         ReceiveResponse receiveResponse = payMemberService.inquiryReceive(member.getId(),
             receiveRequest);
@@ -157,7 +158,7 @@ class PayMemberDatabaseServiceIntegrationTest {
 
         String bankCode = BankType.from(otherBankAccount.getBankName()).getBankCode();
 
-        ReceiveRequest receiveRequest = new ReceiveRequest(depositAmountRequest,
+        ReceiveRequest receiveRequest = new ReceiveRequest(null, depositAmountRequest,
             otherBankAccount.getAccountNumber(), bankCode);
         ReceiveResponse receiveResponse = payMemberService.inquiryReceive(member.getId(),
             receiveRequest);
@@ -189,7 +190,7 @@ class PayMemberDatabaseServiceIntegrationTest {
           String bankCode = BankType.from(bankAccount.getBankName()).getBankCode();
           int difference = calculateAutoChargeAmount();
 
-          ReceiveRequest receiveRequest = new ReceiveRequest(depositAmountRequest,
+          ReceiveRequest receiveRequest = new ReceiveRequest(null, depositAmountRequest,
               bankAccount.getAccountNumber(), bankCode);
           ReceiveResponse receiveResponse = payMemberService.inquiryReceive(member.getId(),
               receiveRequest);
@@ -209,7 +210,7 @@ class PayMemberDatabaseServiceIntegrationTest {
           depositAmountRequest = payMember.getMoney() + diff;
           String bankCode = BankType.from(bankAccount.getBankName()).getBankCode();
 
-          ReceiveRequest receiveRequest = new ReceiveRequest(depositAmountRequest,
+          ReceiveRequest receiveRequest = new ReceiveRequest(null, depositAmountRequest,
               bankAccount.getAccountNumber(), bankCode);
           ReceiveResponse receiveResponse = payMemberService.inquiryReceive(member.getId(),
               receiveRequest);

@@ -45,7 +45,7 @@ import org.springframework.validation.BindException;
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
 @Transactional
-class ConnectionAccountDatabaseControllerTest extends TestHelper {
+class ConnectionAccountControllerTest extends TestHelper {
 
   @MockBean
   ConnectionAccountDatabaseService connectionAccountDataBaseService;

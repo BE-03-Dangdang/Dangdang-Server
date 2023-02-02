@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/connection-accounts")
-public class ConnectionAccountDatabaseController {
+public class ConnectionAccountController {
 
   private final ConnectionAccountDatabaseService connectionAccountDataBaseService;
 
-  public ConnectionAccountDatabaseController(
+  public ConnectionAccountController(
       ConnectionAccountDatabaseService connectionAccountDataBaseService) {
     this.connectionAccountDataBaseService = connectionAccountDataBaseService;
   }

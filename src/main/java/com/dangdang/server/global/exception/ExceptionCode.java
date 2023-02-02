@@ -39,6 +39,8 @@ public enum ExceptionCode {
   SEARCH_KEYWORD_MUST_EXIST(HttpStatus.BAD_REQUEST.value(), "검색어는 필수 입력 항목입니다."),
   UPDATABLE_POST_NOT_EXIST(HttpStatus.NO_CONTENT.value(), "변경할 데이터가 없습니다."),
 
+  // token
+  INVALID_TOKEN(HttpStatus.UNAUTHORIZED.value(), "유효한 토큰 값이 아닙니다"),
 
   // membertown
   NO_ACTIVE_TOWN(HttpStatus.INTERNAL_SERVER_ERROR.value(), "활성화된 동네가 없습니다."),
@@ -46,9 +48,8 @@ public enum ExceptionCode {
   // review
   REVIEW_WRONG_ACCESS(HttpStatus.BAD_REQUEST.value(), "거래가 완료된 후에만 리뷰 작성이 가능합니다.");
 
-
-  int status;
-  String message;
+  private final int status;
+  private final String message;
 
   ExceptionCode(int status, String message) {
     this.status = status;

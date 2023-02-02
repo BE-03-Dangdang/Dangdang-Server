@@ -59,14 +59,14 @@ class ReviewServiceTest {
   @DisplayName("Review를 작성할 수 있다.")
   void saveReviewTest() {
     Post newPost = new Post("title1", "content1", Category.디지털기기, 10000, "desiredName1",
-        new BigDecimal("126.1111"), new BigDecimal("36.111111"), 0, false, reviewer, town,
-        null, StatusType.COMPLETED);
+        new BigDecimal("126.1111"), new BigDecimal("36.111111"), 0, false, reviewer, town, null,
+        StatusType.COMPLETED);
 
     post = postRepository.save(newPost);
 
-    ReviewRequest reviewRequest = new ReviewRequest(post.getId(), reviewer.getId(),
-        reviewee.getId(), "preference", "nicePoint", "content");
-    ReviewResponse reviewResponse = reviewService.saveReview(reviewRequest);
+    ReviewRequest reviewRequest = new ReviewRequest(post.getId(), reviewee.getId(), "preference",
+        "nicePoint", "content");
+    ReviewResponse reviewResponse = reviewService.saveReview(reviewRequest, reviewer);
 
     Review foundReview = reviewRepository.findById(reviewResponse.reviewId()).get();
     assertThat(foundReview.getId()).isEqualTo(reviewResponse.reviewId());
@@ -81,15 +81,15 @@ class ReviewServiceTest {
   @DisplayName("완료된 거래가 아니라면 ReviewWrongAccess예외를 던진다.")
   void WrongAccess() {
     Post newPost = new Post("title1", "content1", Category.디지털기기, 10000, "desiredName1",
-        new BigDecimal("126.1111"), new BigDecimal("36.111111"), 0, false, reviewer, town,
-        null, StatusType.SELLING);
+        new BigDecimal("126.1111"), new BigDecimal("36.111111"), 0, false, reviewer, town, null,
+        StatusType.SELLING);
 
     post = postRepository.save(newPost);
 
-    ReviewRequest reviewRequest = new ReviewRequest(post.getId(), reviewer.getId(),
-        reviewee.getId(), "preference", "nicePoint", "content");
+    ReviewRequest reviewRequest = new ReviewRequest(post.getId(), reviewee.getId(), "preference",
+        "nicePoint", "content");
 
-    assertThatThrownBy(() -> reviewService.saveReview(reviewRequest)).isInstanceOf(
+    assertThatThrownBy(() -> reviewService.saveReview(reviewRequest, reviewer)).isInstanceOf(
         ReviewWrongAccessException.class);
   }
 }

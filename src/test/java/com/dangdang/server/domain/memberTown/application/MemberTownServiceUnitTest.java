@@ -36,8 +36,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 class MemberTownServiceUnitTest {
 
-class MemberTownServiceUnitTest {
-
   @InjectMocks
   MemberTownService memberTownService;
 

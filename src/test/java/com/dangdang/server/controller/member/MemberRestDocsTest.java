@@ -54,15 +54,7 @@ class MemberRestDocsTest {
   @Autowired
   JwtTokenProvider jwtTokenProvider;
   @Autowired
-  RedisSendSmsRepository redisSendSmsRepository;
-
-  @AfterEach
-  void setup() {
-    redisSendSmsRepository.deleteAll();
-  }
-
   RedisSmsTenRepository redisSmsTenRepository;
-
 
   @Test
   @DisplayName("회원 가입 시 핸드폰 번호와 인증 번호로 요청함, 회원 가입이 되어 있지 않다면 Http 200 상태코드가 응답됨")

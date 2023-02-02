@@ -17,9 +17,9 @@ import com.dangdang.server.domain.memberTown.exception.MemberTownNotFoundExcepti
 import com.dangdang.server.domain.post.domain.PostRepository;
 import com.dangdang.server.domain.post.domain.UpdatedPostRepository;
 import com.dangdang.server.domain.post.domain.entity.Post;
-import com.dangdang.server.domain.post.dto.request.PostLikeRequest;
 import com.dangdang.server.domain.post.domain.entity.PostSearch;
 import com.dangdang.server.domain.post.domain.entity.UpdatedPost;
+import com.dangdang.server.domain.post.dto.request.PostLikeRequest;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
 import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
@@ -48,7 +48,7 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final PostImageService postImageService;
-  private final TownRepository townRepository;
+  ;
   private final LikesRepository likesRepository;
   private final MemberRepository memberRepository;
 
@@ -59,16 +59,15 @@ public class PostService {
 
   public PostService(PostRepository postRepository, PostImageService postImageService,
       MemberTownRepository memberTownRepository, TownService townService,
-      UpdatedPostRepository updatedPostRepository, PostSearchRepositoryImpl postSearchRepositoryImpl,
-      TownRepository townRepository, LikesRepository likesRepository,
-      MemberRepository memberRepository) {
+      UpdatedPostRepository updatedPostRepository,
+      PostSearchRepositoryImpl postSearchRepositoryImpl,
+      LikesRepository likesRepository, MemberRepository memberRepository) {
     this.postRepository = postRepository;
     this.postImageService = postImageService;
     this.memberTownRepository = memberTownRepository;
     this.townService = townService;
     this.updatedPostRepository = updatedPostRepository;
     this.postSearchRepositoryImpl = postSearchRepositoryImpl;
-    this.townRepository = townRepository;
     this.likesRepository = likesRepository;
     this.memberRepository = memberRepository;
   }
@@ -142,8 +141,10 @@ public class PostService {
     List<Long> adjacentTownIds = townService.findAdjacentTownWithRangeLevel(
         memberTown.getTownName(), String.valueOf(postSearchOption.rangeLevel()));
 
-    Slice<PostSearch> postSlice = postSearchRepositoryImpl.searchBySearchOptionSlice(query, postSearchOption,
-        adjacentTownIds, PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize() + 1, Sort.by("createdAt").descending()));
+    Slice<PostSearch> postSlice = postSearchRepositoryImpl.searchBySearchOptionSlice(query,
+        postSearchOption,
+        adjacentTownIds, PageRequest.of(postSliceRequest.getPage(), postSliceRequest.getSize() + 1,
+            Sort.by("createdAt").descending()));
     return PostsSliceResponse.of(
         postSlice.getContent().stream().map(PostSliceResponse::from).collect(Collectors.toList()),
         postSlice.hasNext());

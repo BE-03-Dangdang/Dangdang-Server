@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.dangdang.server.domain.common.StatusType;
-import com.dangdang.server.domain.likes.domain.LikesRepository;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
@@ -28,14 +27,13 @@ import com.dangdang.server.global.exception.ExceptionCode;
 import com.dangdang.server.global.exception.UrlInValidException;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.persistence.EntityManager;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -78,31 +76,28 @@ class PostServiceTest {
 
   @Autowired
   private SaveClassForViewUpdate saveClassForViewUpdate;
-  
+
   private PostDetailResponse savedPostResponse;
 
-  void setUp() {
-    Member newMember = new Member("01064083433", "yb");
-    member =memberRepository.save(newMember);
+  void setup() {
+    Member newMember = new Member("01077778888", "yb");
+    member = memberRepository.save(newMember);
     town = townRepository.findByName("천호동")
         .orElseThrow(() -> new TownNotFoundException(ExceptionCode.TOWN_NOT_FOUND));
 
-    MemberTown newMemberTown = new MemberTown(this.loginMember, town);
+    MemberTown newMemberTown = new MemberTown(this.member, town);
     memberTown = memberTownRepository.save(newMemberTown);
 
     PostImageRequest postImageRequest = new PostImageRequest(Arrays.asList(
         "https://" + bucketName + ".s3." + region + ".amazonaws.com/post-image/test2.png",
         "https://" + bucketName + ".s3." + region + ".amazonaws.com/post-image/test3.png"));
 
-    PostSaveRequest postSaveRequest = new PostSaveRequest("맛있는 커피팝니다.", "아메리카노가 단돈 1000원!",
+    postSaveRequest = new PostSaveRequest("맛있는 커피팝니다.", "아메리카노가 단돈 1000원!",
         Category.디지털기기, 1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false,
         "서현동", postImageRequest);
-    savedPostResponse = postService.savePost(postSaveRequest, this.loginMember.getId());
-    postService.uploadToES();
+    savedPostResponse = postService.savePost(postSaveRequest, this.member.getId());
+    //postService.uploadToES();
   }
-
-  @Autowired
-  private LikesRepository likeRepository;
 
   @TestConfiguration
   static class testConfig {
@@ -121,17 +116,23 @@ class PostServiceTest {
     MemberRepository memberRepository;
     @Autowired
     TownRepository townRepository;
+    @Autowired
+    MemberTownRepository memberTownRepository;
 
     Member innerMember;
     Town innerTown;
+    MemberTown innerMemberTown;
     Post innerPost;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Post save() {
-      innerMember = new Member("01033334444", "testImgUrl", "테스트 멤버");
+      innerMember = new Member("01045675544", "testImgUrl", "테스트 멤버");
       memberRepository.save(innerMember);
-      innerTown = new Town("테스트동2", null, null);
+      innerTown = townRepository.findByName("천호동").get();
       townRepository.save(innerTown);
+
+      MemberTown newMemberTown = new MemberTown(innerMember, innerTown);
+      innerMemberTown = memberTownRepository.save(newMemberTown);
 
       innerPost = new Post("title1", "content1", Category.디지털기기, 10000, "desiredName1",
           new BigDecimal("126.1111"), new BigDecimal("36.111111"), 0, false, innerMember, innerTown,
@@ -143,94 +144,9 @@ class PostServiceTest {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteAfterTest() {
       memberRepository.deleteById(innerMember.getId());
-      townRepository.deleteById(innerTown.getId());
+      memberTownRepository.deleteById(innerMemberTown.getId());
       postRepository.deleteById(innerPost.getId());
     }
-  }
-
-  void setup() {
-    Member newMember = new Member("테스트 멤버", "01012341234", "testImgUrl");
-    member = memberRepository.save(newMember);
-    Town newTown = new Town("서현동", null, null);
-    town = townRepository.save(newTown);
-
-    PostImageRequest postImageRequest = new PostImageRequest(Arrays.asList(
-        "https://" + bucketName + ".s3." + region + ".amazonaws.com/post-image/test2.png",
-        "https://" + bucketName + ".s3." + region + ".amazonaws.com/post-image/test3.png"));
-
-    postSaveRequest = new PostSaveRequest("title1", "content1", Category.디지털기기,
-        1000, "서현동 코지카페", BigDecimal.valueOf(123L), BigDecimal.valueOf(123L), false, "서현동",
-        postImageRequest);
-  }
-
-  @Test
-  @DisplayName("게시글을 작성할 수 있다.")
-  void postSaveTest() {
-    setup();
-    PostDetailResponse postDetailResponse = postService.savePost(postSaveRequest,
-        loginMember.getId());
-
-    PostDetailResponse foundPost = postService.findPostDetailById(postDetailResponse.getPostId());
-    assertThat(savedPostResponse.getPostResponse()).usingRecursiveComparison()
-        .isEqualTo(foundPost.getPostResponse());
-    assertThat(savedPostResponse.getMember()).usingRecursiveComparison()
-        .isEqualTo(foundPost.getMember());
-  }
-
-  @Test
-  @DisplayName("게시글 조회시 해당하는 id값이 없다면 PostNotFoundException이 발생한다.")
-  void findPostByIdInCorrect() {
-    Long wrongId = 9999L;
-
-    assertThatThrownBy(() -> postService.findPostDetailById(wrongId)).isInstanceOf(
-        PostNotFoundException.class);
-  }
-
-  @Test
-  @DisplayName("게시글을 상세 조회 할 수 있다.")
-  void findPostDetailById() {
-    setup();
-    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
-    PostDetailResponse foundPost = postService.findPostDetailById(
-        savedPostDetailResponse.postResponse().getId());
-
-    assertThat(foundPost).isNotNull();
-    assertThat(foundPost.imageUrls()).hasSize(2);
-    assertThat(foundPost.imageUrls()).usingRecursiveComparison();
-  }
-
-  @Test
-  @DisplayName("게시글을 상세 조회시 좋아요 횟수를 가져올 수 있다.")
-  void findPostDetailByIdV2() {
-    setup();
-    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
-    postService.clickLikes(
-        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
-
-    PostDetailResponse foundPost = postService.findPostDetailById(
-        savedPostDetailResponse.postResponse().getId());
-
-    assertThat(foundPost.postResponse().getLikeCount()).isEqualTo(1);
-  }
-
-  @Test
-  @DisplayName("게시글 좋아용를 이미 누른 유저가 한번 더 누른 경우 취소된다.")
-  void cancelLikes() {
-    setup();
-    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
-    postService.clickLikes(
-        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
-
-    postService.clickLikes(
-        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
-
-    entityManager.flush();
-    entityManager.clear();
-
-    PostDetailResponse foundPost = postService.findPostDetailById(
-        savedPostDetailResponse.postResponse().getId());
-
-    assertThat(foundPost.postResponse().getLikeCount()).isEqualTo(0);
   }
 
   @Test
@@ -262,13 +178,86 @@ class PostServiceTest {
   }
 
   @Test
+  @DisplayName("게시글을 작성할 수 있다.")
+  void postSaveTest() {
+    setup();
+    PostDetailResponse postDetailResponse = postService.savePost(postSaveRequest,
+        member.getId());
+
+    PostDetailResponse foundPostDetailResponse = postService.findPostDetailById(
+        postDetailResponse.getPostId());
+    assertThat(postDetailResponse.postResponse()).usingRecursiveComparison()
+        .isEqualTo(foundPostDetailResponse.postResponse());
+    assertThat(postDetailResponse.member()).usingRecursiveComparison()
+        .isEqualTo(foundPostDetailResponse.member());
+  }
+
+  @Test
+  @DisplayName("게시글 조회시 해당하는 id값이 없다면 PostNotFoundException이 발생한다.")
+  void findPostByIdInCorrect() {
+    Long wrongId = 9999L;
+
+    assertThatThrownBy(() -> postService.findPostDetailById(wrongId)).isInstanceOf(
+        PostNotFoundException.class);
+  }
+
+  @Test
+  @DisplayName("게시글을 상세 조회 할 수 있다.")
+  void findPostDetailById() {
+    setup();
+    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest,
+        member.getId());
+    PostDetailResponse foundPost = postService.findPostDetailById(
+        savedPostDetailResponse.postResponse().getId());
+
+    assertThat(foundPost).isNotNull();
+    assertThat(foundPost.imageUrls()).hasSize(2);
+    assertThat(foundPost.imageUrls()).usingRecursiveComparison();
+  }
+
+  @Test
+  @DisplayName("게시글을 상세 조회시 좋아요 횟수를 가져올 수 있다.")
+  void findPostDetailByIdV2() {
+    setup();
+    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest,
+        member.getId());
+    postService.clickLikes(
+        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
+
+    PostDetailResponse foundPost = postService.findPostDetailById(
+        savedPostDetailResponse.postResponse().getId());
+
+    assertThat(foundPost.postResponse().getLikeCount()).isEqualTo(1);
+  }
+
+  @Test
+  @DisplayName("게시글 좋아용를 이미 누른 유저가 한번 더 누른 경우 취소된다.")
+  void cancelLikes() {
+    setup();
+    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest,
+        member.getId());
+    postService.clickLikes(
+        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
+
+    postService.clickLikes(
+        new PostLikeRequest(savedPostDetailResponse.postResponse().getId(), member.getId()));
+
+    entityManager.flush();
+    entityManager.clear();
+
+    PostDetailResponse foundPost = postService.findPostDetailById(
+        savedPostDetailResponse.postResponse().getId());
+
+    assertThat(foundPost.postResponse().getLikeCount()).isEqualTo(0);
+  }
+
+  @Test
   @DisplayName("게시글을 상세 조회 시 열어볼 수 있는 이미지 링크를 제공할 수 있다.")
   void findPostDetailByIdOpenImageLink() {
     setup();
-    PostDetailResponse savedPostDetailResponse = postService.savePost(postSaveRequest, member);
-    
+
     PostDetailResponse foundPost = postService.findPostDetailById(savedPostResponse.getPostId());
-    Assertions.assertThat(foundPost.getImageUrls()).hasSize(2);
+    Assertions.assertThat(foundPost.imageUrls()).hasSize(2);
   }
 
   @Test
@@ -282,7 +271,7 @@ class PostServiceTest {
         wrongPostImageRequest);
 
     PostDetailResponse savedPostResponse = postService.savePost(postSaveRequest,
-        loginMember.getId());
+        member.getId());
 
     assertThatThrownBy(
         () -> postService.findPostDetailById(savedPostResponse.getPostId())).isInstanceOf(
@@ -299,7 +288,7 @@ class PostServiceTest {
         0L, 40000L, 1, true);
 
     // when
-    PostsSliceResponse posts = postService.search(query, postSearchOption, loginMember.getId(),
+    PostsSliceResponse posts = postService.search(query, postSearchOption, member.getId(),
         new PostSliceRequest(0, 10));
     //then
     Assertions.assertThat(posts.getPostSliceResponses()).hasSizeGreaterThan(0);

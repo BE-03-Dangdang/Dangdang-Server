@@ -1,29 +1,22 @@
 package com.dangdang.server.controller.post;
 
 import static com.dangdang.server.global.exception.ExceptionCode.POST_STATUS_IS_NULL;
-import static com.dangdang.server.global.exception.ExceptionCode.SLICE_PARAMETER_UNDER_ZERO;
 
 import com.dangdang.server.domain.member.domain.entity.Member;
 import com.dangdang.server.domain.post.application.PostService;
-import com.dangdang.server.domain.post.domain.Category;
-import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
+import com.dangdang.server.domain.post.dto.request.PostLikeRequest;
 import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
 import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
 import com.dangdang.server.domain.post.dto.request.PostUpdateStatusRequest;
 import com.dangdang.server.domain.post.dto.response.PostDetailResponse;
 import com.dangdang.server.domain.post.dto.response.PostsSliceResponse;
-import com.dangdang.server.domain.post.exception.MinParameterException;
 import com.dangdang.server.domain.post.exception.NullParameterException;
-import com.dangdang.server.domain.postImage.dto.PostImageRequest;
-import java.util.Collections;
-import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -79,5 +72,18 @@ public class PostController {
     PostsSliceResponse searchResult = postService.search(query, searchOption, memberId,
         postSliceRequest);
     return ResponseEntity.ok(searchResult);
+  }
+
+  @GetMapping("/{postId}")
+  public ResponseEntity<PostDetailResponse> findPostById(@PathVariable("postId") long postId) {
+    postService.viewUpdate(postId);
+    PostDetailResponse postDetailResponse = postService.findPostDetailById(postId);
+    return ResponseEntity.ok(postDetailResponse);
+  }
+
+  @PostMapping("/likes")
+  public ResponseEntity<Void> updatePostLike(@RequestBody PostLikeRequest postLikeRequest) {
+    postService.clickLikes(postLikeRequest);
+    return ResponseEntity.ok().build();
   }
 }

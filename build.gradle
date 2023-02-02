@@ -40,12 +40,8 @@ dependencies {
     implementation 'org.springframework.data:spring-data-elasticsearch'
     implementation("jakarta.json:jakarta.json-api:2.0.1")
 
-    //querydsl
-    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
-
     // mongodb
-    implementation ('org.springframework.boot:spring-boot-starter-data-mongodb')
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
 
     // S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'

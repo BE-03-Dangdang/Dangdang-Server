@@ -164,6 +164,9 @@ class PostControllerTest {
   @Test
   @DisplayName("게시글을 작성할 수 있다.")
   void savePostTest() throws Exception {
+    postService.uploadToES();
+    Thread.sleep(2000);
+    
     mockMvc.perform(
             post("/posts").header("AccessToken", accessToken).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(postSaveRequest)))

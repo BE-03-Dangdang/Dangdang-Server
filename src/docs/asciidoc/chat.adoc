@@ -1,0 +1,17 @@
+== 채팅방
+=== 채팅방 생성
+=== api/v1/chat-room
+
+.Request
+include::{snippets}/api/v1/post/chat-room/http-request.adoc[]
+
+.Response
+include::{snippets}/api/v1/post/chat-room/http-response.adoc[]
+
+=== 채팅방 조회
+.Request
+include::{snippets}/api/v1/get/chat-room/http-request.adoc[]
+include::{snippets}/api/v1/get/chat-room/request-headers.adoc[]
+
+.Response
+include::{snippets}/api/v1/get/chat-room/http-response.adoc[]

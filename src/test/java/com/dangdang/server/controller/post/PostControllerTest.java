@@ -23,6 +23,7 @@ import com.dangdang.server.domain.memberTown.domain.MemberTownRepository;
 import com.dangdang.server.domain.memberTown.domain.entity.MemberTown;
 import com.dangdang.server.domain.post.application.PostService;
 import com.dangdang.server.domain.post.domain.Category;
+import com.dangdang.server.domain.post.domain.PostSearchRepository;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostSliceRequest;
 import com.dangdang.server.domain.post.dto.request.PostUpdateRequest;
@@ -50,6 +51,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -230,7 +232,9 @@ class PostControllerTest {
                 .params(map).characterEncoding(StandardCharsets.UTF_8)))
         .andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
         .andDo(print()).andDo(document("PostController/findAll", preprocessRequest(prettyPrint()),
-            preprocessResponse(prettyPrint()), responseFields(
+            preprocessResponse(prettyPrint()),
+            requestHeaders(headerWithName("AccessToken").description("Access Token")),
+            responseFields(
                 fieldWithPath("postSliceResponses[]").type(JsonFieldType.ARRAY)
                     .description("게시글 조회 결과 배열").optional(),
                 fieldWithPath("postSliceResponses[].id").type(JsonFieldType.NUMBER).description("글 번호")
@@ -253,7 +257,11 @@ class PostControllerTest {
   @DisplayName("사용자는 게시글을 검색 옵션을 사용해서 검색할 수 있다.")
   public void search() throws Exception {
     //given
-    String query = "지우개";
+    postService.uploadToES();
+    String query = "테스트";
+
+    Thread.sleep(2000);
+
     // when
     MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
     paramMap.add("query", query);
@@ -266,8 +274,10 @@ class PostControllerTest {
 
     mockMvc.perform(get("/posts/search").queryParams(paramMap).header("AccessToken", accessToken))
         .andDo(print()).andExpect(status().isOk()).andDo(print()).andDo(
-            document("PostController/findAll", preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()), responseFields(
+            document("PostController/search", preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(headerWithName("AccessToken").description("Access Token")),
+                responseFields(
                     fieldWithPath("postSliceResponses[]").type(JsonFieldType.ARRAY)
                         .description("게시글 조회 결과 배열").optional(),
                     fieldWithPath("postSliceResponses[].id").type(JsonFieldType.NUMBER)
@@ -299,7 +309,8 @@ class PostControllerTest {
             .header("AccessToken", accessToken))
         .andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
         .andDo(print()).andDo(document("post/api/get/findById", preprocessResponse(prettyPrint()),
-            requestHeaders(headerWithName("AccessToken").description("Access Token")), responseFields(
+            requestHeaders(headerWithName("AccessToken").description("Access Token")),
+            responseFields(
                 fieldWithPath("postResponse.id").type(JsonFieldType.NUMBER).description("게시글 식별자"),
                 fieldWithPath("postResponse.title").type(JsonFieldType.STRING).description("게시글 제목"),
                 fieldWithPath("postResponse.content").type(JsonFieldType.STRING).description("게시글 내용"),

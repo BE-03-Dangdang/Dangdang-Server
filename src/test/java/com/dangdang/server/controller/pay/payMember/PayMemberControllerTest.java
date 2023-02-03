@@ -441,7 +441,6 @@ class PayMemberControllerTest extends TestHelper {
                         fieldWithPath("feeAmount").type(JsonFieldType.NUMBER).description("수수료 금액"),
                         fieldWithPath("freeMonthlyFeeCount").type(JsonFieldType.NUMBER)
                             .description("남은 무료 수수료 횟수"),
-                        fieldWithPath("feeAmount").type(JsonFieldType.NUMBER).description("수수료 금액"),
                         fieldWithPath("balanceMoney").type(JsonFieldType.NUMBER)
                             .description("당근머니 잔액")
                     )

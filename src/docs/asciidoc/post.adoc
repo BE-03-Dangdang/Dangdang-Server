@@ -48,7 +48,7 @@ include::{snippets}/post/api/get/findById/response-fields.adoc[]
 
 === 게시글 상태값 변경
 
-=== /api/v1/posts/status/{id}
+=== /api/v1/posts/{id}/status
 
 .Request
 include::{snippets}/post/api/patch/updateStatus/http-request.adoc[]

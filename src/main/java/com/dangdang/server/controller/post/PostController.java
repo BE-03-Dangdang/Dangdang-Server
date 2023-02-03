@@ -72,12 +72,13 @@ public class PostController {
 
   @GetMapping("/{id}")
   public ResponseEntity<PostDetailResponse> findPostDetailById(@PathVariable("id") long postId) {
+    postService.viewUpdate(postId);
     PostDetailResponse postDetailResponse = postService.findPostDetailById(postId);
     return ResponseEntity.ok(postDetailResponse);
   }
 
   @CurrentUserId
-  @PatchMapping("/status/{id}")
+  @PatchMapping("/{id}/status")
   public ResponseEntity<PostDetailResponse> updatePostStatus(
       @PathVariable("id") long postId,
       @RequestBody @Valid PostUpdateStatusRequest postUpdateStatusRequest,
@@ -111,13 +112,12 @@ public class PostController {
   }
 
   @CurrentUserId
-  @PatchMapping("/likes/{id}")
+  @PatchMapping("/{id}/likes")
   public ResponseEntity<Void> updateLikes(@PathVariable("id") Long postId,
       Long memberId) {
 
     postService.clickLikes(postId, memberId);
 
     return ResponseEntity.ok().build();
-
   }
 }

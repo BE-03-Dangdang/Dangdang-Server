@@ -9,6 +9,8 @@ import com.dangdang.server.domain.chatroom.dto.request.ChatRoomSaveRequest;
 import com.dangdang.server.domain.chatroom.dto.response.ChatRoomsResponse;
 import com.dangdang.server.domain.member.domain.MemberRepository;
 import com.dangdang.server.domain.member.domain.entity.Member;
+import com.dangdang.server.domain.message.domain.MessageRepository;
+import com.dangdang.server.domain.message.domain.entity.Message;
 import com.dangdang.server.domain.post.domain.Category;
 import com.dangdang.server.domain.post.domain.PostRepository;
 import com.dangdang.server.domain.post.domain.entity.Post;
@@ -39,6 +41,9 @@ class ChatRoomServiceTest {
 
   @Autowired
   PostRepository postRepository;
+
+  @Autowired
+  MessageRepository messageRepository;
 
 
   @Test
@@ -89,12 +94,6 @@ class ChatRoomServiceTest {
   @Test
   @DisplayName("채팅방 조회 성공")
   void findChatRooms_success() {
-    // chatRoom 생성 필요
-    // 1. member 2명 생성 필요
-    // 2. post 생성 필요 -> town 생성 필요
-
-    // 3. buyer 달리해서 ChatRoom 만들기
-
     Member buyer1 = new Member("01012345677", "buyer1");
     Member buyer2 = new Member("01012345678", "buyer2");
     Member buyer3 = new Member("01012345679", "buyer3");
@@ -116,9 +115,20 @@ class ChatRoomServiceTest {
     ChatRoom chatRoom2 = new ChatRoom(buyer2, seller, post);
     ChatRoom chatRoom3 = new ChatRoom(buyer3, seller, post);
 
+
+    Message message1 = new Message(chatRoom1, buyer1.getNickname(), "안녕하세요! 맥북 air 있나요?");
+    Message message2 = new Message(chatRoom2, buyer2.getNickname(), "안녕하세요! 맥북 pro 있나요?");
+    Message message3 = new Message(chatRoom3, buyer3.getNickname(), "안녕하세요! 아이폰 있나요?");
+
+    chatRoom1.getMessageList().add(message1);
+    chatRoom2.getMessageList().add(message2);
+    chatRoom3.getMessageList().add(message3);
+
+
     chatRoomRepository.save(chatRoom1);
     chatRoomRepository.save(chatRoom2);
     chatRoomRepository.save(chatRoom3);
+
 
     // when
     ChatRoomsResponse chatRoomsResponse = chatRoomService.findChatRooms(savedSeller.getId());

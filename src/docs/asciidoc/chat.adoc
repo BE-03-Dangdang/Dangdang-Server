@@ -9,9 +9,21 @@ include::{snippets}/api/v1/post/chat-room/http-request.adoc[]
 include::{snippets}/api/v1/post/chat-room/http-response.adoc[]
 
 === 채팅방 조회
+=== api/v1/chat-room
 .Request
 include::{snippets}/api/v1/get/chat-room/http-request.adoc[]
 include::{snippets}/api/v1/get/chat-room/request-headers.adoc[]
 
 .Response
 include::{snippets}/api/v1/get/chat-room/http-response.adoc[]
+
+== 채팅방 메세지
+=== 채팅방 메세지 조회
+=== api/v1/chat-room/{room_id}
+
+.Request
+include::{snippets}/api/v1/get/chat-room/message/http-request.adoc[]
+include::{snippets}/api/v1/get/chat-room/message/request-headers.adoc[]
+
+.Response
+include::{snippets}/api/v1/get/chat-room/message/http-response.adoc[]

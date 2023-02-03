@@ -48,7 +48,10 @@ public enum ExceptionCode {
   NO_ACTIVE_TOWN(HttpStatus.INTERNAL_SERVER_ERROR.value(), "활성화된 동네가 없습니다."),
 
   // review
-  REVIEW_WRONG_ACCESS(HttpStatus.BAD_REQUEST.value(), "거래가 완료된 후에만 리뷰 작성이 가능합니다.");
+  REVIEW_WRONG_ACCESS(HttpStatus.BAD_REQUEST.value(), "거래가 완료된 후에만 리뷰 작성이 가능합니다."),
+
+  // chat
+  CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "채팅방을 찾지 못하였습니다");
 
   private final int status;
   private final String message;

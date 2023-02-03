@@ -132,7 +132,7 @@ class PayMemberControllerTest extends TestHelper {
         .andExpect(status().isOk())
         .andDo(
             document(
-                "PayMemberController/charge",
+                "PayMemberController/withdraw",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 requestHeaders(

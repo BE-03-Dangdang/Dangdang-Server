@@ -23,7 +23,7 @@ operation::PayMemberController/charge[snippets='http-request,request-headers,htt
 [[PayMember-당근머니-출금]]
 === PayMember 당근머니 출금
 
-operation::PayMemberController/charge[snippets='http-request,request-headers,http-response,response-fields']
+operation::PayMemberController/withdraw[snippets='http-request,request-headers,http-response,response-fields']
 
 [[PayMember-수취조회]]
 === PayMember 수취 조회

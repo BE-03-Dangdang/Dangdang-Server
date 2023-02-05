@@ -9,6 +9,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -38,7 +39,7 @@ public class ChatRoom extends BaseEntity {
   @JoinColumn(name = "post_id")
   private Post post;
 
-  @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL ,fetch = FetchType.EAGER)
   List<Message> messageList = new ArrayList<>();
 
   protected ChatRoom() {

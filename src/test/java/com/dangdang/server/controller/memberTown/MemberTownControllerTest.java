@@ -71,7 +71,6 @@ class MemberTownControllerTest {
   Member member;
   String accessToken;
 
-
   @BeforeEach
   void setup() {
     member = new Member("01012345678", null, "Albatross");

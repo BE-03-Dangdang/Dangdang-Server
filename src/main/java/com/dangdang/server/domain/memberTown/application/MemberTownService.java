@@ -43,16 +43,16 @@ public class MemberTownService {
 
 
   @Transactional
-  public MemberTownResponse createMemberTown(MemberTownRequest memberTownRequest, Member member) {
+  public MemberTownResponse createMemberTown(MemberTownRequest memberTownRequest, Long memberId) {
 
     // 반드시 memberTown 개수가 1인 경우에만 추가 가능
-    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(member.getId());
+    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(memberId);
     if (memberTownList.size() != 1) {
       throw new NotAppropriateCountException(ExceptionCode.NOT_APPROPRIATE_COUNT);
     }
 
     Town foundTown = getTownByTownName(memberTownRequest.townName());
-    Member foundMember = getMemberByMemberId(member.getId());
+    Member foundMember = getMemberByMemberId(memberId);
 
     MemberTown memberTown = new MemberTown(foundMember, foundTown);
 
@@ -65,9 +65,9 @@ public class MemberTownService {
   }
 
   @Transactional
-  public void deleteMemberTown(MemberTownRequest memberTownRequest, Member member) {
+  public void deleteMemberTown(MemberTownRequest memberTownRequest, Long memberId) {
     // MemberTown 이 2개 있어야만 삭제가 가능하다
-    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(member.getId());
+    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(memberId);
     if (memberTownList.size() != 2) {
       throw new NotAppropriateCountException(ExceptionCode.NOT_APPROPRIATE_COUNT);
     }
@@ -93,12 +93,11 @@ public class MemberTownService {
   }
 
   @Transactional
-  public MemberTownResponse changeActiveMemberTown(MemberTownRequest memberTownRequest,
-      Member member) {
+  public MemberTownResponse changeActiveMemberTown(MemberTownRequest memberTownRequest, Long memberId) {
     // 상대편은 Inactive, 입력 들어오면 Active
     // member 가 DB에 저장될 때 id를 반드시 가지고 있어야 한다
     // 이 메서드는 front 코드에서 모두 2개의 값이 있을 때 활성화 되야 함
-    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(member.getId());
+    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(memberId);
     if (memberTownList.size() != 2) {
       throw new NotAppropriateCountException(ExceptionCode.NOT_APPROPRIATE_COUNT);
     }
@@ -115,8 +114,8 @@ public class MemberTownService {
 
   @Transactional
   public MemberTownRangeResponse changeMemberTownRange(
-      MemberTownRangeRequest memberTownRangeRequest, Member member) {
-    Member foundMember = getMemberByMemberId(member.getId());
+      MemberTownRangeRequest memberTownRangeRequest, Long memberId) {
+    Member foundMember = getMemberByMemberId(memberId);
     Town foundTown = getTownByTownName(memberTownRangeRequest.townName());
 
     MemberTown foundMemberTown = memberTownRepository
@@ -132,7 +131,7 @@ public class MemberTownService {
 
   @Transactional
   public MemberTownCertifyResponse certifyMemberTown(
-      MemberTownCertifyRequest memberTownCertifyRequest, Member member) {
+      MemberTownCertifyRequest memberTownCertifyRequest, Long memberId) {
     boolean isCertified = false;
     // 1. 현재 위도, 경도를 기준으로 Town list 조회
     List<AdjacentTownResponse> towns = townRepository.findAdjacentTownsByPoint(
@@ -140,7 +139,7 @@ public class MemberTownService {
         memberTownCertifyRequest.longitude(),
         MY_TOWN_CERTIFY_DISTANCE);
     // 2. Active 로 설정한 동네가 list 안에 있는지 확인
-    MemberTown activeMemberTown = memberTownRepository.findByMemberId(member.getId())
+    MemberTown activeMemberTown = memberTownRepository.findByMemberId(memberId)
         .stream()
         .filter(memberTown -> memberTown.getStatus() == StatusType.ACTIVE)
         .findFirst()

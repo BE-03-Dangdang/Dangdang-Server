@@ -1,6 +1,6 @@
 package com.dangdang.server.domain.message.dto;
 
-public record ChatMessage(Long chatRoomId, Long senderId, String message) {
+public record ChatMessage(Long chatRoomId, String senderNickName, String message) {
 
 }
 

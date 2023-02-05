@@ -90,4 +90,5 @@ public class ChatRoomService {
 
     return new ChatRoomsResponse(chatRoomResponseList);
   }
+
 }

@@ -1,0 +1,19 @@
+:hardbreaks:
+:doctype: book
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+[[Sms-API]]
+= Sms API
+
+[[Member-인증]]
+== Sms signupCertify
+=== Request
+include::{snippets}/SmsController/sendMessage/http-request.adoc[]
+=== Request body
+include::{snippets}/SmsController/sendMessage/request-body.adoc[]
+=== Response
+include::{snippets}/SmsController/sendMessage/http-response.adoc[]
+=== Response body
+include::{snippets}/SmsController/sendMessage/response-body.adoc[]

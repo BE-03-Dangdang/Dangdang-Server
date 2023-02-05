@@ -33,7 +33,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-
 class MemberTownServiceUnitTest {
 
   @InjectMocks
@@ -67,7 +66,7 @@ class MemberTownServiceUnitTest {
 
     // when
     MemberTownResponse memberTownResponse = memberTownService.createMemberTown(memberTownRequest,
-        member);
+        1L);
 
     // then
     assertThat(memberTownResponse.townName()).isEqualTo("공릉2동");
@@ -88,7 +87,7 @@ class MemberTownServiceUnitTest {
         .thenReturn(Collections.emptyList());
 
     // when, then
-    assertThatThrownBy(() -> memberTownService.createMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.createMemberTown(memberTownRequest, 1L))
         .isInstanceOf(NotAppropriateCountException.class);
   }
 
@@ -103,7 +102,7 @@ class MemberTownServiceUnitTest {
     when(townRepository.findByName(any())).thenReturn(Optional.empty());
 
     // when, then
-    assertThatThrownBy(() -> memberTownService.createMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.createMemberTown(memberTownRequest, 1L))
         .isInstanceOf(TownNotFoundException.class);
   }
 
@@ -123,7 +122,7 @@ class MemberTownServiceUnitTest {
     when(memberRepository.findById(any())).thenReturn(Optional.empty());
 
     // when, then
-    assertThatThrownBy(() -> memberTownService.createMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.createMemberTown(memberTownRequest, 1L))
         .isInstanceOf(MemberNotFoundException.class);
   }
 
@@ -141,7 +140,7 @@ class MemberTownServiceUnitTest {
             List.of(new MemberTown(member, existingTown1), new MemberTown(member, existingTown2)));
 
     // when
-    memberTownService.deleteMemberTown(memberTownRequest, member);
+    memberTownService.deleteMemberTown(memberTownRequest, 1L);
 
     // then
     verify(memberTownRepository).delete(any());
@@ -159,7 +158,7 @@ class MemberTownServiceUnitTest {
         .thenReturn(List.of(new MemberTown(member, existingTown1)));
 
     // when, then
-    assertThatThrownBy(() -> memberTownService.deleteMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.deleteMemberTown(memberTownRequest, 1L))
         .isInstanceOf(NotAppropriateCountException.class);
   }
 
@@ -177,7 +176,7 @@ class MemberTownServiceUnitTest {
             List.of(new MemberTown(member, existingTown1), new MemberTown(member, existingTown2)));
 
     // when, then
-    assertThatThrownBy(() -> memberTownService.deleteMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.deleteMemberTown(memberTownRequest, 1L))
         .isInstanceOf(MemberTownNotFoundException.class);
   }
 
@@ -195,8 +194,8 @@ class MemberTownServiceUnitTest {
             List.of(new MemberTown(member, existingTown1), new MemberTown(member, existingTown2)));
 
     // when
-    MemberTownResponse memberTownResponse = memberTownService.changeActiveMemberTown(
-        memberTownRequest, member);
+    MemberTownResponse memberTownResponse = memberTownService
+        .changeActiveMemberTown(memberTownRequest, 1L);
 
     // then
     assertThat(memberTownResponse.townName()).isEqualTo("공릉1동");
@@ -214,7 +213,7 @@ class MemberTownServiceUnitTest {
         .thenReturn(List.of(new MemberTown(member, existingTown1)));
 
     // when, then
-    assertThatThrownBy(() -> memberTownService.changeActiveMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.changeActiveMemberTown(memberTownRequest, 1L))
         .isInstanceOf(NotAppropriateCountException.class);
   }
 
@@ -233,7 +232,7 @@ class MemberTownServiceUnitTest {
 
     // when
     MemberTownRangeResponse memberTownRangeResponse = memberTownService.changeMemberTownRange(
-        memberTownRangeRequest, existingMember);
+        memberTownRangeRequest, 1L);
 
     // then
     assertThat(memberTownRangeResponse).usingRecursiveComparison()
@@ -257,7 +256,7 @@ class MemberTownServiceUnitTest {
 
     // when, then
     assertThatThrownBy(
-        () -> memberTownService.changeMemberTownRange(memberTownRangeRequest, existingMember))
+        () -> memberTownService.changeMemberTownRange(memberTownRangeRequest, 1L))
         .isInstanceOf(MemberTownNotFoundException.class);
   }
 }

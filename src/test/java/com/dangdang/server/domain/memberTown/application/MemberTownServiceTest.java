@@ -44,11 +44,13 @@ class MemberTownServiceTest {
   MemberTownService memberTownService;
 
   Member member;
+  Long memberId;
 
   @BeforeEach
   void setup() {
     member = new Member("01012345678", null, "Albatross");
-    memberRepository.save(member);
+    Member savedMember = memberRepository.save(member);
+    memberId = savedMember.getId();
   }
 
   @AfterEach
@@ -69,8 +71,7 @@ class MemberTownServiceTest {
     MemberTownRequest memberTownRequest = new MemberTownRequest("삼성1동");
 
     // when
-    memberTownService.createMemberTown(memberTownRequest,
-        member);
+    memberTownService.createMemberTown(memberTownRequest, memberId);
 
     // then
     // memberTown list size 가 2개인지 확인, 상태가 변경되었는지 확인
@@ -89,7 +90,7 @@ class MemberTownServiceTest {
     MemberTownRequest memberTownRequest = new MemberTownRequest("삼성1동");
 
     // when, then
-    assertThatThrownBy(() -> memberTownService.createMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.createMemberTown(memberTownRequest, memberId))
         .isInstanceOf(NotAppropriateCountException.class);
   }
 
@@ -110,11 +111,11 @@ class MemberTownServiceTest {
     MemberTownRequest memberTownRequest = new MemberTownRequest("삼성1동");
 
     // when
-    memberTownService.deleteMemberTown(memberTownRequest, member);
+    memberTownService.deleteMemberTown(memberTownRequest, memberId);
 
     // then
     // size 는 1이고 삼성 2동이며 Active 상태
-    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(member.getId());
+    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(memberId);
     assertThat(memberTownList.size()).isEqualTo(1);
     assertThat(memberTownList.get(0).getTown().getName()).isEqualTo("삼성2동");
     assertThat(memberTownList.get(0).getStatus()).isEqualTo(StatusType.ACTIVE);
@@ -137,10 +138,10 @@ class MemberTownServiceTest {
     MemberTownRequest memberTownRequest = new MemberTownRequest("삼성2동");
 
     // when
-    memberTownService.deleteMemberTown(memberTownRequest, member);
+    memberTownService.deleteMemberTown(memberTownRequest, memberId);
 
     // then
-    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(member.getId());
+    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(memberId);
     assertThat(memberTownList.size()).isEqualTo(1);
     assertThat(memberTownList.get(0).getTown().getName()).isEqualTo("삼성1동");
     assertThat(memberTownList.get(0).getStatus()).isEqualTo(StatusType.ACTIVE);
@@ -153,7 +154,7 @@ class MemberTownServiceTest {
     MemberTownRequest memberTownRequest = new MemberTownRequest("삼성1동");
 
     // then, given
-    assertThatThrownBy(() -> memberTownService.deleteMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.deleteMemberTown(memberTownRequest, memberId))
         .isInstanceOf(NotAppropriateCountException.class);
   }
 
@@ -174,7 +175,7 @@ class MemberTownServiceTest {
     MemberTownRequest memberTownRequest = new MemberTownRequest("삼성7동");
 
     // then, given
-    assertThatThrownBy(() -> memberTownService.deleteMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.deleteMemberTown(memberTownRequest, memberId))
         .isInstanceOf(MemberTownNotFoundException.class);
   }
 
@@ -196,11 +197,11 @@ class MemberTownServiceTest {
     MemberTownRequest memberTownRequest = new MemberTownRequest("삼성1동");
 
     // when
-    memberTownService.changeActiveMemberTown(memberTownRequest, member);
+    memberTownService.changeActiveMemberTown(memberTownRequest, memberId);
 
     // then
     // 삼성 1동 Active, 삼성 2동 Inactive
-    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(member.getId());
+    List<MemberTown> memberTownList = memberTownRepository.findByMemberId(memberId);
     assertThat(memberTownList.get(0).getStatus()).isEqualTo(StatusType.ACTIVE);
     assertThat(memberTownList.get(1).getStatus()).isEqualTo(StatusType.INACTIVE);
   }
@@ -217,7 +218,7 @@ class MemberTownServiceTest {
     MemberTownRequest memberTownRequest = new MemberTownRequest("삼성2동");
 
     // when, then
-    assertThatThrownBy(() -> memberTownService.changeActiveMemberTown(memberTownRequest, member))
+    assertThatThrownBy(() -> memberTownService.changeActiveMemberTown(memberTownRequest, memberId))
         .isInstanceOf(NotAppropriateCountException.class);
   }
 
@@ -233,7 +234,7 @@ class MemberTownServiceTest {
     MemberTownRangeRequest memberTownRangeRequest = new MemberTownRangeRequest("삼성1동", 3);
 
     // when
-    memberTownService.changeMemberTownRange(memberTownRangeRequest, member);
+    memberTownService.changeMemberTownRange(memberTownRangeRequest, memberId);
 
     // then
     // range 가 변경 되었는지 확인
@@ -257,7 +258,7 @@ class MemberTownServiceTest {
 
     // when, then
     assertThatThrownBy(
-        () -> memberTownService.changeMemberTownRange(memberTownRangeRequest, member))
+        () -> memberTownService.changeMemberTownRange(memberTownRangeRequest, memberId))
         .isInstanceOf(MemberTownNotFoundException.class);
   }
 
@@ -275,7 +276,7 @@ class MemberTownServiceTest {
 
     // when, then
     assertThatThrownBy(
-        () -> memberTownService.changeMemberTownRange(memberTownRangeRequest, member))
+        () -> memberTownService.changeMemberTownRange(memberTownRangeRequest, memberId))
         .isInstanceOf(NotAppropriateRangeException.class);
   }
 
@@ -293,7 +294,7 @@ class MemberTownServiceTest {
 
     // when
     MemberTownCertifyResponse memberTownCertifyResponse = memberTownService.certifyMemberTown(
-        memberTownCertifyRequest, member);
+        memberTownCertifyRequest, memberId);
 
     // then
     assertThat(memberTownCertifyResponse.isCertified()).isEqualTo(true);
@@ -314,7 +315,7 @@ class MemberTownServiceTest {
 
     // when
     MemberTownCertifyResponse memberTownCertifyResponse = memberTownService.certifyMemberTown(
-        memberTownCertifyRequest, member);
+        memberTownCertifyRequest, memberId);
 
     // then
     assertThat(memberTownCertifyResponse.isCertified()).isEqualTo(false);
@@ -335,7 +336,7 @@ class MemberTownServiceTest {
         BigDecimal.valueOf(127.0738380000), BigDecimal.valueOf(37.6248740000));
 
     // when, then
-    assertThatThrownBy(() -> memberTownService.certifyMemberTown(memberTownCertifyRequest, member))
+    assertThatThrownBy(() -> memberTownService.certifyMemberTown(memberTownCertifyRequest, memberId))
         .isInstanceOf(MemberTownNotFoundException.class);
   }
 }

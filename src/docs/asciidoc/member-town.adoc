@@ -61,13 +61,4 @@ include::{snippets}/api/v1/post/member-town/certification/request-fields.adoc[]
 .Response
 include::{snippets}/api/v1/post/member-town/certification/http-response.adoc[]
 
-== 채팅방
-=== 채팅방 생성
-=== api/v1/chat-room
-
-.Request
-include::{snippets}/api/v1/chat-room/http-request.adoc[]
-
-.Response
-include::{snippets}/api/v1/chat-room/http-response.adoc[]
 

@@ -19,11 +19,9 @@ include::{snippets}/post/api/put/update/request-fields.adoc[]
 include::{snippets}/post/api/put/update/http-response.adoc[]
 include::{snippets}/post/api/put/update/response-fields.adoc[]
 
-== 게시글
-
 === 게시글 작성
 
-=== /posts
+=== /api/vi/posts
 
 .Request
 include::{snippets}/post/api/post/save/http-request.adoc[]
@@ -60,6 +58,7 @@ include::{snippets}/post/api/patch/updateStatus/http-response.adoc[]
 include::{snippets}/post/api/patch/updateStatus/response-fields.adoc[]
 
 === 게시글 전체 조회
+
 === /api/v1/posts
 
 .Request
@@ -70,6 +69,7 @@ include::{snippets}/PostController/findAll/response-body.adoc[]
 include::{snippets}/postController/findAll/response-fields.adoc[]
 
 === 게시글 검색
+
 === /api/v1/posts/search
 
 .Request
@@ -78,3 +78,14 @@ include::{snippets}/PostController/search/request-headers.adoc[]
 .Response
 include::{snippets}/PostController/search/response-body.adoc[]
 include::{snippets}/PostController/search/response-fields.adoc[]
+
+=== 게시글 좋아요
+
+=== /posts/{id}/likes
+
+.Request
+include::{snippets}/post/api/patch/updateLikes/http-request.adoc[]
+include::{snippets}/post/api/patch/updateLikes/request-headers.adoc[]
+
+.Response
+include::{snippets}/post/api/patch/updateLikes/http-response.adoc[]

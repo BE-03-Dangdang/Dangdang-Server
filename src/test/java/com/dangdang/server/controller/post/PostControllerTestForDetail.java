@@ -45,13 +45,17 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
+@Transactional
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
 @SpringBootTest
-public class PostControllerTestForDetail {
+class PostControllerTestForDetail {
 
   @Autowired
   MockMvc mockMvc;
+
+  @Autowired
+  PostService postService;
 
   @Autowired
   ObjectMapper objectMapper;
@@ -93,7 +97,6 @@ public class PostControllerTestForDetail {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void save() {
-
       Member newMember = new Member("01098764470", "testImgUrl", "테스트 멤버");
       innerMember = memberRepository.save(newMember);
       innerTown = townRepository.findByName("천호동").get();
@@ -113,6 +116,10 @@ public class PostControllerTestForDetail {
       return postSaveRequest;
     }
 
+    public PostDetailResponse getPostDetailResponse() {
+      return postDetailResponse;
+    }
+
     public String getAccessToken() {
       return "Bearer " + jwtTokenProvider.createAccessToken(innerMember.getId());
     }
@@ -127,11 +134,11 @@ public class PostControllerTestForDetail {
 
   @Test
   @DisplayName("게시글 상세 정보를 확인할 수 있다.")
-  void findPostDetailTest() {
+  public void findPostDetailTest() {
     try {
       saveClassForViewUpdate.save();
       String accessToken = saveClassForViewUpdate.getAccessToken();
-      PostDetailResponse postDetailResponse = saveClassForViewUpdate.postDetailResponse;
+      PostDetailResponse postDetailResponse = saveClassForViewUpdate.getPostDetailResponse();
 
       mockMvc.perform(
               RestDocumentationRequestBuilders.get("/posts/{id}", postDetailResponse.postId())

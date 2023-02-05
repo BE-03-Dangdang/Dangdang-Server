@@ -19,7 +19,6 @@ import com.dangdang.server.domain.post.domain.UpdatedPostRepository;
 import com.dangdang.server.domain.post.domain.entity.Post;
 import com.dangdang.server.domain.post.domain.entity.PostSearch;
 import com.dangdang.server.domain.post.domain.entity.UpdatedPost;
-import com.dangdang.server.domain.post.dto.request.PostLikeRequest;
 import com.dangdang.server.domain.post.dto.request.PostSaveRequest;
 import com.dangdang.server.domain.post.dto.request.PostSearchOptionRequest;
 import com.dangdang.server.domain.post.dto.request.PostSliceRequest;

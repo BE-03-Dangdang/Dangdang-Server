@@ -32,6 +32,9 @@ public class PayMember extends BaseEntity {
   @ColumnDefault("5")
   private Integer freeMonthlyFeeCount = 5;
 
+  @Column
+  private String name;
+
   @Column(name = "member_id")
   private Long memberId;
 

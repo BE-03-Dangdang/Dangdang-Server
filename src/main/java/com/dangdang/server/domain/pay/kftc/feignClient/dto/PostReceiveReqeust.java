@@ -1,6 +1,7 @@
 package com.dangdang.server.domain.pay.kftc.feignClient.dto;
 
 import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingInquiryReceiveRequest;
+import com.dangdang.server.domain.pay.kftc.openBankingFacade.domain.BankType;
 import lombok.Getter;
 
 @Getter
@@ -26,14 +27,17 @@ public class PostReceiveReqeust extends RequestDtoHelper {
     this.cntr_account_type = "N";
     this.transfer_purpose = "TR";
     this.cntr_account_num = cntr_account_num;
-    this.bank_code_std = openBankingInquiryReceiveRequest.bankCode();
-    this.account_num = openBankingInquiryReceiveRequest.bankAccountNumber();
+    BankType depositBankType = BankType.from(openBankingInquiryReceiveRequest.depositBankName());
+    this.bank_code_std = depositBankType.getBankCode();
+    this.account_num = openBankingInquiryReceiveRequest.depositBankAccountNumber();
     this.account_seq = String.valueOf((int) (Math.random() * 1000));
     this.print_content = "당당페이";
     this.tran_amt = openBankingInquiryReceiveRequest.depositAmount().toString();
     this.req_client_name = openBankingInquiryReceiveRequest.accountHolder();
-    this.req_client_bank_code = openBankingInquiryReceiveRequest.bankCode();
-    this.req_client_account_num = openBankingInquiryReceiveRequest.bankAccountNumber();
+    BankType requestClientBankType = BankType.from(
+        openBankingInquiryReceiveRequest.requestClientBankName());
+    this.req_client_bank_code = requestClientBankType.getBankCode();
+    this.req_client_account_num = openBankingInquiryReceiveRequest.depositBankAccountNumber();
     this.req_client_num = makeBankTranId();
   }
 }

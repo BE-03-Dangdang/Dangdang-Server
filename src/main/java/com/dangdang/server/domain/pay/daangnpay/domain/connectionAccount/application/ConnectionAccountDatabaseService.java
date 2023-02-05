@@ -10,6 +10,7 @@ import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccoun
 import com.dangdang.server.domain.pay.banks.bankAccount.exception.InactiveBankAccountException;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.ConnectionAccountRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.Position;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AllConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.GetConnectionAccountReceiveResponse;
@@ -51,8 +52,15 @@ public class ConnectionAccountDatabaseService {
       throw new InactiveBankAccountException(BANK_ACCOUNT_INACTIVE);
     }
 
-    ConnectionAccount connectionAccount = new ConnectionAccount(bankAccount, payMember);
-    return connectionAccountRepository.save(connectionAccount);
+    ConnectionAccount newConnectionAccount;
+    if (connectionAccountRepository.findByPayMemberId(
+        payMember.getId()).size() == 0) {
+      newConnectionAccount = new ConnectionAccount(bankAccount, payMember,
+          Position.MAIN);
+    } else {
+      newConnectionAccount = new ConnectionAccount(bankAccount, payMember, Position.ADDITIONAL);
+    }
+    return connectionAccountRepository.save(newConnectionAccount);
   }
 
   /**
@@ -70,26 +78,33 @@ public class ConnectionAccountDatabaseService {
   }
 
   public GetConnectionAccountReceiveResponse findIsMyAccountAndChargeAccount(
-      Long payMemberId, String AccountNumber) {
+      Long payMemberId, String accountNumber) {
     List<ConnectionAccount> byPayMemberId = connectionAccountRepository.findByPayMemberId(
         payMemberId);
 
     boolean isMyAccount = byPayMemberId.stream()
         .anyMatch(connectionAccount -> connectionAccount.getBankAccountNumber()
-            .equals(AccountNumber));
+            .equals(accountNumber));
 
     ConnectionAccount findChargeAccount = byPayMemberId.stream()
-        .filter(connectionAccount -> connectionAccount.getStatus().equals(StatusType.ACTIVE))
-        .findFirst().orElseThrow();
+        .filter(connectionAccount -> connectionAccount.getPosition().equals(Position.MAIN))
+        .findFirst().orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
 
-    return new GetConnectionAccountReceiveResponse(isMyAccount,
-        findChargeAccount.getAccountHolder(), findChargeAccount.getBank(),
+    return new GetConnectionAccountReceiveResponse(isMyAccount, findChargeAccount.getBank(),
         findChargeAccount.getBankAccountNumber());
   }
 
   public ConnectionAccount findByAccountNumber(String accountNumber) {
     return connectionAccountRepository.findByBankAccountNumber(
         accountNumber).orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
+  }
+
+  public ConnectionAccount findMainConnectionAccountByPayMember(PayMember payMember) {
+    List<ConnectionAccount> findConnectionAccount = connectionAccountRepository.findByPayMemberId(
+        payMember.getId());
+    return findConnectionAccount.stream()
+        .filter(connectionAccount -> connectionAccount.getPosition().equals(Position.MAIN))
+        .findFirst().orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
   }
 
   private PayMember getPayMemberByMemberId(Long memberId) {

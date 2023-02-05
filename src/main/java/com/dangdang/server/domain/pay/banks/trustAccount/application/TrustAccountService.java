@@ -32,7 +32,7 @@ public class TrustAccountService {
 
   @Transactional(propagation = Propagation.MANDATORY)
   public void withdraw(OpenBankingDepositRequest openBankingDepositRequest) {
-    String toTrustAccountNumber = openBankingDepositRequest.fromTurstAccountNumber();
+    String toTrustAccountNumber = openBankingDepositRequest.fromTrustAccountNumber();
     TrustAccount trustAccount = trustAccountRepository.findByAccountNumber(toTrustAccountNumber)
         .orElseThrow(() -> new EmptyResultException(TRUST_ACCOUNT_NOT_FOUND));
 

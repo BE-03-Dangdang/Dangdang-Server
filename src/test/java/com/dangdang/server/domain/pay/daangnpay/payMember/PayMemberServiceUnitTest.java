@@ -68,9 +68,9 @@ public class PayMemberServiceUnitTest {
 
     void checkOpenApiAndConnectionAccount() {
       OpenBankingInquiryReceiveResponse openBankingInquiryReceiveResponse = new OpenBankingInquiryReceiveResponse(
-          1L, null, "신한은행", "홍길동", "38471032472", LocalDateTime.now());
+          1L, "신한은행", "홍길동", "38471032472", LocalDateTime.now());
       GetConnectionAccountReceiveResponse getConnectionAccountReceiveResponse = new GetConnectionAccountReceiveResponse(
-          true, "홍길동", "하나은행", "234719284");
+          true, "하나은행", "234719284");
 
       doReturn(Optional.of(payMember)).when(payMemberRepository).findByMemberId(any());
       doReturn(openBankingInquiryReceiveResponse).when(openBankingFacadeService)

@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 
 public record PayRequest(
     String openBankingToken,
+    @NotBlank String bankName,
     @NotBlank String bankAccountNumber,
     @NotNull Integer amount) {
 

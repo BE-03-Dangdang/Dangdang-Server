@@ -12,6 +12,7 @@ import com.dangdang.server.domain.pay.banks.bankAccount.exception.InactiveBankAc
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.application.ConnectionAccountDatabaseService;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.ConnectionAccountRepository;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.ConnectionAccount;
+import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.domain.entity.Position;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AddConnectionAccountRequest;
 import com.dangdang.server.domain.pay.daangnpay.domain.connectionAccount.dto.AllConnectionAccount;
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.PayMemberRepository;
@@ -130,7 +131,8 @@ class ConnectionAccountServiceTest {
         @DisplayName("전체 리스트가 조회된다.")
         void getAllConnectionAccountList() {
           for (BankAccount account : allBankAccount) {
-            ConnectionAccount connectionAccount = new ConnectionAccount(account, payMember);
+            ConnectionAccount connectionAccount = new ConnectionAccount(account, payMember,
+                Position.ADDITIONAL);
             connectionAccountRepository.save(connectionAccount);
           }
 

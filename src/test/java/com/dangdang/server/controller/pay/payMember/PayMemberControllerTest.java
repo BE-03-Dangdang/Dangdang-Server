@@ -63,6 +63,7 @@ class PayMemberControllerTest extends TestHelper {
   ObjectMapper objectMapper;
 
   String accessToken;
+  String bankName = "신한은행";
   String bankAccountNumber = "12354324534";
 
   @BeforeEach
@@ -73,7 +74,7 @@ class PayMemberControllerTest extends TestHelper {
   @Test
   @DisplayName("당근머니 충전 API 성공")
   void charge() throws Exception {
-    PayRequest payRequest = new PayRequest(null, bankAccountNumber, 10000);
+    PayRequest payRequest = new PayRequest(null, bankName, bankAccountNumber, 10000);
     String json = objectMapper.writeValueAsString(payRequest);
     PayResponse payResponse = new PayResponse("신한은행", "234716230423", 20000, LocalDateTime.now());
 
@@ -98,6 +99,8 @@ class PayMemberControllerTest extends TestHelper {
                 requestFields(
                     fieldWithPath("openBankingToken").type(JsonFieldType.STRING)
                         .description("openAPI 액세스 토큰").optional(),
+                    fieldWithPath("bankName").type(JsonFieldType.STRING)
+                        .description("충전 계좌 은행명"),
                     fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)
                         .description("충전 계좌 번호"),
                     fieldWithPath("amount").type(JsonFieldType.NUMBER).description("충전 금액")
@@ -116,7 +119,7 @@ class PayMemberControllerTest extends TestHelper {
   @Test
   @DisplayName("당근머니 출금 API 성공")
   void withdraw() throws Exception {
-    PayRequest payRequest = new PayRequest(null, bankAccountNumber, 10000);
+    PayRequest payRequest = new PayRequest(null, bankName, bankAccountNumber, 10000);
     String json = objectMapper.writeValueAsString(payRequest);
     PayResponse payResponse = new PayResponse("신한은행", "234716230423", 20000, LocalDateTime.now());
 
@@ -141,8 +144,10 @@ class PayMemberControllerTest extends TestHelper {
                 requestFields(
                     fieldWithPath("openBankingToken").type(JsonFieldType.STRING)
                         .description("openAPI 액세스 토큰").optional(),
+                    fieldWithPath("bankName").type(JsonFieldType.STRING)
+                        .description("충전 계좌 은행명"),
                     fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)
-                        .description("출금 계좌 번호"),
+                        .description("충전 계좌 번호"),
                     fieldWithPath("amount").type(JsonFieldType.NUMBER).description("충전 금액")
                 ),
                 responseFields(
@@ -362,8 +367,8 @@ class PayMemberControllerTest extends TestHelper {
                             .description("입금 요청 금액"),
                         fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)
                             .description("수취 조회 계좌 번호"),
-                        fieldWithPath("bankCode").type(JsonFieldType.STRING)
-                            .description("수취 조회 계좌 은행 코드")
+                        fieldWithPath("bankName").type(JsonFieldType.STRING)
+                            .description("수취 조회 계좌 은행명")
                     ),
                     responseFields(
                         fieldWithPath("receiveClientName").type(JsonFieldType.STRING)
@@ -397,7 +402,7 @@ class PayMemberControllerTest extends TestHelper {
       @DisplayName("당근머니 송금을 진행한다.")
       void successRemittanceTest() throws Exception {
         RemittanceRequest remittanceRequest = new RemittanceRequest(null, 10000, "홍길동",
-            bankAccountNumber, "097");
+            bankAccountNumber, "신한은행");
         String json = objectMapper.writeValueAsString(remittanceRequest);
         RemittanceResponse remittanceResponse = new RemittanceResponse("케이뱅크", "3274623",
             1000, 0, 3, 0);
@@ -428,8 +433,8 @@ class PayMemberControllerTest extends TestHelper {
                             .description("입금 계좌 예금주명"),
                         fieldWithPath("bankAccountNumber").type(JsonFieldType.STRING)
                             .description("입금 계좌 번호"),
-                        fieldWithPath("bankCode").type(JsonFieldType.STRING)
-                            .description("입금 계좌 은행 코드")
+                        fieldWithPath("bankName").type(JsonFieldType.STRING)
+                            .description("입금 계좌 은행명")
                     ),
                     responseFields(
                         fieldWithPath("chargeAccountBankName").type(JsonFieldType.STRING)
@@ -441,7 +446,6 @@ class PayMemberControllerTest extends TestHelper {
                         fieldWithPath("feeAmount").type(JsonFieldType.NUMBER).description("수수료 금액"),
                         fieldWithPath("freeMonthlyFeeCount").type(JsonFieldType.NUMBER)
                             .description("남은 무료 수수료 횟수"),
-                        fieldWithPath("feeAmount").type(JsonFieldType.NUMBER).description("수수료 금액"),
                         fieldWithPath("balanceMoney").type(JsonFieldType.NUMBER)
                             .description("당근머니 잔액")
                     )

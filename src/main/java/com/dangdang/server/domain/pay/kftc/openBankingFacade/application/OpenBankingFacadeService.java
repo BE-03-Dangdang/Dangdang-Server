@@ -72,9 +72,8 @@ public class OpenBankingFacadeService implements OpenBankingService {
         openBankingInquiryReceiveRequest);
 
     return new OpenBankingInquiryReceiveResponse(openBankingInquiryReceiveRequest.payMemberId(),
-        openBankingInquiryReceiveRequest.bankCode(), bankOpenBankingApiREsponse.bankName(),
-        bankOpenBankingApiREsponse.clientName(), bankOpenBankingApiREsponse.accountNumber(),
-        LocalDateTime.now());
+        bankOpenBankingApiREsponse.bankName(), bankOpenBankingApiREsponse.clientName(),
+        bankOpenBankingApiREsponse.accountNumber(), LocalDateTime.now());
   }
 
   @Override

@@ -119,6 +119,12 @@ class BankAccountServiceUnitTest {
   @DisplayName("은행 계좌에 입금 요청이 들어왔을 때")
   class DepositTest {
 
+    String fintechUseNum = "3414239047";
+    String payMemberName = "김당근";
+    String payMemberConnectionAccountBank = "카카오뱅크";
+    String payMemberConnectionAccountNumber = "38491836471";
+    String toBankName = "우리은행";
+
     @Nested
     @DisplayName("성공")
     class WhenSuccess {
@@ -130,7 +136,8 @@ class BankAccountServiceUnitTest {
         int balance = 1000;
         int result = 1600;
         OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(1L,
-            null, "1111", "1111", amountReq);
+            null, fintechUseNum, payMemberName, payMemberConnectionAccountBank,
+            payMemberConnectionAccountNumber, toBankName, "1111", "1111", amountReq);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", balance, payMember, "홍길동");
 
         doReturn(1L).when(payMember).getId();
@@ -150,7 +157,8 @@ class BankAccountServiceUnitTest {
       @DisplayName("입금계좌 상태가 inactive인 경우 InactiveBankAccountExceptionException이 발생한다.")
       void inactiveAccount() {
         OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(1L,
-            null, "1111", "1111", 10000);
+            null, fintechUseNum, payMemberName, payMemberConnectionAccountBank,
+            payMemberConnectionAccountNumber, toBankName, "1111", "1111", 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000, payMember, "홍길동",
             StatusType.INACTIVE);
 
@@ -164,7 +172,8 @@ class BankAccountServiceUnitTest {
       @DisplayName("입금계좌의 payMemberId와 요청값인 payMemberId가 일치하지 않는다면 BankAccountAuthenticationException이 발생한다.")
       void failAuth() {
         OpenBankingDepositRequest openBankingDepositRequest = new OpenBankingDepositRequest(2L,
-            null, "1111", "1111", 10000);
+            null, fintechUseNum, payMemberName, payMemberConnectionAccountBank,
+            payMemberConnectionAccountNumber, toBankName, "1111", "1111", 10000);
         BankAccount bankAccount = new BankAccount("11239847", "신한은행", 1000, payMember, "홍길동");
 
         doReturn(bankAccount).when(bankAccountService).findByAccountNumber(any());

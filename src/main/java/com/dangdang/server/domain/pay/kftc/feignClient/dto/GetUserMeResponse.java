@@ -13,7 +13,7 @@ public record GetUserMeResponse(
     String user_ci,
     String user_name,
     String res_cnt,
-    List<ResList> res_list,
+    List<PostDepositResList> res_list,
     String inquiry_card_cnt,
     List inquiry_card_list,
     String inquiry_pay_cnt,

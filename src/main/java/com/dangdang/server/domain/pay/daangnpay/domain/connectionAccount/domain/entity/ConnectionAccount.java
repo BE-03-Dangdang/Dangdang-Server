@@ -5,6 +5,8 @@ import com.dangdang.server.domain.pay.banks.bankAccount.domain.entity.BankAccoun
 import com.dangdang.server.domain.pay.daangnpay.domain.payMember.domain.entity.PayMember;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,8 +33,9 @@ public class ConnectionAccount extends BaseEntity {
   @Column
   private String fintechUseNum;   // 오픈API를 통해 계좌등록을 하면 핀테크 이용번호가 부여된다.
 
-  @Column
-  private String accountHolder;
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private Position position;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "pay_member_id")
@@ -41,9 +44,10 @@ public class ConnectionAccount extends BaseEntity {
   protected ConnectionAccount() {
   }
 
-  public ConnectionAccount(BankAccount bankAccount, PayMember payMember) {
+  public ConnectionAccount(BankAccount bankAccount, PayMember payMember, Position position) {
     this.bank = bankAccount.getBankName();
     this.bankAccountNumber = bankAccount.getAccountNumber();
+    this.position = position;
     this.payMember = payMember;
   }
 }

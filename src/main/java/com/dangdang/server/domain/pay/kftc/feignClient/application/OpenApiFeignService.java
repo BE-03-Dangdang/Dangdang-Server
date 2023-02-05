@@ -18,6 +18,8 @@ import com.dangdang.server.domain.pay.kftc.feignClient.dto.AuthTokenRequestPrope
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostDepositRequest;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostDepositResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostReceiveReqeust;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostReceiveResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawRequest;
@@ -92,7 +94,13 @@ public class OpenApiFeignService implements OpenBankingService {
    */
   @Override
   public OpenBankingResponse deposit(OpenBankingDepositRequest openBankingDepositRequest) {
-    return null;
+    PostDepositRequest postDepositRequest = new PostDepositRequest(openBankingDepositRequest);
+    PostDepositResponse postDepositResponse = openApiFeignClient.deposit(
+        openBankingDepositRequest.openBankingToken(), postDepositRequest);
+
+    return OpenBankingResponse.ofExternal(openBankingDepositRequest.payMemberId(),
+        openBankingDepositRequest.toBankAccountNumber(), postDepositResponse,
+        LocalDateTime.now());
   }
 
   /**

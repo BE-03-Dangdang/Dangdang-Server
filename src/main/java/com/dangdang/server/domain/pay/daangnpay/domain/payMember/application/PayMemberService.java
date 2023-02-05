@@ -32,6 +32,7 @@ import com.dangdang.server.domain.pay.kftc.common.dto.OpenBankingWithdrawRequest
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenRequest;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,7 +96,7 @@ public class PayMemberService {
     ConnectionAccount connectionAccount = connectionAccountDatabaseService.findByAccountNumber(
         payRequest.bankAccountNumber());
     OpenBankingWithdrawRequest openBankingWithdrawRequest = createOpenBankingWithdrawRequest(
-        payMember.getId(), payRequest, connectionAccount);
+        payMember, payRequest, connectionAccount);
     OpenBankingResponse openBankingResponse = openBankingService.withdraw(
         openBankingWithdrawRequest);
 
@@ -117,16 +118,28 @@ public class PayMemberService {
     }
 
     PayMember payMember = getPayMember(memberId);
-    return withdrawRequestLogic(payMember, payRequest);
+    return depositRequestLogic(payMember, payRequest, PayType.WITHDRAW);
   }
 
   /**
-   * 출금이체 요청
+   * 입금 이체 요청
    */
   @Transactional
-  public PayResponse withdrawRequestLogic(PayMember payMember, PayRequest payRequest) {
+  public PayResponse depositRequestLogic(PayMember payMember, PayRequest payRequest,
+      PayType payType) {
+    ConnectionAccount connectionAccount = null;
+    if (payType == PayType.WITHDRAW) {
+      connectionAccount = connectionAccountDatabaseService.findByAccountNumber(
+          payRequest.bankAccountNumber());
+    }
+
+    if (payType == PayType.REMITTANCE) {
+      connectionAccount = connectionAccountDatabaseService.findMainConnectionAccountByPayMember(
+          payMember);
+    }
+
     OpenBankingDepositRequest openBankingDepositRequestFromWithdraw = createOpenBankingDepositRequest(
-        payMember.getId(), payRequest);
+        payMember, payRequest, Objects.requireNonNull(connectionAccount));
 
     OpenBankingResponse openBankingResponse = openBankingService.deposit(
         openBankingDepositRequestFromWithdraw);
@@ -152,7 +165,7 @@ public class PayMemberService {
         payMemberId, receiveRequest.bankAccountNumber());
 
     OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest = createOpenBankingInquiryReceiveRequest(
-        payMemberId, receiveRequest, getConnectionAccountReceiveResponse);
+        payMember, receiveRequest, getConnectionAccountReceiveResponse);
     OpenBankingInquiryReceiveResponse openBankingInquiryReceiveResponse = openBankingService.inquiryReceive(
         openBankingInquiryReceiveRequest);
 
@@ -174,14 +187,24 @@ public class PayMemberService {
         payMemberId, remittanceRequest.bankAccountNumber());
 
     int autoChargeAmount = payMember.calculateAutoChargeAmount(remittanceRequest.depositAmount());
+
+    // 자동충전 금액 출금이체 요청
+    ConnectionAccount chargeAccount = connectionAccountDatabaseService.findMainConnectionAccountByPayMember(
+        payMember);
+    OpenBankingWithdrawRequest openBankingWithdrawRequest = createOpenBankingWithdrawRequest(
+        payMember, new PayRequest(remittanceRequest.openBankingToken(), chargeAccount.getBank(),
+            chargeAccount.getBankAccountNumber(), autoChargeAmount), chargeAccount);
+    openBankingService.withdraw(openBankingWithdrawRequest);
+
     payMember.addMoney(autoChargeAmount);
 
     FeeInfo feeInfo = payMember.getFeeInfo();
     payMember.minusMoney(feeInfo.getFeeAmount());
 
-    PayResponse payResponse = withdrawRequestLogic(payMember,
-        new PayRequest(remittanceRequest.openBankingToken(),
-            remittanceRequest.bankAccountNumber(), remittanceRequest.depositAmount()));
+    PayResponse payResponse = depositRequestLogic(payMember,
+        new PayRequest(remittanceRequest.openBankingToken(), remittanceRequest.bankName(),
+            remittanceRequest.bankAccountNumber(), remittanceRequest.depositAmount()),
+        PayType.REMITTANCE);
 
     return RemittanceResponse.of(getConnectionAccountReceiveResponse, autoChargeAmount, feeInfo,
         payResponse);
@@ -192,27 +215,31 @@ public class PayMemberService {
         .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));
   }
 
-  private OpenBankingWithdrawRequest createOpenBankingWithdrawRequest(Long payMemberId,
+  private OpenBankingWithdrawRequest createOpenBankingWithdrawRequest(PayMember payMember,
       PayRequest payRequest, ConnectionAccount connectionAccount) {
-    return new OpenBankingWithdrawRequest(payMemberId, payRequest.openBankingToken(),
+    return new OpenBankingWithdrawRequest(payMember.getId(), payRequest.openBankingToken(),
         connectionAccount.getFintechUseNum(), OPEN_BANKING_CONTRACT_ACCOUNT.getAccountNumber(),
-        connectionAccount.getAccountHolder(), payRequest.bankAccountNumber(), payRequest.amount());
+        payMember.getName(), payRequest.bankAccountNumber(), payRequest.amount());
   }
 
-  private OpenBankingDepositRequest createOpenBankingDepositRequest(Long payMemberId,
-      PayRequest payRequest) {
-    return new OpenBankingDepositRequest(payMemberId, payRequest.openBankingToken(),
-        payRequest.bankAccountNumber(), OPEN_BANKING_CONTRACT_ACCOUNT.getAccountNumber(),
-        payRequest.amount());
+  private OpenBankingDepositRequest createOpenBankingDepositRequest(PayMember payMember,
+      PayRequest payRequest, ConnectionAccount connectionAccount) {
+    return new OpenBankingDepositRequest(payMember.getId(), payRequest.openBankingToken(),
+        connectionAccount.getFintechUseNum(), payMember.getName(),
+        connectionAccount.getBank(), connectionAccount.getBankAccountNumber(),
+        payRequest.bankName(), payRequest.bankAccountNumber(),
+        OPEN_BANKING_CONTRACT_ACCOUNT.getAccountNumber(), payRequest.amount());
   }
 
-  private OpenBankingInquiryReceiveRequest createOpenBankingInquiryReceiveRequest(Long payMemberId,
-      ReceiveRequest receiveRequest,
+  private OpenBankingInquiryReceiveRequest createOpenBankingInquiryReceiveRequest(
+      PayMember payMember, ReceiveRequest receiveRequest,
       GetConnectionAccountReceiveResponse getConnectionAccountReceiveResponse) {
-    return new OpenBankingInquiryReceiveRequest(payMemberId, receiveRequest.openBankingToken(),
+    return new OpenBankingInquiryReceiveRequest(payMember.getId(),
+        receiveRequest.openBankingToken(),
         getConnectionAccountReceiveResponse.chargeAccountBankName(),
-        getConnectionAccountReceiveResponse.accountHolder(), receiveRequest.bankAccountNumber(),
-        receiveRequest.bankCode(), receiveRequest.depositAmount());
+        payMember.getName(), getConnectionAccountReceiveResponse.chargeAccountNumber(),
+        receiveRequest.bankName(), receiveRequest.bankAccountNumber(),
+        receiveRequest.depositAmount());
   }
 
   private int minusPayMemberMoney(PayMember payMember, PayRequest payRequest) {

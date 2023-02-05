@@ -2,6 +2,8 @@ package com.dangdang.server.domain.pay.kftc.feignClient;
 
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetAuthTokenResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.GetUserMeResponse;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostDepositRequest;
+import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostDepositResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostReceiveReqeust;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostReceiveResponse;
 import com.dangdang.server.domain.pay.kftc.feignClient.dto.PostWithdrawRequest;
@@ -36,6 +38,13 @@ public interface OpenApiFeignClient {
       @RequestParam String user_seq_no);
 
   /**
+   * 입금 이체
+   */
+  @PostMapping(value = "/v2.0/transfer/deposit/acnt_num", produces = "application/json")
+  PostDepositResponse deposit(@RequestHeader("Authorization") String token, @RequestBody
+  PostDepositRequest postDepositRequest);
+
+  /**
    * 출금 이체
    */
   @PostMapping(value = "/v2.0/transfer/withdraw/fin_num", produces = "application/json")
@@ -48,4 +57,5 @@ public interface OpenApiFeignClient {
   @PostMapping(value = "/v2.0/inquiry/receive", produces = "application/json")
   PostReceiveResponse inquiryReceive(@RequestHeader("Authorization") String openBankingToken,
       @RequestBody PostReceiveReqeust postReceiveReqeust);
+
 }

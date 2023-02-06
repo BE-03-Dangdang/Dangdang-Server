@@ -241,4 +241,21 @@ class PayMemberServiceIntegrationTest {
       }
     }
   }
+
+  @Nested
+  @DisplayName("월 무료 수수료 횟수 초기화를 실행하면")
+  class InitFreeMonthlyFeeCountTest {
+
+    @Test
+    @DisplayName("모든 사용자의 무료 수수료 횟수가 5로 초기화된다.")
+    void successFiveInit() {
+      payMemberRepository.save(new PayMember(10000, 0));
+
+      payMemberService.initFiveFreeMonthlyFeeCount();
+
+      List<PayMember> allPayMember = payMemberRepository.findAll();
+      allPayMember.forEach(
+          payMember1 -> assertThat(payMember1.getFreeMonthlyFeeCount()).isEqualTo(5));
+    }
+  }
 }

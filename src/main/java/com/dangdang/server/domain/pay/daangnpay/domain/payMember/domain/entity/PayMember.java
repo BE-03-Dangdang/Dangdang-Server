@@ -89,4 +89,8 @@ public class PayMember extends BaseEntity {
       freeMonthlyFeeCount -= 1;
     }
   }
+
+  public void initFiveFreeMonthlyFeeCount() {
+    freeMonthlyFeeCount = 5;
+  }
 }

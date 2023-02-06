@@ -41,7 +41,7 @@
   signupButton.addEventListener('click', () => {
     inputPhoneNumber = document.getElementById("PhoneNumber").value;
 
-    fetch("http://localhost:8080/api/v1/members/verify", {
+    fetch("http://localhost:9000/api/v1/members/verify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -68,7 +68,7 @@
   })
 
   function saveState() {
-    fetch("http://localhost:8080/api/v1/open-banking", {
+    fetch("http://localhost:9000/api/v1/open-banking", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -109,7 +109,7 @@
     windowProxy.location = "https://testapi.openbanking.or.kr/oauth/2.0/authorize?"
         + "response_type=code&"
         + "client_id=b1cc2cf1-9aa8-4912-abb4-205dbfac0bbe&"
-        + "redirect_uri=http://localhost:8080/api/v1/open-banking/auth-result&"
+        + "redirect_uri=http://localhost:9000/api/v1/open-banking/auth-result&"
         + "scope=login inquiry transfer&"
         + "client_info=test&"
         + "state=" + randomString + "&"

@@ -1,34 +1,64 @@
 # Dangdang
-에프팀의 당근마켓 클론 프로젝트입니다. 회원, 검색, 페이, 채팅기능에 초점을 두고 프로젝트를 진행합니다.
+
+<img src="https://user-images.githubusercontent.com/86194303/216897482-d38ba933-9286-4981-98f1-4d1ca51e10ec.png" width="600"/>
+
+당당팀의 당근마켓 클론 프로젝트 당당마켓입니다.
+
+회원, 게시글, 채팅, 페이 도메인으로 나눠 구현했습니다.
+
+### 도메인 담당자
+
+회원|게시글|채팅|페이|
+---|---|---|---|
+장주영, 이동준|김기웅, 김영빈|이동준|장예지
+
 ## 팀원 소개
 Scrum Master|Product Owner|Developer|Developer|Developer|Mentor|Sub-Mentor
 ---|---|---|---|---|---|---|
 [장주영](https://github.com/orgs/BE-03-Dangdang/people/cloudwi)|[장예지](https://github.com/yeeeze)|[김기웅](https://github.com/kivv00ng)|[김영빈](https://github.com/ybkim-dev)|[이동준](https://github.com/Albatross3)|[에프](https://github.com/lleellee0)|[김수빈](https://github.com/kimziou77)
 
-<div align=center><h1>📚 STACKS</h1></div>
+<h1>📚 STACKS</h1></div>
+<h3> Tech Stack </h3>
 
-<div align=center> 
-  <h3> Tech Stack </h3>
-  <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white"> 
-  <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white"> 
-  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"> 
-  <img src="https://img.shields.io/badge/spring data jpa-6DB33F?style=for-the-badge&logo=spring&logoColor=white"> 
-  <img src="https://img.shields.io/badge/gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white"> 
-  
-  <br>
-  <h3> Tool </h3>
-  <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"> 
-  <img src="https://img.shields.io/badge/jira software-0052CC?style=for-the-badge&logo=jirasoftware&logoColor=white"> 
+- Java 17
+- Gradle 7.6
+- Mysql
+- SpringDataMongoDB
+- Springboot 2.7.7
+- SpringDataJpa
+- SpringSecurity
+- Redis
+- Jwt
+- WebSocket
+- STOMP
+- 금융결제원 오픈API 연동 (Oauth, 출금이체, 입금이체, 수취조회 등)
+- SpringColudOpenFeign
+- SpringDataElasticSearch
+- S3
+- lombok
+- Junit5
+- Mockito
+- RestDocs
 
-  
-</div>
+<h3> Tool </h3>
+
+- notion
+- jira
+- slack
+
+## 기능 정의
+[기능 정의 wiki 문서](https://github.com/BE-03-Dangdang/Dangdang-Server/wiki/기능-정의)
 
 ## API 설계 문서
-링크 부여 예정
+[API 명세서](https://backend-devcourse.notion.site/API-8db9c61328a748c9975ec4e026fd8fcd)
 
 
 ## ERD 설계
 
 ![dangdang-ERD](https://user-images.githubusercontent.com/43260658/216890703-f4f1677e-80b0-44f0-a922-1c93eb2c725f.png)
-## 문서
-WIKI 문서 참조
+
+## Git Convention
+[Git Convention wiki 문서](https://github.com/BE-03-Dangdang/Dangdang-Server/wiki/Git-Convention)
+
+## 환경 설정
+[환경 설정 wiki 문서](https://github.com/BE-03-Dangdang/Dangdang-Server/wiki/환경설정)

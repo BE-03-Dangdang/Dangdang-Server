@@ -17,6 +17,7 @@ import com.dangdang.server.domain.post.infrastructure.PostSearchRepositoryImpl;
 import com.dangdang.server.domain.town.domain.TownRepository;
 import com.dangdang.server.domain.town.domain.entity.Town;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -96,12 +97,15 @@ class PostRepositoryTest {
   @Transactional
   @DisplayName("게시글 검색 테스트")
   class PostSearchTest {
+    Member member;
+    ArrayList<Long> postIds;
 
     @BeforeAll
     void setUpForSearch() throws Exception {
-      Member member = new Member("01064083433", "yb");
+      member = new Member("01064083433", "yb");
       memberRepository.save(member);
       Post post;
+      postIds = new ArrayList<>();
       for (int i = 1; i <= 40; i++) {
         //given
         Town town = townRepository.findByName("천호동").get();
@@ -130,6 +134,7 @@ class PostRepositoryTest {
         // "image_url"은 기존 테스트 코드의 동작을 보장하기 위한 임의의 image link String 값입니다.
         // when
         postRepository.save(post);
+        postIds.add(post.getId());
         postSearchRepository.save(PostSearch.from(UpdatedPost.from(post)));
       }
     }
@@ -318,8 +323,9 @@ class PostRepositoryTest {
 
     @AfterAll
     void tearDownForSearch() {
+      postRepository.deleteAllById(postIds);
+      memberRepository.delete(member);
       postSearchRepository.deleteAll();
-
     }
   }
 }

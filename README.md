@@ -29,6 +29,6 @@ Scrum Master|Product Owner|Developer|Developer|Developer|Mentor|Sub-Mentor
 
 ## ERD 설계
 
-![dangdang-ERD](https://user-images.githubusercontent.com/80630604/212277293-dd940c30-d29b-4a81-b5ce-d7d8dbb08541.png)
+![dangdang-ERD](https://user-images.githubusercontent.com/43260658/216890703-f4f1677e-80b0-44f0-a922-1c93eb2c725f.png)
 ## 문서
 WIKI 문서 참조

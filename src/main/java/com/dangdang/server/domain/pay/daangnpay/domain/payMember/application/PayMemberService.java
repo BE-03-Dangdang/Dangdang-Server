@@ -210,6 +210,13 @@ public class PayMemberService {
         payResponse);
   }
 
+  /**
+   * 월 무료 수수료 횟수 초기화
+   */
+  public void initFiveFreeMonthlyFeeCount() {
+    payMemberRepository.findAll().forEach(PayMember::initFiveFreeMonthlyFeeCount);
+  }
+
   private PayMember getPayMember(Long memberId) {
     return payMemberRepository.findByMemberId(memberId)
         .orElseThrow(() -> new EmptyResultException(PAY_MEMBER_NOT_FOUND));

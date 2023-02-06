@@ -60,6 +60,11 @@ Scrum Master|Product Owner|Developer|Developer|Developer|Mentor|Sub-Mentor
 
 ![dangdang-ERD](https://user-images.githubusercontent.com/43260658/216890703-f4f1677e-80b0-44f0-a922-1c93eb2c725f.png)
 
+## Git Flow
+![Git Flow](https://user-images.githubusercontent.com/80630604/216977553-438cbba7-8d8d-44d9-bd7c-12f7b1e8e12e.png)
+
+Git Flow를 차용하여 Release 브랜치를 제외한 형태의 브랜치 전략을 사용했습니다.
+
 ## Git Convention
 [Git Convention wiki 문서](https://github.com/BE-03-Dangdang/Dangdang-Server/wiki/Git-Convention)
 

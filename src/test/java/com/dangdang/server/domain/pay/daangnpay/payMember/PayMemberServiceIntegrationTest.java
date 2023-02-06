@@ -39,6 +39,8 @@ class PayMemberServiceIntegrationTest {
   static List<BankAccount> bankAccounts;
   static PayMember payMember;
   final int payMemberMoney = 100000;
+  BankAccount otherBankAccount;
+
   @Autowired
   MemberRepository memberRepository;
   @Autowired
@@ -54,16 +56,24 @@ class PayMemberServiceIntegrationTest {
   void createPayMemberAndBankAccounts() {
     member = new Member("010", "예지 테스트 유저");
     memberRepository.save(member);
+    Member otherMember = new Member("011", "예지 테스트 유저2");
+    memberRepository.save(otherMember);
 
     String password = "password123";
     payMember = new PayMember(password, payMemberMoney, member.getId());
     payMemberRepository.save(payMember);
+
+    PayMember otherPayMember = new PayMember(password, payMemberMoney, otherMember.getId());
+    payMemberRepository.save(otherPayMember);
 
     BankAccount bankAccount1 = new BankAccount("12383461723", "신한은행", 500000, payMember, "홍길동");
     BankAccount bankAccount2 = new BankAccount("34511234235", "우리은행", 40000, payMember, "홍길동");
     BankAccount bankAccount3 = new BankAccount("01290947732", "케이뱅크", 248200, payMember, "홍길동");
     bankAccounts = List.of(bankAccount1, bankAccount2, bankAccount3);
     bankAccountRepository.saveAll(bankAccounts);
+
+    otherBankAccount = new BankAccount("6547657", "케이뱅크", 243, otherPayMember, "김고구마");
+    bankAccountRepository.save(otherBankAccount);
 
     ConnectionAccount connectionAccount1 = new ConnectionAccount(bankAccount1, payMember,
         Position.MAIN);
@@ -92,8 +102,7 @@ class PayMemberServiceIntegrationTest {
         PayRequest payRequest = new PayRequest(null, bankAccount.getBankName(), accountNumber,
             1000);
 
-        payResponse = payMemberService.withdraw(member.getId(),
-            payRequest);
+        payResponse = payMemberService.withdraw(member.getId(), payRequest);
 
         assertThat(payResponse.bank()).isEqualTo(bankAccount.getBankName());
         assertThat(payResponse.accountNumber()).isEqualTo(accountNumber);
@@ -162,7 +171,6 @@ class PayMemberServiceIntegrationTest {
       @Test
       @DisplayName("타인계좌일 경우 isMyAccount는 false, 무료 수수료 횟수가 0일 경우 500원이 반환된다.")
       void whenNotMyAccountAndFreeMonthlyFeeCountIsZero() {
-        BankAccount otherBankAccount = bankAccounts.get(1);
         updateFreeMonthlyFeeCountIsZero(payMember);
 
         String bankCode = BankType.from(otherBankAccount.getBankName()).getBankCode();
@@ -173,7 +181,7 @@ class PayMemberServiceIntegrationTest {
             receiveRequest);
 
         assertThat(receiveResponse.receiveClientName()).isEqualTo(otherBankAccount.getClientName());
-//        assertThat(receiveResponse.isMyAccount()).isFalse();
+        assertThat(receiveResponse.isMyAccount()).isFalse();
         assertThat(receiveResponse.feeAmount()).isEqualTo(500);
         assertThat(receiveResponse.freeMonthlyFeeCount()).isZero();
       }

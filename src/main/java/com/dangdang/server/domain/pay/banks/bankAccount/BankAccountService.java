@@ -51,8 +51,7 @@ public class BankAccountService {
 
   public BankOpenBankingApiResponse inquiryReceive(
       OpenBankingInquiryReceiveRequest openBankingInquiryReceiveRequest) {
-    BankAccount bankAccount = bankAccountRepository.findByPayMemberIdAndAccountNumber(
-            openBankingInquiryReceiveRequest.payMemberId(),
+    BankAccount bankAccount = bankAccountRepository.findByAccountNumber(
             openBankingInquiryReceiveRequest.depositBankAccountNumber())
         .orElseThrow(() -> new EmptyResultException(BANK_ACCOUNT_NOT_FOUND));
     return BankOpenBankingApiResponse.from(bankAccount);

@@ -1,0 +1,20 @@
+:hardbreaks:
+ifndef::snippets[]
+:snippets: ../ ../ ../build/generated-snippets
+endif::[]
+
+
+== 리뷰
+
+=== 리뷰 작성
+
+=== /reviews
+
+.Request
+include::{snippets}/reviews/api/post/save/http-request.adoc[]
+include::{snippets}/reviews/api/post/save/request-fields.adoc[]
+
+.Response
+include::{snippets}/reviews/api/post/save//http-response.adoc[]
+include::{snippets}/reviews/api/post/save//response-fields.adoc[]
+

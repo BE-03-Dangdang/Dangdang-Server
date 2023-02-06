@@ -1,0 +1,30 @@
+:hardbreaks:
+:doctype: book
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+[[Member-API]]
+= Member API
+
+[[Member-인증]]
+== Member signupCertify
+=== Request
+include::{snippets}/MemberController/signupCertify/http-request.adoc[]
+=== Request body
+include::{snippets}/MemberController/signupCertify/request-body.adoc[]
+=== Response
+include::{snippets}/MemberController/signupCertify/http-response.adoc[]
+=== Response body
+include::{snippets}/MemberController/signupCertify/response-body.adoc[]
+
+[[Member-로그아웃]]
+== Member logout
+=== Request
+include::{snippets}/MemberController/logout/http-request.adoc[]
+=== Request body
+include::{snippets}/MemberController/logout/request-body.adoc[]
+=== Response
+include::{snippets}/MemberController/logout/http-response.adoc[]
+=== Response body
+include::{snippets}/MemberController/logout/response-body.adoc[]

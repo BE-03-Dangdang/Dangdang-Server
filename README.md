@@ -12,6 +12,9 @@
 ---|---|---|---|
 장주영, 이동준|김기웅, 김영빈|이동준|장예지
 
+### 프로젝트 기간
+2023-01-13 ~ 2023-02-06
+
 ## 팀원 소개
 Scrum Master|Product Owner|Developer|Developer|Developer|Mentor|Sub-Mentor
 ---|---|---|---|---|---|---|

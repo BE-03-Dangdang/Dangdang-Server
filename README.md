@@ -1,6 +1,6 @@
 # Dangdang
 
-<img src="https://user-images.githubusercontent.com/86194303/216897482-d38ba933-9286-4981-98f1-4d1ca51e10ec.png" width="600"/>
+<img width="627" alt="스크린샷 2023-02-08 오후 2 24 43" src="https://user-images.githubusercontent.com/86194303/217442107-ee0ec726-dc2f-4ba8-b93b-0f7fe886f30d.png">
 
 당당팀의 당근마켓 클론 프로젝트 당당마켓입니다.
 

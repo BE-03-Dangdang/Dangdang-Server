@@ -18,7 +18,7 @@
 ## 팀원 소개
 Scrum Master|Product Owner|Developer|Developer|Developer|Mentor|Sub-Mentor
 ---|---|---|---|---|---|---|
-[장주영](https://github.com/orgs/BE-03-Dangdang/people/cloudwi)|[장예지](https://github.com/yeeeze)|[김기웅](https://github.com/kivv00ng)|[김영빈](https://github.com/ybkim-dev)|[이동준](https://github.com/Albatross3)|[에프](https://github.com/lleellee0)|[김수빈](https://github.com/kimziou77)
+[장주영](https://github.com/cloudwi)|[장예지](https://github.com/yeeeze)|[김기웅](https://github.com/kivv00ng)|[김영빈](https://github.com/ybkim-dev)|[이동준](https://github.com/Albatross3)|[에프](https://github.com/lleellee0)|[김수빈](https://github.com/kimziou77)
 
 <h1>📚 STACKS</h1></div>
 <h3> Tech Stack </h3>
